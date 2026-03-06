@@ -1,74 +1,94 @@
 # cass
 
-A Claude Code plugin. Replace this description with what your plugin does.
+A Claude Code plugin that brings a structured plan → build → review workflow to any project.
 
-## Structure
+## Workflow
 
 ```
-cass-claude-code/
-├── .claude-plugin/
-│   └── plugin.json          # Plugin metadata
-├── commands/
-│   └── example-command.md   # Slash commands (/cass:example-command)
-├── skills/
-│   └── example-skill/
-│       └── SKILL.md         # Auto-invoked skills
-├── agents/                  # (optional) Autonomous subagents
-├── hooks/                   # (optional) Event hooks
-│   └── hooks.json
-└── .mcp.json                # (optional) MCP server config
+/cass:cass-init          set up the project (once)
+      ↓
+planner agent            clarify requirements, write a plan md file
+      ↓
+swe agent                implement from the plan, branch + worktree, commit, push, PR
+      ↓
+pr-reviewer agent        review diff against plan, surface issues by priority
 ```
 
-## Components
+## Agents
 
-### Commands (`commands/`)
+### planner — `haiku`
 
-User-invoked via `/cass:<command-name>`. Each `.md` file is one command.
+Triggered when you ask to plan a feature or task.
 
-Frontmatter fields:
-- `description` — shown in `/help`
-- `argument-hint` — argument hint shown to user
-- `allowed-tools` — pre-approved tools (reduces permission prompts)
-- `model` — override model (`haiku`, `sonnet`, `opus`)
+- Enters plan mode immediately — no code is written
+- Fetches Jira tickets via MCP if a ticket reference is provided
+- Discovers project conventions (`CLAUDE.md`, `instructions/`, `docs/`, `README.md`) before asking questions
+- Iterates with clarifying questions until the plan is unambiguous
+- Writes a structured plan file (Goal / Background / Scope / Approach / Open Questions / Success Criteria)
+- Saves to `instructions/`, `docs/plans/`, or `.claude/plans/` based on what exists in the project
+- Offers to hand off to the `swe` agent when done
 
-Use `$ARGUMENTS` in the body to receive user-provided arguments.
-Use `!`backtick command backtick`` for inline shell context.
+### swe — `sonnet`
 
-### Skills (`skills/<skill-name>/SKILL.md`)
+Triggered when you want to implement from a plan file.
 
-Auto-invoked by Claude based on the `description` frontmatter. Write specific trigger phrases so Claude knows when to load the skill.
+- Reads the plan and resolves any blocking open questions before starting
+- Reads project conventions first
+- Asks whether to start from `staging`, current branch, or no worktree — creates branch + worktree accordingly
+- Builds a task list via TodoWrite and works through it
+- Commits each logical unit using `cass-.gitmessage` (semantic format + `Co-authored-by: Claude`)
+- Verifies with build / lint / test commands from `CLAUDE.md` or `README.md`
+- Pushes and creates a PR using `.github/cass-pull_request_template.md` once you confirm
 
-Frontmatter fields:
-- `name` — skill identifier
-- `description` — trigger conditions (be specific)
-- `version` — semantic version
+### pr-reviewer — `sonnet`
 
-### Agents (`agents/<agent-name>.md`)
+Triggered when you want to review implementation changes before merging.
 
-Autonomous subagents Claude can spawn. Frontmatter fields: `name`, `description`, `model`, `color`, `tools`.
+- Reads the plan file as the source of truth
+- Gets the full diff against the base branch
+- Reviews for logic, performance, syntax/quality, and plan compliance
+- Reports findings grouped by priority:
+  - **P1** — must fix (correctness, security, data loss)
+  - **P2** — should fix (performance, logic gaps, missing error handling)
+  - **P3** — consider (style, naming, minor improvements)
+  - **Plan compliance** — checklist of success criteria met / not met
+- Applies fixes only when you explicitly direct it
 
-### Hooks (`hooks/hooks.json`)
+## Commands
 
-Event-driven automation. Events: `PreToolUse`, `PostToolUse`, `Stop`, `SessionStart`, `SessionEnd`, `UserPromptSubmit`.
+### `/cass:cass-init`
 
-### MCP Servers (`.mcp.json`)
+Initialises a project for use with this plugin. Run once per project.
 
-External tool integration via Model Context Protocol:
-```json
-{
-  "server-name": {
-    "type": "stdio",
-    "command": "npx",
-    "args": ["-y", "@your/mcp-package"]
-  }
-}
-```
+1. Checks for an existing `.claude/` — stops if found (nothing is overwritten)
+2. Runs `/init` to generate `.claude/` and `CLAUDE.md`
+3. Copies `assets/commit-template/.gitmessage` → `cass-.gitmessage` and configures `git config commit.template`
+4. Copies `assets/pr-template/pull_request_template.md` → `.github/cass-pull_request_template.md`
+
+Each copy step is idempotent — skipped if the file already exists.
+
+## Assets
+
+| File | Copied to | Purpose |
+|------|-----------|---------|
+| `assets/commit-template/.gitmessage` | `cass-.gitmessage` | Semantic commit format with Claude co-author |
+| `assets/pr-template/pull_request_template.md` | `.github/cass-pull_request_template.md` | What / Why / How / Checklist PR body |
 
 ## Installation
 
 ```bash
-# Load for a single session
-claude --plugin-dir /path/to/cass-claude-code
+# Clone the plugin
+git clone git@github.com:tonycodersg/cass-claude-code.git ~/.claude/plugins/cass
+```
 
-# Or install to a project's .claude/plugins/
+Then in any project:
+
+```bash
+/cass:cass-init
+```
+
+To load for a single session without installing globally:
+
+```bash
+claude --plugin-dir ~/.claude/plugins/cass
 ```
