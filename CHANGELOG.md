@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-03-06
+
+### Added
+
+- `planner`: after plan is confirmed, splits complex work into parallel/sequential task groups and adds a **Task Breakdown** section to the plan file
+- `planner`: offers to create tickets in Jira, GitHub Issues, or GitLab Issues via MCP after the plan is written; falls back to formatted text if the MCP tool is unavailable
+- `swe`: accepts Jira, GitHub, GitLab, and Linear ticket references as input; fetches ticket details via MCP before starting implementation
+
+### Changed
+
+- `commands/cass-init.md` renamed to `commands/init.md` — command is now `/cass:init`
+
 ## [0.1.0] - 2026-03-06
 
 ### Added
