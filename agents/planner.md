@@ -107,9 +107,49 @@ Checklist of what done looks like.
 
 `.claude/plans/` is the recommended default because plan files are Claude workflow artifacts, not project source, and `.claude/` is already the conventional home for Claude-specific files.
 
+**Step 5b — Split complex plans into parallel tasks**
+
+After writing the plan file, review the Approach section. If the plan has multiple independent steps or is complex enough that work could proceed in parallel:
+
+1. Break the approach into discrete, independently-executable tasks
+2. Group tasks by dependency — tasks with no shared dependencies can run in parallel
+3. Add a **Task Breakdown** section to the plan file:
+
+```
+## Task Breakdown
+
+### Can run in parallel
+- Task A: <description>
+- Task B: <description>
+
+### Depends on Task A + B
+- Task C: <description>
+```
+
+If the plan is simple and linear (one person, one sequence), skip this section.
+
+**Step 5c — Offer to create tickets**
+
+After writing the plan, ask the user:
+
+> "Would you like me to create tickets for these tasks? I can create them in:
+> 1. Jira
+> 2. GitHub Issues
+> 3. GitLab Issues
+> 4. No thanks — the plan file is enough"
+
+Based on the answer:
+
+- **Jira**: use the Jira MCP tool to create one ticket per task. Set summary, description, and link tickets that have dependencies. If the original input was a Jira ticket, create subtasks under it.
+- **GitHub Issues**: use the GitHub MCP tool (`create_issue`) to create one issue per task. Add a parent issue or milestone if the repo has one. Cross-reference dependency issues in the body.
+- **GitLab Issues**: use the GitLab MCP tool to create one issue per task. Link dependencies using GitLab's `blocks` / `is blocked by` relations if available.
+- **No**: skip ticket creation. The plan file is the source of truth.
+
+If the chosen MCP tool is not available, tell the user which tool is missing and offer to output the ticket details as formatted text for manual creation instead.
+
 **Step 6 — Offer to start building**
 
-After the plan file is written, ask the user:
+After the plan file is written (and tickets created if requested), ask the user:
 
 > "The plan is saved. Would you like to start building now? I can hand this off to the SWE agent to implement it."
 
