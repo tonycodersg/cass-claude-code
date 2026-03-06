@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `pr-reviewer` (sonnet) — reviews the diff against the plan, surfaces issues grouped by P1/P2/P3 priority, and applies fixes on user direction
 
 **Commands**
-- `cass-init` — initialises a project: generates `.claude/` via `/init`, copies `cass-.gitmessage` commit template and `.github/cass-pull_request_template.md` PR template (idempotent, skips existing files)
+- `init (`/cass:init`)` — initialises a project: generates `.claude/` via `/init`, copies `cass-.gitmessage` commit template and `.github/cass-pull_request_template.md` PR template (idempotent, skips existing files)
 
 **Assets**
 - `assets/commit-template/.gitmessage` — semantic commit format (`<type>(<scope>): <summary>`) with `Co-authored-by: Claude` pre-filled

@@ -5,7 +5,7 @@ A Claude Code plugin that brings a structured plan → build → review workflow
 ## Workflow
 
 ```
-/cass:cass-init          set up the project (once)
+/cass:init          set up the project (once)
       ↓
 planner agent            clarify requirements, write a plan md file
       ↓
@@ -56,7 +56,7 @@ Triggered when you want to review implementation changes before merging.
 
 ## Commands
 
-### `/cass:cass-init`
+### `/cass:init`
 
 Initialises a project for use with this plugin. Run once per project.
 
@@ -84,7 +84,7 @@ git clone git@github.com:tonycodersg/cass-claude-code.git ~/.claude/plugins/cass
 Then in any project:
 
 ```bash
-/cass:cass-init
+/cass:init
 ```
 
 To load for a single session without installing globally:
