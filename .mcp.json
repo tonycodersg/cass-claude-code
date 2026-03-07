@@ -2,7 +2,7 @@
   "atlassian": {
     "type": "http",
     "url": "https://mcp.atlassian.com/v1/mcp",
-    "description": "Atlassian remote MCP server — provides Jira and Confluence tools for reading/creating issues, fetching ticket details, and creating subtasks. Used by the planner and swe agents."
+    "description": "Connects to Atlassian cloud over HTTP. Gives agents access to Jira projects, issues, and Confluence pages — used by planner to pull ticket context and by swe to link implementations back to tickets."
   },
   "serena": {
     "type": "stdio",
@@ -18,6 +18,6 @@
       "--open-web-dashboard",
       "False"
     ],
-    "description": "Serena semantic code toolkit for IDE-like code navigation and editing. Optimized for large repos (30k+ files). Use context 'claude-code' to avoid tool duplication with Claude Code built-ins."
+    "description": "Launches Serena via uvx for symbol-aware code navigation — find definitions, references, and call graphs without scanning every file. The claude-code context disables tools already covered by Claude Code built-ins."
   }
 }
