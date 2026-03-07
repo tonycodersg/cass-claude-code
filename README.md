@@ -74,6 +74,46 @@ Each copy step is idempotent — skipped if the file already exists.
 | `assets/commit-template/.gitmessage` | `cass-.gitmessage` | Semantic commit format with Claude co-author |
 | `assets/pr-template/pull_request_template.md` | `.github/cass-pull_request_template.md` | What / Why / How / Checklist PR body |
 
+## Prerequisites
+
+### Python, uv, and uvx
+
+Serena (the semantic code navigation MCP) runs via `uvx`, which ships with `uv`.
+
+**Install `uv` (includes `uvx`):**
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+Restart your shell or run `source $HOME/.local/bin/env` to activate it.
+
+Verify:
+
+```bash
+uv --version
+uvx --version
+```
+
+`uv` manages its own Python — no separate Python install is required. If you need a specific version:
+
+```bash
+uv python install 3.12
+```
+
+### Verify Serena starts
+
+Run this once to confirm Serena works before starting a session:
+
+```bash
+uvx --from git+https://github.com/oraios/serena serena start-mcp-server \
+  --context claude-code \
+  --project-from-cwd \
+  --open-web-dashboard False
+```
+
+If it starts without errors, Claude Code will launch it automatically via `.mcp.json` on each session.
+
 ## Installation
 
 ```bash

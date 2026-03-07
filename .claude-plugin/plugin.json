@@ -1,7 +1,8 @@
 {
-  "name": "cass",
-  "description": "Cass — a Claude Code plugin for [describe your plugin purpose here]",
-  "author": {
-    "name": "tony.coder"
-  }
+    "author": {
+        "name": "tony.coder"
+    },
+    "description": "Cass — a Claude Code plugin for your agentic workflow. It provides a simple interface to execute code snippets and manage your coding tasks efficiently.",
+    "name": "cass",
+    "version": "1.0.0"
 }

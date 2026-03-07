@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-03-07
+
+### Added
+
+- `README`: Prerequisites section covering `uv`/`uvx` installation and how to verify Serena starts
+- `.mcp.json`: Atlassian HTTP MCP server and Serena stdio MCP server configurations with descriptions
+- `agents/devops`: new agent for writing Dockerfiles, Docker Compose, VPS deployment scripts, and CI/CD pipelines (.NET, Node.js, Python, Go)
+
 ## [0.2.0] - 2026-03-06
 
 ### Added
