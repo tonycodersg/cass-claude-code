@@ -122,6 +122,25 @@ After all tasks are complete:
 3. Present a summary of what was implemented against the plan's success criteria
 4. Ask the user to review the changes
 
+**Step 6b — SA review (optional but recommended)**
+
+After presenting the implementation summary, ask the user:
+
+> "Implementation is complete. Would you like the SA agent to review the changes against the plan before we create the PR? (Recommended — SA findings will be included in the PR description.)"
+
+**If the user says yes:**
+
+1. Invoke the `sa` agent with the plan file path and current branch. Tell it:
+   > "Review the implementation on this branch against the plan at `<plan file path>`. Provide findings grouped by must-fix, should-fix, and consider."
+2. Wait for the SA agent to complete and capture its full findings output.
+3. If the SA agent flagged **must-fix** items, fix them now following SA's proposed changes. Re-run build/lint/test after fixing.
+4. If the SA agent flagged **should-fix** items, ask the user:
+   > "SA flagged these should-fix items: [list]. Fix them now or defer to a follow-up?"
+   Apply only what the user confirms.
+5. Once all agreed fixes are applied, confirm with the user that the implementation is approved.
+
+**If the user says no:** proceed directly to Step 7.
+
 **Step 7 — Push and create PR**
 
 Once the user confirms the changes are complete and correct:
@@ -130,25 +149,48 @@ Once the user confirms the changes are complete and correct:
 git push origin feat/<kebab-case-plan-title>
 ```
 
-Then create a pull request using the cass PR template if it exists:
+Create the PR targeting **`staging`**:
 
 ```bash
-# If .github/cass-pull_request_template.md exists:
 gh pr create \
-  --base <base-branch> \
+  --base staging \
   --title "<type>(<scope>): <plan goal summary>" \
-  --body "$(cat .github/cass-pull_request_template.md)"
+  --body "<body>"
 ```
 
-Fill the template body with:
-- **What**: the plan's goal
-- **Why**: the Jira ticket reference or plan file path
-- **How**: the approach summary from the plan
-- **Checklist**: the plan's success criteria as checkboxes
+Construct the PR body using this structure:
 
-If `.github/cass-pull_request_template.md` does not exist, construct the PR body inline using the same What / Why / How / Checklist structure.
+```markdown
+## What
+<plan goal — one or two sentences>
+
+## Why
+<Jira ticket or plan file reference>
+
+## How
+<approach summary from the plan>
+
+## Architecture Review
+<If SA review was run: paste the full SA review findings here, grouped as Must Fix / Should Fix / Consider.
+ If SA review was skipped: "SA review not run for this PR.">
+
+## Implementation Steps
+<numbered list of what was actually done, derived from the TodoWrite task list>
+
+## Checklist
+- [ ] <success criterion 1 from plan>
+- [ ] <success criterion 2 from plan>
+- [ ] Build and lint pass
+- [ ] Tests pass
+- [ ] SA must-fix items resolved
+- [ ] No out-of-scope changes
+```
+
+If `.github/cass-pull_request_template.md` exists, use it as the base and append the **Architecture Review** and **Implementation Steps** sections.
 
 If `gh` is not available, output the filled PR body for the user to paste manually.
+
+If `staging` branch does not exist on the remote, ask the user which base branch to target before creating the PR.
 
 ## Constraints
 
