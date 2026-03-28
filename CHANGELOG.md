@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `swe`: after implementation verification, now asks the user if they want an SA review before creating a PR; fixes SA must-fix items and embeds the full SA findings in the PR description
 - `swe`: PR target branch changed to `staging`; PR body now includes an **Architecture Review** section and **Implementation Steps** section alongside the existing What / Why / How / Checklist structure
 - `commands/plan-task`: after plan approval, SA agent is automatically spawned to review and enrich the plan before SWE starts — no manual step required
+- `commands/plan-task`: Step 9 expanded — on approval, switches to `staging`, saves the plan, creates a GitHub issue from the plan content, and creates the feature branch `feat/<feature>-<issue-number>` from staging before handing off to SA and SWE; SWE is told the branch already exists and must link the issue in commits and PR
 - `README`: updated workflow diagram, agent descriptions, commands, and skills sections to reflect the new pipeline
 
 ## [0.3.0] - 2026-03-07

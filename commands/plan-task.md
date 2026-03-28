@@ -111,13 +111,66 @@ Present the plan to the user and ask:
 
 **Do not save anything or invoke any agent until the user explicitly approves.**
 
-### Step 9 — On approval: save the plan
+### Step 9 — On approval: switch to staging, save the plan, create issue and branch
 
 When the user approves:
+
+**9a — Switch to staging**
+
+```bash
+git fetch origin
+git checkout staging
+git pull origin staging
+```
+
+If `staging` does not exist locally or remotely, ask the user which branch to use as the base before continuing.
+
+**9b — Save the plan**
 
 1. Create `docs/` in the project root if it does not exist: `mkdir -p docs`
 2. Derive a kebab-case feature name from the plan title (e.g. `user-authentication`)
 3. Save the plan to: `docs/<kebab-feature>_<YYYY-MM-DD>.md` (use today's date from context above)
+
+**9c — Create a GitHub issue**
+
+Create a GitHub issue that captures the plan as the issue body:
+
+```bash
+gh issue create \
+  --title "<plan title>" \
+  --body "<issue body — see format below>"
+```
+
+Issue body format:
+
+```markdown
+## Goal
+<goal from plan>
+
+## Scope
+<in-scope items from plan>
+
+## Approach
+<approach summary from plan>
+
+## Success Criteria
+<success criteria checklist from plan>
+
+---
+Plan file: `docs/<kebab-feature>_<YYYY-MM-DD>.md`
+```
+
+Save the issue number returned (e.g. `#42`) — it will be referenced in the branch name and PR.
+
+**9d — Create the feature branch from staging**
+
+```bash
+git checkout -b feat/<kebab-feature>-<issue-number>
+```
+
+Example: `feat/user-authentication-42`
+
+Confirm the branch was created and is based off the latest `staging` commit.
 
 ### Step 10 — Spawn the SA agent for technical review
 
@@ -129,21 +182,24 @@ Wait for the SA agent to complete its review and update the plan file before con
 
 ### Step 11 — Hand off to SWE agent (Sonnet)
 
-After the SA agent has finished, invoke the `swe` agent with the (now SA-updated) plan file path. Tell it:
+After the SA agent has finished, invoke the `swe` agent with the plan file path, the feature branch name, and the issue number. Tell it:
 
-> "Implement the plan at `<plan file path>`. Follow the Architecture Notes added by the SA agent. After implementation is complete, ask the user if they want an SA review before creating the PR."
+> "Implement the plan at `<plan file path>`. The feature branch `<branch>` is already created from staging — do not create a new branch. Follow the Architecture Notes added by the SA agent. Link issue `<issue number>` in commits and the PR. After implementation is complete, ask the user if they want an SA review before creating the PR."
 
 The SWE agent will:
 - Read the updated plan (including SA architecture notes) as the source of truth
-- Set up a git branch and implement all tasks
+- Work on the already-created feature branch (skip branch setup)
 - Spawn sub-agents for tasks marked as parallel in the Task Breakdown
+- Reference the GitHub issue in commits (`closes #<issue-number>`)
 - After verification, prompt the user for SA review
-- Create the PR targeting `staging` with SA review findings in the description
+- Create the PR targeting `staging` with the issue linked and SA review findings in the description
 
 ## Constraints
 
 - Never write code or modify files during planning (Steps 1–8)
-- Never save the plan file until the user approves (Step 9)
+- Always switch to `staging` and pull latest before saving the plan (Step 9a)
+- Never save the plan file until the user approves (Step 9b)
+- Always create the GitHub issue before the branch (Step 9c) — branch name includes issue number
 - Always run SA review (Step 10) before handing off to SWE — it enriches the plan
 - Keep questions sharp — one clear question beats three vague ones
 - The plan must be actionable by someone who wasn't in the conversation
