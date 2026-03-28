@@ -167,19 +167,43 @@ If it starts without errors, Claude Code will launch it automatically via `.mcp.
 
 ## Installation
 
-```bash
-# Clone the plugin
-git clone git@github.com:tonycodersg/cass-claude-code.git ~/.claude/plugins/cass
+### Option 1 — Plugin marketplace (recommended)
+
+In any Claude Code session, run:
+
+```
+/plugin marketplace add tonycodersg/cass-claude-code
+/plugin install cass@cass-marketplace
 ```
 
-Then in any project:
+Then initialise the plugin in your project:
 
-```bash
+```
 /cass:init
 ```
 
-To load for a single session without installing globally:
+> **How to find this plugin:** search for `cass-claude-code` on [github.com/tonycodersg](https://github.com/tonycodersg/cass-claude-code) or copy the install commands above directly into Claude Code.
+
+### Option 2 — Official Anthropic marketplace
+
+> Coming soon — pending submission at [claude.ai/settings/plugins/submit](https://claude.ai/settings/plugins/submit)
+
+Once listed, install with:
+
+```
+/plugin install cass@claude-plugins-official
+```
+
+### Option 3 — Local development
+
+Load for a single session without installing:
 
 ```bash
-claude --plugin-dir ~/.claude/plugins/cass
+claude --plugin-dir /path/to/cass-claude-code
+```
+
+Or symlink globally so it loads in every session:
+
+```bash
+ln -s /path/to/cass-claude-code ~/.claude/plugins/cass
 ```

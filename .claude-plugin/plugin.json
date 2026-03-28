@@ -2,7 +2,10 @@
     "author": {
         "name": "tony.coder"
     },
-    "description": "Cass — a Claude Code plugin for your agentic workflow. It provides a simple interface to execute code snippets and manage your coding tasks efficiently.",
+    "description": "Cass — a Claude Code plugin that brings a structured plan → architect → build → review pipeline with SA, SWE, planner, devops, and pr-reviewer agents.",
+    "homepage": "https://github.com/tonycodersg/cass-claude-code",
+    "license": "MIT",
     "name": "cass",
+    "repository": "https://github.com/tonycodersg/cass-claude-code",
     "version": "0.4.0"
 }

@@ -1,0 +1,20 @@
+{
+    "name": "cass-marketplace",
+    "owner": {
+        "name": "tony.coder",
+        "homepage": "https://github.com/tonycodersg"
+    },
+    "plugins": [
+        {
+            "name": "cass",
+            "description": "Structured plan → architect → build → review pipeline for Claude Code. Includes SA, SWE, planner, devops, and pr-reviewer agents plus /cass:plan-task command.",
+            "version": "0.4.0",
+            "homepage": "https://github.com/tonycodersg/cass-claude-code",
+            "license": "MIT",
+            "source": {
+                "source": "github",
+                "repo": "tonycodersg/cass-claude-code"
+            }
+        }
+    ]
+}
