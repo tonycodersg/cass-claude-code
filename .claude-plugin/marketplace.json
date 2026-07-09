@@ -7,8 +7,8 @@
     "plugins": [
         {
             "name": "cass",
-            "description": "Structured plan → architect → build → review pipeline for Claude Code. Includes SA, SWE, planner, devops, and pr-reviewer agents plus /cass:plan-task command.",
-            "version": "0.4.0",
+            "description": "Structured plan → architect → build → review pipeline for Claude Code. Includes SA, SWE, planner, devops, and pr-reviewer agents plus role-split commands: /cass:plan, /cass:dev-feat, /cass:pr, /cass:review, /cass:doctor, /cass:clean-wt.",
+            "version": "0.5.0",
             "homepage": "https://github.com/tonycodersg/cass-claude-code",
             "license": "MIT",
             "source": {
