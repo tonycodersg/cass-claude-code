@@ -7,6 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-07-09
+
+### Added
+
+- `commands/plan`: new `/cass:plan` command — PO workflow: spawns SA + planner agents in parallel to investigate a requirement, iterates with the user until clear, then writes a structured requirement MD file or creates a Jira ticket (Atlassian MCP); default model is Haiku with option to switch to Sonnet
+- `commands/dev-feat`: new `/cass:dev-feat` command — SWE/SA workflow: reads a requirement MD or ticket, enters plan mode, writes an implementation plan with test coverage, identifies parallel workstreams, sets up git worktrees, and spawns SWE agents (one per parallel stream or one for sequential work); sub-task branches target the main feature branch, not staging
+- `commands/pr`: new `/cass:pr` command — creates a PR from the current branch; auto-detects whether this is a sub-task branch (PR → main feature branch) or main feature branch (PR → staging); optionally triggers SA review before creating
+- `commands/review`: new `/cass:review` command — triggers the `pr-reviewer` agent on a PR number, URL, or the current branch diff; surfaces P1/P2/P3 findings and plan compliance
+- `commands/clean-wt`: new `/cass:clean-wt` command — lists all cass-managed worktrees, checks PR merge status via `gh`, removes worktrees and branches for merged PRs, and offers to clean the remote branches too
+
+### Changed
+
+- `agents/swe`: when spawned by `/cass:dev-feat`, skips workspace setup (branch and worktree already configured) and uses the provided PR target branch instead of always targeting `staging`; supports sub-task mode where PR targets the main feature branch
+- `commands/dev-feat`: worktree location is configurable — sibling folder (`../<repo-name>-agent-works/`) or centralized (`~/.cass/worktrees/<repo-name>/`); preference is saved to `.claude/settings.local.json` so the user is not asked again
+
+### Workflow model (v0.5.0)
+
+```
+/cass:plan     → requirement MD or Jira ticket
+/cass:dev-feat → implementation plan + worktree setup + SWE agents
+/cass:pr       → PR per sub-task (→ main feature branch) or final PR (→ staging)
+/cass:review   → code review via pr-reviewer agent
+/cass:clean-wt → cleanup merged worktrees and branches
+```
+
+Worktree hierarchy:
+```
+staging/master
+  └── feat/<feature>           ← main feature branch
+        ├── feat/<ticket>-api  ← sub-branch (agent 1) → PR to feat/<feature>
+        └── feat/<ticket>-ui   ← sub-branch (agent 2) → PR to feat/<feature>
+```
+
 ## [0.4.0] - 2026-03-28
 
 ### Added
@@ -63,7 +96,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `.claude-plugin/plugin.json` manifest
 - Example command and skill stubs
 
-[Unreleased]: https://github.com/tonycodersg/cass-claude-code/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/tonycodersg/cass-claude-code/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/tonycodersg/cass-claude-code/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/tonycodersg/cass-claude-code/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/tonycodersg/cass-claude-code/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/tonycodersg/cass-claude-code/compare/v0.1.0...v0.2.0
