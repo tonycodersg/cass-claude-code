@@ -6,19 +6,31 @@ A Claude Code plugin that brings a structured plan → architect → build → r
 
 ```
 /cass:init               set up the project (once)
+/cass:doctor             verify all tools and MCP servers are working
       ↓
-/cass:plan-task          clarify requirements, write a plan md file  [haiku]
+/cass:plan               PO role — parallel SA+planner investigation, write requirement MD or Jira ticket  [haiku]
       ↓
-sa agent                 review plan for SOLID/CAP/clean code, update plan with Architecture Notes  [sonnet]
+/cass:dev-feat           SWE/SA role — implementation plan, worktree setup, spawn parallel agents  [sonnet]
       ↓
-swe agent                implement from the updated plan, branch + worktree, commit, push  [sonnet]
+      ├── sub-agent 1    work in own worktree, PR → main feature branch
+      └── sub-agent 2    work in own worktree, PR → main feature branch
       ↓
-sa agent                 review implementation diff, produce prioritised findings  [sonnet]
+/cass:review             trigger pr-reviewer agent on any PR or current diff
       ↓
-swe agent                fix SA must-fix items, create PR → staging with SA review in description  [sonnet]
+/cass:pr                 create final PR from main feature branch → staging
+      ↓
+/cass:clean-wt           clean up merged worktrees and branches
 ```
 
-> The `planner` agent is also available for standalone planning sessions without the full `/cass:plan-task` pipeline.
+**Worktree model:**
+```
+staging/master
+  └── feat/<feature>              ← main feature branch
+        ├── feat/<ticket>-api     ← agent 1 sub-branch → PR to feat/<feature>
+        └── feat/<ticket>-ui      ← agent 2 sub-branch → PR to feat/<feature>
+```
+
+> `/cass:plan-task` is still available as a single-command alternative that combines planning and implementation in one step.
 
 ## Agents
 
@@ -92,25 +104,59 @@ Triggered when you need infrastructure, containerisation, or CI/CD work.
 
 ## Commands
 
-### `/cass:plan-task [description or ticket]`
-
-Full end-to-end planning → architect → build pipeline. Run this instead of invoking the planner agent manually when you want the complete workflow.
-
-1. **Requirement review** (Haiku) — clarifies requirements, asks questions, writes a plan md file
-2. Asks for your approval before saving or doing anything
-3. **SA review** (Sonnet) — reviews the plan, appends Architecture Notes
-4. **SWE implementation** (Sonnet) — implements from the SA-enriched plan, verifies, runs SA post-review, creates PR → `staging`
-
 ### `/cass:init`
 
-Initialises a project for use with this plugin. Run once per project.
+Initialises a project for use with cass. Run once per project.
 
 1. Checks for an existing `.claude/` — stops if found (nothing is overwritten)
 2. Runs `/init` to generate `.claude/` and `CLAUDE.md`
 3. Copies `assets/commit-template/.gitmessage` → `cass-.gitmessage` and configures `git config commit.template`
 4. Copies `assets/pr-template/pull_request_template.md` → `.github/cass-pull_request_template.md`
 
-Each copy step is idempotent — skipped if the file already exists.
+### `/cass:doctor`
+
+Health check — verifies all tools, MCP servers, and project config are set up correctly. Run after install or when something isn't working.
+
+Checks: git identity · commit template · PR template · `gh` install + auth · Serena MCP (`uvx` + package) · Atlassian MCP reachability · other MCP servers in `.mcp.json` · worktree preference.
+
+Outputs a pass/warn/fail report with fix commands for anything missing.
+
+### `/cass:plan [description or ticket]`
+
+**PO role.** Spawns SA + planner agents in parallel to rapidly investigate a requirement, then iterates with you until everything is clear. Writes a structured requirement MD file or creates a Jira ticket.
+
+- Default model: Haiku (fast). Type "use sonnet" to switch.
+- SA agent investigates technical constraints; planner agent identifies scope gaps and open questions — both run simultaneously
+- On approval: saves to `docs/<feature>_<date>.md` and/or creates Jira ticket via Atlassian MCP
+
+### `/cass:dev-feat [path or ticket]`
+
+**SWE/SA role.** Reads a requirement MD or ticket, enters plan mode, writes an implementation plan with test coverage, and sets up the git/worktree structure.
+
+- Identifies parallel workstreams and asks whether to split into sub-agents
+- Worktree location: **sibling folder** (`../<repo>-agent-works/`) or **centralized** (`~/.cass/worktrees/<repo>/`) — saved to `.claude/settings.local.json`
+- Sub-task branches target the main feature branch (not staging); each agent creates its own PR
+- Preference is saved per project so you're not asked again
+
+### `/cass:pr`
+
+Creates a PR from the current branch. Auto-detects the correct target:
+- Sub-task branch → PR targets the main feature branch
+- Main feature branch → PR targets `staging`
+
+Optionally triggers SA review before creating. Includes What / Why / How / SA Review / Implementation Steps / Checklist.
+
+### `/cass:review [PR number or URL]`
+
+Triggers the `pr-reviewer` agent on a PR or the current branch diff. Reports findings grouped as P1 (must fix) / P2 (should fix) / P3 (consider) / Plan Compliance. Never applies fixes without your direction.
+
+### `/cass:clean-wt`
+
+Scans all cass-managed worktrees, checks PR merge status via `gh`, and removes worktrees + branches for merged PRs. Asks before removing anything with no PR or uncertain state.
+
+### `/cass:plan-task [description or ticket]`
+
+Legacy single-command alternative that combines planning and implementation in one step. Still available — useful when you want the full pipeline without the role split.
 
 ## Skills
 
@@ -127,34 +173,89 @@ Auto-invoked when you type `/plan-task`, "plan this feature", "help me plan", or
 
 ## Prerequisites
 
-### Python, uv, and uvx
+Install these once before using cass. Run `/cass:doctor` after setup to verify everything is wired up.
 
-Serena (the semantic code navigation MCP) runs via `uvx`, which ships with `uv`.
+---
 
-**Install `uv` (includes `uvx`):**
+### 1. Claude Code
 
+The CLI that runs this plugin.
+
+**macOS / Linux:**
+```bash
+npm install -g @anthropic-ai/claude-code
+```
+
+**Verify:**
+```bash
+claude --version
+```
+
+> Requires Node.js 18+. See [nodejs.org](https://nodejs.org) if `node` is not installed.
+
+---
+
+### 2. GitHub CLI (`gh`)
+
+Used by cass to create issues, branches, PRs, and check merge status.
+
+**macOS:**
+```bash
+brew install gh
+```
+
+**Linux:**
+```bash
+sudo apt install gh        # Debian/Ubuntu
+sudo dnf install gh        # Fedora
+```
+
+**Windows:**
+```bash
+winget install GitHub.cli
+```
+
+**Authenticate after install:**
+```bash
+gh auth login
+```
+
+**Verify:**
+```bash
+gh auth status
+```
+
+---
+
+### 3. uv + uvx (for Serena)
+
+Serena (semantic code navigation MCP) is launched via `uvx`, which ships with `uv`.
+
+**macOS / Linux:**
 ```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-Restart your shell or run `source $HOME/.local/bin/env` to activate it.
+**Windows:**
+```powershell
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
 
-Verify:
+Restart your shell, or run `source $HOME/.local/bin/env` to activate it immediately.
 
+**Verify:**
 ```bash
 uv --version
 uvx --version
 ```
 
-`uv` manages its own Python — no separate Python install is required. If you need a specific version:
+> `uv` manages its own Python — no separate Python install needed.
 
-```bash
-uv python install 3.12
-```
+---
 
-### Verify Serena starts
+### 4. Serena MCP
 
-Run this once to confirm Serena works before starting a session:
+Verify Serena launches correctly before your first session:
 
 ```bash
 uvx --from git+https://github.com/oraios/serena serena start-mcp-server \
@@ -163,7 +264,34 @@ uvx --from git+https://github.com/oraios/serena serena start-mcp-server \
   --open-web-dashboard False
 ```
 
-If it starts without errors, Claude Code will launch it automatically via `.mcp.json` on each session.
+If it starts without errors, Claude Code will launch it automatically via `.mcp.json` on every session. Press `Ctrl+C` to stop it — you don't need to keep it running manually.
+
+---
+
+### 5. Atlassian MCP (optional — for Jira integration)
+
+Required only if you want `/cass:plan` and the planner agent to read and create Jira tickets.
+
+1. Generate an Atlassian API token at [id.atlassian.com/manage-profile/security/api-tokens](https://id.atlassian.com/manage-profile/security/api-tokens)
+2. Add it to your shell profile:
+
+```bash
+export ATLASSIAN_API_TOKEN=your_token_here
+export ATLASSIAN_EMAIL=you@example.com
+export ATLASSIAN_DOMAIN=yourcompany.atlassian.net
+```
+
+---
+
+### Quick health check
+
+After installing everything, run `/cass:doctor` inside any Claude Code session with cass loaded to verify all tools are configured correctly:
+
+```
+/cass:doctor
+```
+
+It checks git identity, `gh` auth, Serena connectivity, Atlassian MCP, and project-level setup, then reports pass/warn/fail with fix commands for anything missing.
 
 ## Installation
 

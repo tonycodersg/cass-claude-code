@@ -61,10 +61,18 @@ Before writing any code, read project context files in this order:
 
 Use these to align implementation with established patterns, naming conventions, and architecture.
 
-**Step 3 — Branch and worktree setup**
+**Step 3 — Detect context and branch setup**
+
+First, determine whether you are being spawned by `/cass:dev-feat` with a pre-configured workspace, or invoked standalone:
+
+**If spawned by `/cass:dev-feat`** (worktree path and branch are passed as context):
+- The branch is already created and checked out in the worktree path provided
+- The PR target branch is provided — use it exactly (may be a main feature branch, not staging)
+- Skip directly to Step 4 — do not ask the user about workspace setup
+
+**If invoked standalone** (no pre-configured context):
 
 Ask the user:
-
 > "How would you like to set up the workspace?
 > 1. **Start from staging** — check out `staging`, create a feature branch from it, and set up a worktree to work in isolation
 > 2. **Use current branch** — create a feature branch from where I am now and set up a worktree
@@ -146,14 +154,16 @@ After presenting the implementation summary, ask the user:
 Once the user confirms the changes are complete and correct:
 
 ```bash
-git push origin feat/<kebab-case-plan-title>
+git push origin <current-branch>
 ```
 
-Create the PR targeting **`staging`**:
+Determine the PR target branch:
+- **If spawned by `/cass:dev-feat` with a PR target specified** → use that target (may be the main feature branch, not staging)
+- **If this is a standalone invocation** → target `staging` (or ask the user if staging doesn't exist)
 
 ```bash
 gh pr create \
-  --base staging \
+  --base <pr-target-branch> \
   --title "<type>(<scope>): <plan goal summary>" \
   --body "<body>"
 ```
