@@ -1,5 +1,5 @@
 ---
-description: Smoke test — creates an isolated temp repo, runs through cass workflow mechanics (init, plan, dev-feat, clean-wt), reports pass/fail for each step, then cleans up
+description: Smoke test — creates an isolated temp repo, runs 13 mechanical checks covering init, plan output structure (Technical Context + Risks), dev-feat worktree creation, and clean-wt listing and removal; reports pass/fail per step then cleans up
 allowed-tools: [Bash, Read]
 ---
 
@@ -201,7 +201,7 @@ grep -c "## Goal\|## Functional Requirements\|## Success Criteria" "$TEST_REPO/d
 
 ---
 
-### Test 8 — plan: docs/ output folder and MD file naming
+### Test 8 — plan: docs/ output contains required sections
 
 Simulate saving the plan output as an MD file:
 
@@ -225,16 +225,24 @@ Allow users to log in with email and password.
 
 ### Success Criteria
 - [ ] User can log in with valid credentials
+
+### Technical Context
+- **Existing patterns**: Session middleware in src/auth/session.js
+- **Constraints**: Must use existing User model
+- **Dependencies**: PostgreSQL users table
+- **Risks**: No rate limiting currently in place
 EOF
 ```
 
-Verify file exists at the expected path and contains a Risks section:
+Verify file exists and has all required sections (Risks + Technical Context):
 
 ```bash
-[ -f "$PLAN_FILE" ] && grep -q "### Risks" "$PLAN_FILE"
+[ -f "$PLAN_FILE" ] \
+  && grep -q "### Risks" "$PLAN_FILE" \
+  && grep -q "### Technical Context" "$PLAN_FILE"
 ```
 
-- **PASS** if file exists and has Risks section
+- **PASS** if file exists and both sections are present
 - **FAIL** otherwise
 
 ---

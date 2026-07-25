@@ -7,8 +7,8 @@
     "plugins": [
         {
             "name": "cass",
-            "description": "Structured plan → architect → build → review pipeline for Claude Code. Includes SA, SWE, planner, devops, and pr-reviewer agents plus role-split commands: /cass:plan, /cass:dev-feat, /cass:pr, /cass:review, /cass:doctor, /cass:clean-wt.",
-            "version": "0.5.0",
+            "description": "Structured plan → architect → build → review pipeline for Claude Code. PO workflow (/cass:plan) with risk assessment and Technical Context handoff. Dev workflow (/cass:dev-feat) with worktree agents, skips re-investigation when Technical Context is present. Includes SA, SWE, planner, devops, and pr-reviewer agents.",
+            "version": "0.6.0",
             "homepage": "https://github.com/tonycodersg/cass-claude-code",
             "license": "MIT",
             "source": {

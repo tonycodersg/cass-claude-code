@@ -7,6 +7,63 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-07-25
+
+### Added
+
+- `commands/test`: new `/cass:test` command — smoke test that creates an isolated temp repo and runs 13 mechanical checks covering init file creation, settings JSON shape and multi-project merge, plan doc structure, worktree creation, branch/date listing, remote branch check, and worktree removal; cleans up after itself regardless of failures
+- `commands/plan`: accepts requirement as plain text **or a doc file path** (`.md`, `.txt`) — no longer requires a Jira ticket ref
+- `commands/plan`: mandatory **Risks table** (likelihood, impact, mitigation) and **Suggestions** section in every plan output
+- `commands/plan`: **Technical Context** section written by the SA agent into the saved doc — captures existing patterns, constraints, dependencies, and risks so dev-feat can skip re-investigating the codebase
+- `commands/plan`: save options expanded — Jira ticket (with optional parent epic), GitHub issue (with optional milestone), or MD file to `docs/`
+- `commands/dev-feat`: when the plan has a `### Technical Context` section, skips codebase re-investigation entirely — reuses what the SA agent already captured during `/cass:plan`
+- `commands/dev-feat`: **Step 3b** — raises dev questions (implementation ambiguities) after reading the plan, before writing the implementation plan; these come from the dev's own analysis, not pre-filled by the PO
+- `commands/dev-feat`: when run with no argument, asks whether the requirement comes from an MD file, Jira ticket, GitHub issue, or inline description
+- `commands/init`: accepts optional project name as argument (`/cass:init <name>`)
+- `commands/init`: asks two setup questions — worktree folder path (default: `../<repo>-agent-works`) and main branch (options: `main`, `staging`, or custom name)
+- `commands/init`: saves project config to `cass.projects.<name>` in `.claude/settings.local.json` — supports multiple projects in the same settings file, safe to re-run
+- `commands/init`: creates the worktree base folder during init
+- `commands/pr`: detects whether running inside a worktree or main repo folder; warns if run from the main folder
+- `commands/pr`: main feature branch → staging PR now confirms the target branch before creating, with option to type a different name
+- `commands/clean-wt`: replaced PR-status-based logic with simple folder listing — shows worktree folder, branch name, and last modified date; user picks which to remove by number
+- `commands/clean-wt`: remote branch deletion only prompted when `git ls-remote` confirms the branch still exists on origin
+- `commands/doctor`: Check 8 updated to validate `cass.projects` entries (main repo path, main branch, worktree path on disk) instead of legacy `worktreeBase` string
+
+### Changed
+
+- `commands/dev-feat`: workspace setup (Step 5) now reads `cass.projects` from `.claude/settings.local.json` instead of asking worktree questions at runtime; stops with an actionable message if init has not been run
+- `commands/dev-feat`: base branch for feature branches comes from `cass.mainBranch` in project config instead of hardcoded `staging`
+- `commands/clean-wt`: reads `cass.projects.worktreePath` from settings; supports multi-project selection
+- `commands/plan`: removed model-selection prompt (Haiku/Sonnet toggle) — always runs on Haiku
+- `README`: workflow diagram updated to show main folder vs worktree folder mental model; command descriptions updated for init, plan, dev-feat, pr, clean-wt, and new test command
+
+### Workflow model (v0.6.0)
+
+```
+PO side
+  /cass:plan [text or doc]   → risk-assessed plan with Technical Context → saved as ticket or MD
+
+Dev side
+  /cass:dev-feat [plan/ticket] → reads Technical Context (skips re-investigation)
+                                → raises dev questions → implementation plan → worktrees + agents
+  /cass:pr                     → run from worktree → PR to staging (confirm or change target)
+  /cass:clean-wt               → list worktrees by project → pick to remove
+
+Setup
+  /cass:init [project]         → worktree path + main branch → saved to cass.projects
+  /cass:doctor                 → validates cass.projects entries + all tools
+  /cass:test                   → 13-step mechanical smoke test
+```
+
+Folder model:
+```
+my-repo/                        ← main folder (stays on main/staging — merge & test only)
+my-repo-agent-works/
+  ├── feat-user-auth/           ← main feature worktree
+  ├── feat-user-auth-api/       ← agent 1 sub-worktree → PR to feat-user-auth
+  └── feat-user-auth-ui/        ← agent 2 sub-worktree → PR to feat-user-auth
+```
+
 ## [0.5.0] - 2026-07-09
 
 ### Added
@@ -96,7 +153,8 @@ staging/master
 - `.claude-plugin/plugin.json` manifest
 - Example command and skill stubs
 
-[Unreleased]: https://github.com/tonycodersg/cass-claude-code/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/tonycodersg/cass-claude-code/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/tonycodersg/cass-claude-code/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/tonycodersg/cass-claude-code/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/tonycodersg/cass-claude-code/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/tonycodersg/cass-claude-code/compare/v0.2.0...v0.3.0
