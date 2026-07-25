@@ -181,6 +181,10 @@ Scans all cass-managed worktrees, checks PR merge status via `gh`, and removes w
 
 Reads `worktreePath` from `cass.projects` in `.claude/settings.local.json`. If multiple projects are configured, asks which one to clean. Pass a path as argument to override: `/cass:clean-wt /path/to/worktrees`.
 
+### `/cass:test`
+
+Smoke test — creates an isolated temp repo and runs through the cass workflow mechanics without touching the current project. Tests init file creation, settings JSON shape, multi-project merge, worktree creation, folder listing (branch + date), and worktree removal. Reports pass/fail per step and cleans up the temp dir at the end.
+
 ### `/cass:plan-task [description or ticket]`
 
 Legacy single-command alternative that combines planning and implementation in one step. Still available — useful when you want the full pipeline without the role split.
