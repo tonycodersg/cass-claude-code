@@ -328,7 +328,29 @@ It checks git identity, `gh` auth, Serena connectivity, Atlassian MCP, and proje
 
 ## Installation
 
-### Option 1 — Plugin marketplace (recommended)
+### Option 1 — Clone from GitHub (recommended)
+
+```bash
+git clone https://github.com/tonycodersg/cass-claude-code ~/.claude/plugins/cass
+```
+
+That's it. Claude Code auto-loads any plugin under `~/.claude/plugins/` — no restart needed.
+
+Then initialise cass in your project:
+
+```
+/cass:init <project-name>
+```
+
+**To update later:**
+
+```bash
+cd ~/.claude/plugins/cass && git pull
+```
+
+---
+
+### Option 2 — Plugin marketplace
 
 In any Claude Code session, run:
 
@@ -337,33 +359,21 @@ In any Claude Code session, run:
 /plugin install cass@cass-marketplace
 ```
 
-Then initialise the plugin in your project:
+---
 
-```
-/cass:init
-```
+### Option 3 — Per-session only
 
-> **How to find this plugin:** search for `cass-claude-code` on [github.com/tonycodersg](https://github.com/tonycodersg/cass-claude-code) or copy the install commands above directly into Claude Code.
-
-### Option 2 — Official Anthropic marketplace
-
-> Coming soon — pending submission at [claude.ai/settings/plugins/submit](https://claude.ai/settings/plugins/submit)
-
-Once listed, install with:
-
-```
-/plugin install cass@claude-plugins-official
-```
-
-### Option 3 — Local development
-
-Load for a single session without installing:
+Load for a single session without installing globally:
 
 ```bash
 claude --plugin-dir /path/to/cass-claude-code
 ```
 
-Or symlink globally so it loads in every session:
+---
+
+### Option 4 — Symlink (for local development)
+
+If you have cloned the repo somewhere else and want to develop against it:
 
 ```bash
 ln -s /path/to/cass-claude-code ~/.claude/plugins/cass
