@@ -40,14 +40,31 @@ Extract: goal, scope, functional requirements, non-functional requirements, succ
 
 ### Step 2 — Discover project conventions
 
-Read project context in this order:
-1. `CLAUDE.md`
-2. `instructions/`, `docs/`, `.claude/`
-3. `README.md`
+**Check if the plan already has `### Dev Questions` and `### Technical Context` sections** (written by the SA agent during `/cass:plan`):
+
+- **If both sections exist** → use them directly. Skip SA investigation entirely — the PO's plan already contains the technical context and dev questions. Print:
+  > "Using technical context from PO plan — skipping re-investigation."
+
+- **If either section is missing** → read project context in this order:
+  1. `CLAUDE.md`
+  2. `instructions/`, `docs/`, `.claude/`
+  3. `README.md`
 
 ### Step 3 — Enter plan mode
 
 Enter plan mode immediately. Do not modify any files until the user approves the plan.
+
+### Step 3b — Resolve dev questions
+
+If the plan has a `### Dev Questions` section with unanswered questions, present them to the dev now before writing the implementation plan:
+
+> "The PO plan flagged these questions for the dev team to answer before we start:
+> 1. <question>
+> 2. <question>"
+
+Wait for answers, then incorporate them into the implementation plan. If all questions are already answered or the section is empty, proceed directly.
+
+---
 
 ### Step 4 — Write implementation plan
 
