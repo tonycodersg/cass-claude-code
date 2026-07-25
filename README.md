@@ -144,13 +144,15 @@ Checks: git identity · commit template · PR template · `gh` install + auth ·
 
 Outputs a pass/warn/fail report with fix commands for anything missing.
 
-### `/cass:plan [description or ticket]`
+### `/cass:plan [requirement text or doc path]`
 
-**PO role.** Spawns SA + planner agents in parallel to rapidly investigate a requirement, then iterates with you until everything is clear. Writes a structured requirement MD file or creates a Jira ticket.
+**PO role.** Takes a raw requirement as text or a document file, investigates it using parallel SA + planner agents, and produces a structured plan with risk assessment and suggestions.
 
-- Default model: Haiku (fast). Type "use sonnet" to switch.
-- SA agent investigates technical constraints; planner agent identifies scope gaps and open questions — both run simultaneously
-- On approval: saves to `docs/<feature>_<date>.md` and/or creates Jira ticket via Atlassian MCP
+- Input: paste requirement text directly, or provide a path to a `.md` / `.txt` doc
+- SA agent identifies technical risks and constraints; planner agent finds scope gaps and open questions — both run in parallel
+- Presents a plan with **Risks table** (likelihood, impact, mitigation) and **Suggestions** before saving anything
+- On PO approval, saves as: Jira ticket (with optional parent epic), GitHub issue (with optional milestone), or `docs/<feature>_<date>.md`
+- Risks section is always included — never omitted
 
 ### `/cass:dev-feat [path or ticket]`
 
