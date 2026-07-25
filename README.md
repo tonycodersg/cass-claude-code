@@ -5,7 +5,7 @@ A Claude Code plugin that brings a structured plan → architect → build → r
 ## Workflow
 
 ```
-/cass:init               set up the project (once)
+/cass:init [project]     set up the project — registers paths, safe to re-run for multiple projects
 /cass:doctor             verify all tools and MCP servers are working
       ↓
 /cass:plan               PO role — parallel SA+planner investigation, write requirement MD or Jira ticket  [haiku]
@@ -24,10 +24,13 @@ A Claude Code plugin that brings a structured plan → architect → build → r
 
 **Worktree model:**
 ```
-staging/master
-  └── feat/<feature>              ← main feature branch
-        ├── feat/<ticket>-api     ← agent 1 sub-branch → PR to feat/<feature>
-        └── feat/<ticket>-ui      ← agent 2 sub-branch → PR to feat/<feature>
+my-repo/                          ← main folder (stays on main/staging — merge & test here)
+  └── branch: main or staging
+
+my-repo-agent-works/              ← worktree folder (agents work here, never touch main folder)
+  ├── feat/<feature>/             ← main feature worktree
+  ├── feat/<ticket>-api/          ← agent 1 sub-worktree → PR to feat/<feature>
+  └── feat/<ticket>-ui/           ← agent 2 sub-worktree → PR to feat/<feature>
 ```
 
 > `/cass:plan-task` is still available as a single-command alternative that combines planning and implementation in one step.
@@ -104,20 +107,40 @@ Triggered when you need infrastructure, containerisation, or CI/CD work.
 
 ## Commands
 
-### `/cass:init`
+### `/cass:init [project name]`
 
-Initialises a project for use with cass. Run once per project.
+Initialises a project for use with cass. Safe to run multiple times — re-running updates config without overwriting existing template files. Run once per project; multiple projects can be registered in the same repo.
 
-1. Checks for an existing `.claude/` — stops if found (nothing is overwritten)
-2. Runs `/init` to generate `.claude/` and `CLAUDE.md`
-3. Copies `assets/commit-template/.gitmessage` → `cass-.gitmessage` and configures `git config commit.template`
-4. Copies `assets/pr-template/pull_request_template.md` → `.github/cass-pull_request_template.md`
+Asks two setup questions:
+- **Worktree folder path** — where feature branch worktrees are created. Default: `../<repo-name>-agent-works` (sibling folder next to the repo)
+- **Main branch** — the branch this main repo folder stays on (for merging and testing only). Options: `main` (default), `staging`, or a custom name
+
+Saves project config to `.claude/settings.local.json` under `cass.projects.<name>`:
+```json
+{
+  "cass": {
+    "projects": {
+      "my-app": {
+        "mainRepoPath": "/path/to/repo",
+        "mainBranch": "main",
+        "worktreePath": "/path/to/repo-agent-works"
+      }
+    }
+  }
+}
+```
+
+Then runs the original setup steps:
+1. Generates `.claude/` and `CLAUDE.md` if not already present
+2. Copies `assets/commit-template/.gitmessage` → `cass-.gitmessage` and configures `git config commit.template`
+3. Copies `assets/pr-template/pull_request_template.md` → `.github/cass-pull_request_template.md`
+4. Creates the worktree base folder if it doesn't exist
 
 ### `/cass:doctor`
 
 Health check — verifies all tools, MCP servers, and project config are set up correctly. Run after install or when something isn't working.
 
-Checks: git identity · commit template · PR template · `gh` install + auth · Serena MCP (`uvx` + package) · Atlassian MCP reachability · other MCP servers in `.mcp.json` · worktree preference.
+Checks: git identity · commit template · PR template · `gh` install + auth · Serena MCP (`uvx` + package) · Atlassian MCP reachability · other MCP servers in `.mcp.json` · `cass.projects` config (main repo path, main branch, worktree path exists on disk).
 
 Outputs a pass/warn/fail report with fix commands for anything missing.
 
@@ -133,10 +156,12 @@ Outputs a pass/warn/fail report with fix commands for anything missing.
 
 **SWE/SA role.** Reads a requirement MD or ticket, enters plan mode, writes an implementation plan with test coverage, and sets up the git/worktree structure.
 
+- Reads `cass.projects` from `.claude/settings.local.json` (set by `/cass:init`) — no worktree questions asked at runtime
+- If one project is configured, uses it automatically; if multiple, asks which one
+- If init has not been run, stops and prompts you to run `/cass:init <project-name>` first
 - Identifies parallel workstreams and asks whether to split into sub-agents
-- Worktree location: **sibling folder** (`../<repo>-agent-works/`) or **centralized** (`~/.cass/worktrees/<repo>/`) — saved to `.claude/settings.local.json`
-- Sub-task branches target the main feature branch (not staging); each agent creates its own PR
-- Preference is saved per project so you're not asked again
+- Creates feature branches from `mainBranch` and worktrees under `worktreePath`
+- Sub-task branches target the main feature branch (not the main branch); each agent creates its own PR
 
 ### `/cass:pr`
 
@@ -153,6 +178,8 @@ Triggers the `pr-reviewer` agent on a PR or the current branch diff. Reports fin
 ### `/cass:clean-wt`
 
 Scans all cass-managed worktrees, checks PR merge status via `gh`, and removes worktrees + branches for merged PRs. Asks before removing anything with no PR or uncertain state.
+
+Reads `worktreePath` from `cass.projects` in `.claude/settings.local.json`. If multiple projects are configured, asks which one to clean. Pass a path as argument to override: `/cass:clean-wt /path/to/worktrees`.
 
 ### `/cass:plan-task [description or ticket]`
 

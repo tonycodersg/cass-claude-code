@@ -20,7 +20,7 @@ allowed-tools: [Bash, Read]
 - .mcp.json exists: !`[ -f .mcp.json ] && echo "yes" || echo "no"`
 - .mcp.json content: !`cat .mcp.json 2>/dev/null || echo "NOT FOUND"`
 - Claude settings: !`cat .claude/settings.json 2>/dev/null || cat ~/.claude/settings.json 2>/dev/null || echo "NOT FOUND"`
-- Worktree preference: !`cat .claude/settings.local.json 2>/dev/null | grep worktreeBase || echo "not set"`
+- cass settings: !`cat .claude/settings.local.json 2>/dev/null || echo "NOT FOUND"`
 
 ## Instructions
 
@@ -106,11 +106,23 @@ For each additional server found in `.mcp.json` (beyond `atlassian` and `serena`
 
 ---
 
-### Check 8 — Worktree preference
+### Check 8 — cass init configuration
 
-From context:
-- **INFO** if `cass.worktreeBase` is set in `.claude/settings.local.json` — show the current value
-- **INFO** if not set — will be asked on first `/cass:dev-feat` run
+From `cass.projects` in `.claude/settings.local.json`:
+
+- **FAIL** if `cass.projects` is empty or missing → fix: run `/cass:init <project-name>`
+- **PASS** if at least one project is configured
+
+For each project found, show:
+```
+  Project: <name>
+    Main repo:      <mainRepoPath>   (branch: <mainBranch>)
+    Worktree base:  <worktreePath>
+```
+
+For each project, also check that `worktreePath` exists on disk:
+- **PASS** if folder exists
+- **WARN** if it doesn't → fix: `mkdir -p <worktreePath>` or re-run `/cass:init <project-name>`
 
 ---
 
@@ -142,8 +154,9 @@ Atlassian MCP
 Other MCP servers
   ✓  <server-name>                    command found
 
-Worktree
-  ℹ  cass.worktreeBase                sibling  (../<repo>-agent-works/)
+cass projects
+  ✓  my-app         /path/to/repo  (branch: staging) | worktrees: /path/to/repo-agent-works ✓
+  ✓  another-app    /path/to/other (branch: main)    | worktrees: /path/to/other-agent-works ✓
 
 ─────────────────────────────────────
   X passed   Y warnings   Z failed

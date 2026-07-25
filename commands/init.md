@@ -1,41 +1,95 @@
 ---
-description: Initialise a project with the cass plugin setup — generates .claude folder and copies commit and PR templates
-allowed-tools: [Bash, Read, Write]
+description: Initialise a project with the cass plugin setup — asks for project name, worktree path, and main branch, then generates .claude folder and copies commit and PR templates. Safe to run multiple times.
+argument-hint: "[project name]"
+allowed-tools: [Bash, Read, Write, AskUserQuestion]
 ---
 
-## Task
-
-Initialise the current project with the cass plugin setup.
-
-## Current state
+## Context
 
 - Working directory: !`pwd`
+- Repo root: !`git rev-parse --show-toplevel 2>/dev/null || pwd`
+- Repo name: !`basename $(git rev-parse --show-toplevel 2>/dev/null) 2>/dev/null || basename $(pwd)`
 - .claude folder exists: !`[ -d .claude ] && echo "yes" || echo "no"`
-- .github folder exists: !`[ -d .github ] && echo "yes" || echo "no"`
 - cass-.gitmessage exists: !`[ -f cass-.gitmessage ] && echo "yes" || echo "no"`
-- cass-pull_request_template.md exists: !`[ -f .github/cass-pull_request_template.md ] && echo "yes" || echo "no"`
+- PR template exists: !`[ -f .github/cass-pull_request_template.md ] && echo "yes" || echo "no"`
+- Existing settings: !`cat .claude/settings.local.json 2>/dev/null || echo "NOT FOUND"`
+- Default worktree path: !`echo "$(dirname $(git rev-parse --show-toplevel 2>/dev/null))/$(basename $(git rev-parse --show-toplevel 2>/dev/null))-agent-works"`
+- User input: $ARGUMENTS
 
 ## Instructions
 
-Work through these steps in order. Stop and report if any step fails.
+### Step 1 — Resolve project name
 
-### Step 1 — Check .claude
+If `$ARGUMENTS` is provided, use it as the project name.
 
-If the `.claude` folder already exists, print:
+If `$ARGUMENTS` is empty, ask:
+> "What is the project name? (press Enter to use the repo folder name: `<repo name from context>`)"
 
-> "`.claude/` already exists — skipping init. No files were modified."
+If the user presses Enter or leaves it blank, use the repo folder name from context.
 
-Then stop. Do not proceed further.
+---
 
-### Step 2 — Run /init
+### Step 2 — Ask workspace setup questions
 
-Run the built-in `/init` command to generate the `.claude/` folder and `CLAUDE.md` for this project.
+Ask the user these two questions together in a single message:
 
-### Step 3 — Copy commit template
+> **cass init — workspace setup for `<project name>`**
+>
+> **1. Worktree folder path**
+> Feature branches will be checked out as worktrees here so agents work in isolation without touching this main repo folder.
+>
+> Default: `<default worktree path from context>`
+>
+> Press Enter to use the default, or type a custom absolute path.
+>
+> **2. Main branch**
+> This main repo folder will stay checked out on this branch (for merging and testing only — agents work in worktrees).
+>
+> 1. `main` (default)
+> 2. `staging`
+> 3. Other — type the branch name
 
-Copy `${CLAUDE_PLUGIN_ROOT}/assets/commit-template/.gitmessage` to `cass-.gitmessage` in the project root.
+Resolve answers:
+- Worktree path: if blank/Enter → use the default from context. Expand `~` to home directory if present.
+- Main branch: if they chose 1 or pressed Enter → `main`. If they chose 2 → `staging`. If they typed a custom name → use it as-is.
 
-Then configure git to use it:
+---
+
+### Step 3 — Check .claude
+
+If the `.claude` folder does not exist, run the built-in `/init` command to generate `.claude/` and `CLAUDE.md`.
+
+If `.claude/` already exists, skip this step silently.
+
+---
+
+### Step 4 — Save project config to settings
+
+Write (or update) `.claude/settings.local.json` with a `cass.projects` entry for this project:
+
+```json
+{
+  "cass": {
+    "projects": {
+      "<project name>": {
+        "mainRepoPath": "<absolute path to repo root>",
+        "mainBranch": "<branch>",
+        "worktreePath": "<resolved absolute worktree path>"
+      }
+    }
+  }
+}
+```
+
+If `.claude/settings.local.json` already exists:
+- Merge the new project entry into `cass.projects` — do not overwrite other projects or other keys
+- If this project name already exists in `cass.projects`, update its values
+
+---
+
+### Step 5 — Copy commit template
+
+Copy `${CLAUDE_PLUGIN_ROOT}/assets/commit-template/.gitmessage` to `cass-.gitmessage` in the project root, then configure git:
 
 ```bash
 git config commit.template cass-.gitmessage
@@ -44,20 +98,43 @@ git config commit.template cass-.gitmessage
 If `cass-.gitmessage` already exists, skip the copy and print:
 > "`cass-.gitmessage` already exists — skipped."
 
-### Step 4 — Copy PR template
+---
+
+### Step 6 — Copy PR template
 
 Create `.github/` if it does not exist, then copy `${CLAUDE_PLUGIN_ROOT}/assets/pr-template/pull_request_template.md` to `.github/cass-pull_request_template.md`.
 
 If `.github/cass-pull_request_template.md` already exists, skip the copy and print:
 > "`.github/cass-pull_request_template.md` already exists — skipped."
 
-### Step 5 — Report
+---
 
-Print a summary of what was done:
+### Step 7 — Create worktree base folder
+
+If the worktree path does not already exist, create it:
+
+```bash
+mkdir -p <worktree path>
+```
+
+---
+
+### Step 8 — Report
+
+Print a final summary:
 
 ```
 cass init complete
-  ✓ .claude/                          generated
-  ✓ cass-.gitmessage                  copied  (or: skipped — already exists)
-  ✓ .github/cass-pull_request_template.md  copied  (or: skipped — already exists)
+==================
+Project:        <project name>
+
+  Main repo:      /absolute/path/to/repo   (branch: staging)
+  Worktree base:  /absolute/path/to/repo-agent-works
+
+  ✓  .claude/settings.local.json   saved
+  ✓  cass-.gitmessage              copied  (or: skipped — already exists)
+  ✓  .github/cass-pull_request_template.md   copied  (or: skipped — already exists)
+  ✓  worktree base folder          created  (or: already exists)
+
+Run /cass:doctor to verify the full setup.
 ```

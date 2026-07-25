@@ -11,6 +11,7 @@ model: haiku
 - Repo name: !`basename $(git rev-parse --show-toplevel 2>/dev/null) 2>/dev/null || basename $(pwd)`
 - Repo root: !`git rev-parse --show-toplevel 2>/dev/null || pwd`
 - User input: $ARGUMENTS
+- cass settings: !`cat .claude/settings.local.json 2>/dev/null || echo "NOT FOUND"`
 
 ## Your Role
 
@@ -20,19 +21,12 @@ Find all cass-managed worktrees, check whether their PRs have been merged, and c
 
 ### Step 1 — Find worktree base
 
-If `$ARGUMENTS` is provided, use it as the worktree base path.
+If `$ARGUMENTS` is provided, use it as the worktree base path directly.
 
-Otherwise, read `.claude/settings.local.json` to get `cass.worktreeBase`:
-- `"sibling"` → base is `<repo-root>/../<repo-name>-agent-works`
-- `"central"` → base is `~/.cass/worktrees/<repo-name>`
-
-If the setting is not found, check both locations and show the user what was found:
-```bash
-ls <repo-root>/../<repo-name>-agent-works 2>/dev/null
-ls ~/.cass/worktrees/<repo-name> 2>/dev/null
-```
-
-If neither exists, report "No cass worktrees found" and exit.
+Otherwise, read `cass.projects` from `.claude/settings.local.json` (already injected in context above):
+- If one project → use its `worktreePath`
+- If multiple projects → ask the user which project's worktrees to clean
+- If no projects → tell the user to run `/cass:init <project-name>` first and exit
 
 ### Step 2 — List active worktrees
 

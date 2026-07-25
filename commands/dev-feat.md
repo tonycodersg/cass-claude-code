@@ -12,6 +12,7 @@ model: sonnet
 - Repo name: !`basename $(git rev-parse --show-toplevel 2>/dev/null) 2>/dev/null || basename $(pwd)`
 - Repo root: !`git rev-parse --show-toplevel 2>/dev/null || pwd`
 - User input: $ARGUMENTS
+- cass settings: !`cat .claude/settings.local.json 2>/dev/null || echo "NOT FOUND"`
 
 ## Your Role
 
@@ -84,37 +85,38 @@ Iterate until the user approves.
 
 ### Step 5 — Workspace setup
 
-Ask the user two questions together:
+Read `cass.projects` from `.claude/settings.local.json` (already injected in context above).
 
-> "Two setup questions:
->
-> **1. Worktree or main folder?**
-> - **Worktree** — isolated working copies outside the main repo (recommended for parallel work or keeping main clean)
-> - **Main folder** — work directly in this repo
->
-> **2. Worktree location (if worktree)?**
-> - **A) Sibling folder** — `../<repo-name>-agent-works/` next to this repo
-> - **B) Centralized** — `~/.cass/worktrees/<repo-name>/` (better if you have multiple repos)"
+**If there is exactly one project in `cass.projects`:** use it automatically. Tell the user:
+> "Using project `<name>`:
+>   Main repo:     `<mainRepoPath>` (branch: `<mainBranch>`)
+>   Worktree base: `<worktreePath>`"
 
-Save the chosen worktree base to `.claude/settings.local.json` under `cass.worktreeBase` so you don't ask again:
-- Sibling: `"cass.worktreeBase": "sibling"`
-- Centralized: `"cass.worktreeBase": "central"`
+**If there are multiple projects:** ask the user which project to work on:
+> "Which project?
+> 1. `<project-name-1>` — `<mainRepoPath>`
+> 2. `<project-name-2>` — `<mainRepoPath>`"
 
-If `.claude/settings.local.json` already has `cass.worktreeBase` set, skip this question and use the saved preference (mention it to the user).
+Use the selected project's `mainRepoPath`, `mainBranch`, and `worktreePath` for all subsequent steps.
 
-Resolve the worktree base path:
-- Sibling: `<repo-root>/../<repo-name>-agent-works`
-- Central: `~/.cass/worktrees/<repo-name>`
+**If no projects are configured (init has not been run):** tell the user:
+> "No projects configured. Run `/cass:init <project-name>` first, then come back."
+
+Stop and do not proceed until init has been run.
 
 ### Step 6 — Git and worktree setup
 
 **Determine base branch:**
 
+Use `cass.mainBranch` from settings as the base branch. Fetch and pull it:
+
 ```bash
 git fetch origin
+git checkout <mainBranch>
+git pull origin <mainBranch>
 ```
 
-Check if `staging` exists on remote. If yes, use it. If not, ask the user which base branch to use.
+If the branch doesn't exist on the remote, stop and ask the user to verify their init configuration.
 
 **Create the main feature branch:**
 
