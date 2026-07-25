@@ -54,15 +54,16 @@ Extract: goal, scope, functional requirements, non-functional requirements, succ
 
 Enter plan mode immediately. Do not modify any files until the user approves the plan.
 
-### Step 3b — Resolve dev questions
+### Step 3b — Raise dev questions
 
-If the plan has a `### Dev Questions` section with unanswered questions, present them to the dev now before writing the implementation plan:
+After reading the plan (and Technical Context if present), identify anything that would block or significantly change the implementation — things the PO plan left ambiguous for the dev to decide:
 
-> "The PO plan flagged these questions for the dev team to answer before we start:
-> 1. <question>
-> 2. <question>"
+- Which library / pattern to use for a specific piece
+- Where to put new code given existing module structure
+- Whether to extend an existing module or create a new one
+- Edge cases not covered by the success criteria
 
-Wait for answers, then incorporate them into the implementation plan. If all questions are already answered or the section is empty, proceed directly.
+Ask all of them in a single numbered list. Wait for answers before writing the implementation plan. If nothing is ambiguous, proceed directly.
 
 ---
 

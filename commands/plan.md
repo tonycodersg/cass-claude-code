@@ -101,16 +101,12 @@ Out of scope:
 ### Open Questions
 - <any remaining decisions>
 
-### Dev Questions
-<!-- Pre-filled by SA agent — dev team must answer these before implementing -->
-- <question the dev team needs to resolve, e.g. "Which auth library — existing session middleware or new JWT approach?">
-
 ### Technical Context
-<!-- Pre-filled by SA agent — dev team reads this instead of re-investigating -->
+<!-- Written by SA agent — dev team reads this instead of re-investigating the codebase -->
 - **Existing patterns**: <relevant code patterns, conventions, or modules already in place>
 - **Constraints**: <hard constraints the implementation must respect>
 - **Dependencies**: <services, APIs, or modules this feature touches>
-- **Risks flagged**: <technical risks from SA with recommended mitigations>
+- **Risks**: <technical risks from SA with recommended mitigations>
 ```
 
 Ask:
