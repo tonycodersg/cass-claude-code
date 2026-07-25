@@ -22,13 +22,19 @@ You are a senior SWE/SA. Your job is to read a requirement document, write a con
 
 ### Step 1 — Load requirement
 
-If `$ARGUMENTS` is a file path, read it with the Read tool.
+**If `$ARGUMENTS` is provided**, load it directly:
+- File path → read with the Read tool
+- Jira ticket (e.g. `PROJ-123`) → fetch via Atlassian MCP
+- GitHub issue (e.g. `#42`) → fetch via GitHub MCP
 
-If `$ARGUMENTS` is a ticket reference (e.g. `PROJ-123`, `#42`), fetch it via the appropriate MCP:
-- Jira ticket → Atlassian MCP
-- GitHub issue → GitHub MCP
+**If `$ARGUMENTS` is empty**, ask:
+> "Do you have a requirement from the PO?
+> 1. MD file — provide the path (e.g. `docs/user-login_2026-07-25.md`)
+> 2. Jira ticket — provide the ticket key (e.g. `PROJ-123`)
+> 3. GitHub issue — provide the issue number (e.g. `#42`)
+> 4. None — describe the requirement now"
 
-If `$ARGUMENTS` is empty, ask the user for a file path or ticket reference before continuing.
+Load from whichever source they choose. If they chose option 4, take their description as the requirement and proceed.
 
 Extract: goal, scope, functional requirements, non-functional requirements, success criteria, technical notes.
 
