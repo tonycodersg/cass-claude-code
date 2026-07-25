@@ -1,109 +1,101 @@
 ---
-description: Clean up merged worktrees — lists all agent worktrees, checks PR status, and removes worktrees + branches for merged PRs
+description: Clean up worktrees — lists initialized projects, shows worktrees with branch name and last modified date, removes the ones you select
 argument-hint: "[optional: worktree base path override]"
-allowed-tools: [Bash, AskUserQuestion, Read]
+allowed-tools: [Bash, AskUserQuestion]
 model: haiku
 ---
 
 ## Context
 
 - Working directory: !`pwd`
-- Repo name: !`basename $(git rev-parse --show-toplevel 2>/dev/null) 2>/dev/null || basename $(pwd)`
 - Repo root: !`git rev-parse --show-toplevel 2>/dev/null || pwd`
 - User input: $ARGUMENTS
 - cass settings: !`cat .claude/settings.local.json 2>/dev/null || echo "NOT FOUND"`
 
-## Your Role
-
-Find all cass-managed worktrees, check whether their PRs have been merged, and clean up the ones that are done. Ask before removing anything that looks uncertain.
-
 ## Process
 
-### Step 1 — Find worktree base
+### Step 1 — Select project
 
-If `$ARGUMENTS` is provided, use it as the worktree base path directly.
+**If `$ARGUMENTS` is provided**, use it as the worktree base path and skip to Step 2.
 
-Otherwise, read `cass.projects` from `.claude/settings.local.json` (already injected in context above):
-- If one project → use its `worktreePath`
-- If multiple projects → ask the user which project's worktrees to clean
-- If no projects → tell the user to run `/cass:init <project-name>` first and exit
+**Otherwise**, read `cass.projects` from settings:
+- No projects → tell the user to run `/cass:init <project-name>` first and exit
+- One project → use it automatically
+- Multiple projects → list them and ask which one
 
-### Step 2 — List active worktrees
+---
 
-```bash
-git worktree list --porcelain
-```
+### Step 2 — List worktrees
 
-Filter for worktrees that live inside the worktree base path identified in Step 1.
-
-### Step 3 — Check PR status for each worktree
-
-For each worktree found:
+Run:
 
 ```bash
-# Get the branch name for this worktree
-git -C <worktree-path> branch --show-current
-
-# Check if a PR exists and its state
-gh pr list --head <branch-name> --json number,title,state,mergedAt --limit 1
+ls -1 <worktree-base>
 ```
 
-Classify each worktree:
-- **Merged** — PR state is `MERGED`
-- **Open** — PR is open (not yet merged)
-- **No PR** — no PR found for this branch
-- **Unknown** — gh command failed or branch is detached
+For each folder, get branch and last modified date:
 
-### Step 4 — Report and confirm
+```bash
+git -C <worktree-path> branch --show-current 2>/dev/null || echo "detached"
+stat -f "%Sm" -t "%Y-%m-%d" <worktree-path> 2>/dev/null || stat --format="%y" <worktree-path> 2>/dev/null | cut -d' ' -f1
+```
 
-Present a summary table:
+---
+
+### Step 3 — Show list and ask
+
+Display:
 
 ```
-Worktree cleanup report
-=======================
-<worktree-base>/feat-user-auth/       branch: feat/user-auth          PR #12 — MERGED ✓
-<worktree-base>/PROJ-123-api-layer/   branch: feat/PROJ-123-api-layer PR #13 — OPEN
-<worktree-base>/PROJ-123-ui/          branch: feat/PROJ-123-ui        PR #14 — MERGED ✓
-<worktree-base>/feat-old-thing/       branch: feat/old-thing          No PR found
+#   Folder                   Branch                    Modified
+─── ──────────────────────── ───────────────────────── ──────────
+1   feat-user-auth/          feat/user-auth            2026-07-20
+2   feat-payment/            feat/payment              2026-07-22
+3   feat-old-thing/          feat/old-thing            2026-06-10
 ```
 
 Ask:
-> "Found [N] merged worktrees ready to clean. Shall I remove them and delete their branches?
-> (Open PRs and 'No PR' worktrees will be skipped unless you confirm separately)"
+> "Which worktrees do you want to remove? Enter numbers separated by commas (e.g. 1,3), or `all`, or `none`:"
 
-For any "No PR" worktrees, ask individually:
-> "No PR found for `<branch>` in `<folder>`. Remove this worktree anyway? (y/n)"
+---
 
-### Step 5 — Clean up
+### Step 4 — Remove selected
 
-For each confirmed worktree to remove:
+For each selected worktree:
 
 ```bash
-# Remove the worktree
 git worktree remove <worktree-path> --force
-
-# Delete the local branch
-git branch -d <branch-name>
-
-# Delete the remote branch (optional — ask first)
-gh pr view <pr-number> --json mergedAt | grep -q mergedAt && git push origin --delete <branch-name> 2>/dev/null || true
+git branch -d <branch-name> 2>/dev/null || true
 ```
 
-Before deleting remote branches, ask:
-> "Also delete the remote branches on origin? (They may already be deleted if auto-delete is enabled on your repo)"
+Then check if a remote tracking branch still exists:
 
-### Step 6 — Final report
-
-```
-Cleanup complete
-================
-Removed: <worktree-path> (PR #N merged)
-Removed: <worktree-path> (PR #N merged)
-Skipped: <worktree-path> (PR open)
-Skipped: <worktree-path> (user chose to keep)
-
-Remaining worktrees: <N>
+```bash
+git ls-remote --heads origin <branch-name>
 ```
 
-If the worktree base folder is now empty after cleanup, offer to remove it:
-> "The worktree folder `<worktree-base>` is now empty. Remove it?"
+- If it **does not exist** on remote → skip, nothing to do
+- If it **exists** on remote → ask once for all remaining:
+  > "Remote branches still exist for: `feat/user-auth`, `feat/old-thing`. Delete them on origin? (y/n)"
+
+  If yes:
+  ```bash
+  git push origin --delete <branch-name> 2>/dev/null || true
+  ```
+
+---
+
+### Step 5 — Report
+
+```
+Done
+====
+Removed: feat-user-auth/    feat/user-auth
+Removed: feat-old-thing/    feat/old-thing
+Kept:    feat-payment/      feat/payment
+
+Remaining: 1 worktree
+```
+
+If the base folder is now empty, offer to remove it:
+> "Worktree folder is now empty. Remove it? (y/n)"

@@ -163,13 +163,13 @@ Outputs a pass/warn/fail report with fix commands for anything missing.
 - Creates feature branches from `mainBranch` and worktrees under `worktreePath`
 - Sub-task branches target the main feature branch (not the main branch); each agent creates its own PR
 
-### `/cass:pr`
+### `/cass:pr [base branch]`
 
-Creates a PR from the current branch. Auto-detects the correct target:
-- Sub-task branch → PR targets the main feature branch
-- Main feature branch → PR targets `staging`
+Run this inside a worktree folder where the feature branch is checked out. Auto-detects the correct PR target:
+- Sub-task branch (e.g. `feat/user-auth-api-layer`) → PR targets the parent main feature branch
+- Main feature branch (e.g. `feat/user-auth`) → PR targets `staging` by default; prompts to confirm or type a different target
 
-Optionally triggers SA review before creating. Includes What / Why / How / SA Review / Implementation Steps / Checklist.
+Optionally triggers SA review before creating. Includes What / Why / How / SA Review / Implementation Steps / Checklist. Pass a branch name as argument to override the target: `/cass:pr main`.
 
 ### `/cass:review [PR number or URL]`
 
