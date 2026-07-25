@@ -1,5 +1,5 @@
 ---
-description: Smoke test — creates an isolated temp repo, runs through the cass workflow mechanics (init, worktree creation, clean-wt listing), reports pass/fail for each step, then cleans up
+description: Smoke test — creates an isolated temp repo, runs through cass workflow mechanics (init, plan, dev-feat, clean-wt), reports pass/fail for each step, then cleans up
 allowed-tools: [Bash, Read]
 ---
 
@@ -21,6 +21,7 @@ Run a scripted smoke test of cass command mechanics in an isolated temp director
 TEST_DIR=$(mktemp -d)
 TEST_REPO="$TEST_DIR/cass-test-repo"
 TEST_WT="$TEST_DIR/cass-test-repo-agent-works"
+TODAY=$(date +%Y-%m-%d)
 
 mkdir -p "$TEST_REPO"
 cd "$TEST_REPO"
@@ -48,8 +49,7 @@ Track results as a list: `PASS`, `FAIL <reason>`, or `SKIP <reason>`.
 mkdir -p "$TEST_REPO/.claude"
 ```
 
-Check `.claude/` exists:
-- **PASS** if directory exists
+- **PASS** if `.claude/` exists
 - **FAIL** otherwise
 
 ---
@@ -60,8 +60,7 @@ Check `.claude/` exists:
 cp "${CLAUDE_PLUGIN_ROOT}/assets/commit-template/.gitmessage" "$TEST_REPO/cass-.gitmessage"
 ```
 
-Check `cass-.gitmessage` exists and is non-empty:
-- **PASS** if file exists and has content
+- **PASS** if `cass-.gitmessage` exists and is non-empty
 - **FAIL** otherwise
 
 ---
@@ -73,15 +72,12 @@ mkdir -p "$TEST_REPO/.github"
 cp "${CLAUDE_PLUGIN_ROOT}/assets/pr-template/pull_request_template.md" "$TEST_REPO/.github/cass-pull_request_template.md"
 ```
 
-Check `.github/cass-pull_request_template.md` exists:
-- **PASS** if file exists
+- **PASS** if `.github/cass-pull_request_template.md` exists
 - **FAIL** otherwise
 
 ---
 
 ### Test 4 — init: settings.local.json written correctly
-
-Write a simulated settings file:
 
 ```bash
 cat > "$TEST_REPO/.claude/settings.local.json" <<EOF
@@ -99,28 +95,25 @@ cat > "$TEST_REPO/.claude/settings.local.json" <<EOF
 EOF
 ```
 
-Read it back and verify:
-- `cass.projects.cass-test-repo.mainRepoPath` == `$TEST_REPO`
-- `cass.projects.cass-test-repo.mainBranch` == `"main"`
-- `cass.projects.cass-test-repo.worktreePath` == `$TEST_WT`
+Verify all three fields round-trip correctly:
 
 ```bash
-node -e "
-  const s = JSON.parse(require('fs').readFileSync('$TEST_REPO/.claude/settings.local.json'));
-  const p = s.cass.projects['cass-test-repo'];
-  const ok = p.mainRepoPath === '$TEST_REPO' && p.mainBranch === 'main' && p.worktreePath === '$TEST_WT';
-  process.exit(ok ? 0 : 1);
-" 2>/dev/null || python3 -c "
+python3 -c "
 import json, sys
 s = json.load(open('$TEST_REPO/.claude/settings.local.json'))
 p = s['cass']['projects']['cass-test-repo']
 ok = p['mainRepoPath'] == '$TEST_REPO' and p['mainBranch'] == 'main' and p['worktreePath'] == '$TEST_WT'
 sys.exit(0 if ok else 1)
+" 2>/dev/null || node -e "
+  const s = JSON.parse(require('fs').readFileSync('$TEST_REPO/.claude/settings.local.json'));
+  const p = s.cass.projects['cass-test-repo'];
+  const ok = p.mainRepoPath === '$TEST_REPO' && p.mainBranch === 'main' && p.worktreePath === '$TEST_WT';
+  process.exit(ok ? 0 : 1);
 "
 ```
 
 - **PASS** if exit 0
-- **FAIL** if exit 1 or command not available
+- **FAIL** if exit 1 or no parser available
 
 ---
 
@@ -130,15 +123,12 @@ sys.exit(0 if ok else 1)
 mkdir -p "$TEST_WT"
 ```
 
-Check folder exists:
-- **PASS** if directory exists
+- **PASS** if `$TEST_WT` exists
 - **FAIL** otherwise
 
 ---
 
 ### Test 6 — init re-run: second project merges without overwriting first
-
-Simulate a second init for a different project:
 
 ```bash
 python3 -c "
@@ -160,27 +150,96 @@ json.dump(s, open(path, 'w'), indent=2)
 "
 ```
 
-Verify original project is still intact:
 ```bash
 python3 -c "
 import json, sys
 s = json.load(open('$TEST_REPO/.claude/settings.local.json'))
-orig = s['cass']['projects'].get('cass-test-repo')
-new = s['cass']['projects'].get('another-project')
-sys.exit(0 if orig and new else 1)
+ok = bool(s['cass']['projects'].get('cass-test-repo')) and bool(s['cass']['projects'].get('another-project'))
+sys.exit(0 if ok else 1)
 " 2>/dev/null || node -e "
   const s = JSON.parse(require('fs').readFileSync('$TEST_REPO/.claude/settings.local.json'));
-  const ok = s.cass.projects['cass-test-repo'] && s.cass.projects['another-project'];
-  process.exit(ok ? 0 : 1);
+  process.exit(s.cass.projects['cass-test-repo'] && s.cass.projects['another-project'] ? 0 : 1);
 "
 ```
 
-- **PASS** if both projects exist
+- **PASS** if both projects exist in settings
 - **FAIL** if first project was overwritten
 
 ---
 
-### Test 7 — dev-feat: worktree created for a feature branch
+### Test 7 — plan: requirement file is readable
+
+Write a sample requirement doc:
+
+```bash
+mkdir -p "$TEST_REPO/docs"
+cat > "$TEST_REPO/docs/test-requirement.md" <<EOF
+# Requirement: User Login
+
+## Goal
+Allow users to log in with email and password.
+
+## Functional Requirements
+- Email and password fields on login page
+- Validate credentials against the database
+- Redirect to dashboard on success
+
+## Success Criteria
+- [ ] User can log in with valid credentials
+- [ ] Invalid credentials show an error message
+EOF
+```
+
+Read it back and verify it contains expected sections:
+
+```bash
+grep -c "## Goal\|## Functional Requirements\|## Success Criteria" "$TEST_REPO/docs/test-requirement.md"
+```
+
+- **PASS** if count is 3 (all sections present)
+- **FAIL** otherwise
+
+---
+
+### Test 8 — plan: docs/ output folder and MD file naming
+
+Simulate saving the plan output as an MD file:
+
+```bash
+KEBAB_TITLE="user-login"
+PLAN_FILE="$TEST_REPO/docs/${KEBAB_TITLE}_${TODAY}.md"
+
+cat > "$PLAN_FILE" <<EOF
+## Plan: User Login
+
+### Goal
+Allow users to log in with email and password.
+
+### Risks
+| Risk | Likelihood | Impact | Suggestion |
+|------|------------|--------|------------|
+| Brute force attacks | High | High | Add rate limiting and account lockout |
+
+### Suggestions
+- Consider OAuth as a future extension
+
+### Success Criteria
+- [ ] User can log in with valid credentials
+EOF
+```
+
+Verify file exists at the expected path and contains a Risks section:
+
+```bash
+[ -f "$PLAN_FILE" ] && grep -q "### Risks" "$PLAN_FILE"
+```
+
+- **PASS** if file exists and has Risks section
+- **FAIL** otherwise
+
+---
+
+### Test 9 — dev-feat: worktree created for a feature branch
 
 ```bash
 cd "$TEST_REPO"
@@ -188,7 +247,6 @@ git checkout -b feat/smoke-test
 git worktree add "$TEST_WT/feat-smoke-test" feat/smoke-test
 ```
 
-Check worktree folder exists and is on correct branch:
 ```bash
 git -C "$TEST_WT/feat-smoke-test" branch --show-current
 ```
@@ -198,7 +256,7 @@ git -C "$TEST_WT/feat-smoke-test" branch --show-current
 
 ---
 
-### Test 8 — clean-wt: folder listing shows branch and date
+### Test 10 — clean-wt: folder listing shows branch and date
 
 ```bash
 BRANCH=$(git -C "$TEST_WT/feat-smoke-test" branch --show-current 2>/dev/null)
@@ -207,19 +265,29 @@ MODIFIED=$(stat -f "%Sm" -t "%Y-%m-%d" "$TEST_WT/feat-smoke-test" 2>/dev/null \
 echo "Branch: $BRANCH | Modified: $MODIFIED"
 ```
 
-- **PASS** if `BRANCH` is non-empty and `MODIFIED` matches `YYYY-MM-DD` pattern
+- **PASS** if `BRANCH` is non-empty and `MODIFIED` matches `YYYY-MM-DD`
 - **FAIL** otherwise
 
 ---
 
-### Test 9 — clean-wt: worktree removal
+### Test 11 — clean-wt: remote branch check (no remote = skip deletion)
+
+```bash
+git ls-remote --heads origin feat/smoke-test 2>/dev/null
+```
+
+- **PASS** if command runs without error (empty output = no remote branch = deletion correctly skipped)
+- **FAIL** if command errors
+
+---
+
+### Test 12 — clean-wt: worktree removal
 
 ```bash
 git worktree remove "$TEST_WT/feat-smoke-test" --force
 git branch -d feat/smoke-test 2>/dev/null || true
 ```
 
-Check worktree folder is gone:
 - **PASS** if `$TEST_WT/feat-smoke-test` no longer exists
 - **FAIL** if it still exists
 
@@ -232,34 +300,34 @@ cd /tmp
 rm -rf "$TEST_DIR"
 ```
 
-Confirm `$TEST_DIR` is gone:
-- **PASS** if removed
-- **FAIL** if still exists
+- **PASS** if `$TEST_DIR` no longer exists
+- **FAIL** otherwise
 
 ---
 
 ### Final report
 
-Print results for every test:
-
 ```
 cass smoke test results
 =======================
-Test 1  init: .claude folder              PASS
-Test 2  init: commit template             PASS
-Test 3  init: PR template                 PASS
-Test 4  init: settings.local.json shape   PASS
-Test 5  init: worktree base folder        PASS
-Test 6  init: re-run merges projects      PASS
-Test 7  dev-feat: worktree creation       PASS
-Test 8  clean-wt: listing branch + date   PASS
-Test 9  clean-wt: worktree removal        PASS
-Test 10 teardown: temp dir removed        PASS
-───────────────────────────────────────────────
-10 passed  0 failed
+Test 1   init: .claude folder                  PASS
+Test 2   init: commit template                 PASS
+Test 3   init: PR template                     PASS
+Test 4   init: settings.local.json shape       PASS
+Test 5   init: worktree base folder            PASS
+Test 6   init: re-run merges projects          PASS
+Test 7   plan: requirement file readable       PASS
+Test 8   plan: docs/ output + MD naming        PASS
+Test 9   dev-feat: worktree creation           PASS
+Test 10  clean-wt: listing branch + date       PASS
+Test 11  clean-wt: remote branch check         PASS
+Test 12  clean-wt: worktree removal            PASS
+Test 13  teardown: temp dir removed            PASS
+────────────────────────────────────────────────────
+13 passed  0 failed
 ```
 
-Use `PASS` / `FAIL` / `SKIP`. If any test failed, list the failures with the error output under the table.
+Use `PASS` / `FAIL` / `SKIP`. List any failures with error output below the table.
 
 If all pass:
 > "All checks passed. cass mechanics are working correctly."
