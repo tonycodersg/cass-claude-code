@@ -328,42 +328,51 @@ It checks git identity, `gh` auth, Serena connectivity, Atlassian MCP, and proje
 
 ## Installation
 
-### Option 1 — Clone from GitHub (recommended)
+### Option 1 — Plugin marketplace (recommended)
+
+**Prerequisites:** SSH key must be added to your GitHub account. Test with:
+```bash
+ssh -T git@github.com
+# Should print: Hi <username>! You've successfully authenticated
+```
+
+If not set up, see [GitHub SSH key guide](https://docs.github.com/en/authentication/connecting-to-github-with-ssh).
+
+**Install globally** (available in every Claude Code session):
+
+In any Claude Code session:
+```
+/plugin marketplace add tonycodersg/cass-claude-code
+/plugin install cass@cass-marketplace --global
+/reload-plugins
+```
+
+**Update:**
+```
+/plugin update cass@cass-marketplace
+/reload-plugins
+```
+
+---
+
+### Option 2 — Clone from GitHub
 
 ```bash
 git clone https://github.com/tonycodersg/cass-claude-code ~/.claude/plugins/cass
 ```
 
-That's it. Claude Code auto-loads any plugin under `~/.claude/plugins/` — no restart needed.
+Claude Code auto-loads anything under `~/.claude/plugins/` — no restart needed.
 
-Then initialise cass in your project:
-
-```
-/cass:init <project-name>
-```
-
-**To update later:**
-
+**Update:**
 ```bash
 cd ~/.claude/plugins/cass && git pull
 ```
 
 ---
 
-### Option 2 — Plugin marketplace
-
-In any Claude Code session, run:
-
-```
-/plugin marketplace add tonycodersg/cass-claude-code
-/plugin install cass@cass-marketplace
-```
-
----
-
 ### Option 3 — Per-session only
 
-Load for a single session without installing globally:
+Load for a single session without a permanent install:
 
 ```bash
 claude --plugin-dir /path/to/cass-claude-code
@@ -373,8 +382,14 @@ claude --plugin-dir /path/to/cass-claude-code
 
 ### Option 4 — Symlink (for local development)
 
-If you have cloned the repo somewhere else and want to develop against it:
-
 ```bash
 ln -s /path/to/cass-claude-code ~/.claude/plugins/cass
 ```
+
+Updates automatically as you edit files — no pull needed.
+
+---
+
+### After installing
+
+Run `/cass:init <project-name>` in your project to set up the worktree path and main branch, then `/cass:doctor` to verify everything is wired up.
