@@ -119,10 +119,17 @@ PR body structure:
 ## Implementation Steps
 <numbered list of what was done>
 
+## Risks
+<risks carried over from the plan's Risks table, or "No significant risks" if none were flagged>
+
+## Test Coverage
+<what was tested — unit tests added, integration tests, manual verification steps>
+
 ## Checklist
 - [ ] <success criterion from plan>
 - [ ] Build and lint pass
 - [ ] Tests pass
+- [ ] Risks documented
 - [ ] No out-of-scope changes
 
 ---
