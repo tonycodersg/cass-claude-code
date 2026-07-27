@@ -14,6 +14,7 @@ model: sonnet
 - Today's date: !`date +%Y-%m-%d`
 - All worktrees: !`git worktree list --porcelain 2>/dev/null`
 - cass settings: !`cat .claude/settings.local.json 2>/dev/null || echo "NOT FOUND"`
+- Claude session ID: !`echo "${CLAUDE_SESSION_ID:-unknown}"`
 - User override: $ARGUMENTS
 
 ## Your Role
@@ -123,9 +124,13 @@ PR body structure:
 - [ ] Build and lint pass
 - [ ] Tests pass
 - [ ] No out-of-scope changes
+
+---
+
+**Claude session:** <Claude session ID from context>
 ```
 
-If `.github/cass-pull_request_template.md` exists, use it as the base template.
+If `.github/cass-pull_request_template.md` exists, use it as the base template and replace the `<!-- $CLAUDE_SESSION_ID -->` placeholder with the session ID from context.
 
 If `gh` is not available, output the filled PR body for the user to paste manually and provide the GitHub PR creation URL.
 

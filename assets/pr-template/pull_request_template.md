@@ -19,3 +19,7 @@
 - [ ] Tests pass (or N/A with reason)
 - [ ] No unintended side effects
 - [ ] Ready for review
+
+---
+
+**Claude session:** <!-- $CLAUDE_SESSION_ID -->
