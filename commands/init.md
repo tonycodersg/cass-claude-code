@@ -100,12 +100,37 @@ If `cass-.gitmessage` already exists, skip the copy and print:
 
 ---
 
-### Step 6 — Copy PR template
+### Step 6 — Set up PR template
 
-Create `.github/` if it does not exist, then copy `${CLAUDE_PLUGIN_ROOT}/assets/pr-template/pull_request_template.md` to `.github/cass-pull_request_template.md`.
-
-If `.github/cass-pull_request_template.md` already exists, skip the copy and print:
+If `.github/cass-pull_request_template.md` already exists, skip this step and print:
 > "`.github/cass-pull_request_template.md` already exists — skipped."
+
+Otherwise, ask:
+
+> **PR template**
+> Would you like to use a custom PR template from this repo?
+>
+> 1. Use cass default template (recommended)
+> 2. Use an existing file from this repo — provide the path (e.g. `.github/pull_request_template.md`)
+
+**If option 1:** create `.github/` if it doesn't exist, then copy `${CLAUDE_PLUGIN_ROOT}/assets/pr-template/pull_request_template.md` to `.github/cass-pull_request_template.md`.
+
+**If option 2:** read the file at the path they provided. If it exists, copy it to `.github/cass-pull_request_template.md`. If the file doesn't exist, warn:
+> "File not found at `<path>`. Falling back to cass default template."
+And copy the default instead.
+
+Save the chosen template source to `.claude/settings.local.json` under the project config:
+```json
+{
+  "cass": {
+    "projects": {
+      "<project name>": {
+        "prTemplate": "default"  // or the path they provided
+      }
+    }
+  }
+}
+```
 
 ---
 
@@ -133,7 +158,7 @@ Project:        <project name>
 
   ✓  .claude/settings.local.json   saved
   ✓  cass-.gitmessage              copied  (or: skipped — already exists)
-  ✓  .github/cass-pull_request_template.md   copied  (or: skipped — already exists)
+  ✓  .github/cass-pull_request_template.md   copied from <default / path they provided>  (or: skipped — already exists)
   ✓  worktree base folder          created  (or: already exists)
 
 Run /cass:doctor to verify the full setup.
