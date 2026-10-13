@@ -5,7 +5,7 @@
 > Hooks run automatically to guard against destructive commands and keep Claude context-aware.
 > Each repo gets its own `.cass/` customization layer — override commands, agents, hooks, and templates, committed alongside your code.
 
-**Latest stable: [v0.7.0](https://github.com/tonycodersg/cass-claude-code/releases/tag/v0.7.0)**
+**Latest stable: [v0.8.0](https://github.com/tonycodersg/cass-claude-code/releases/tag/v0.8.0)**
 
 ---
 

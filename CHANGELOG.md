@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-10-13
+
+### Added
+
+- `commands/pr`: post-PR callback hook — after every PR is created, `/cass:pr` runs `.cass/hooks/scripts/post-pr.sh` if it exists, passing PR URL, source branch, and target branch. Teams use this for Slack notifications, Jira transitions, generic webhooks, etc.
+- `commands/customize`: scaffolds `post-pr.sh` stub with commented Slack and generic webhook examples when `hooks` is selected
+- `README.md`: documents the post-PR callback pattern with a Slack example
+
 ## [0.7.0] - 2026-10-13
 
 ### Added
