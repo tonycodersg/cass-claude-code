@@ -1,36 +1,45 @@
 ## What
 
-<!-- A concise description of what this PR does. -->
+<!-- What this PR does — one or two sentences. -->
 
 ## Why
 
-<!-- The motivation or context. Link the plan file or Jira ticket if applicable. -->
-<!-- Plan: `.claude/plans/<title>.md` -->
-<!-- Ticket: PROJ-123 -->
+<!-- Motivation. Link plan file or ticket. -->
+<!-- Plan: docs/<title>.md | Ticket: PROJ-123 | Issue: #42 -->
 
 ## How
 
-<!-- A brief summary of the approach taken. -->
+<!-- Approach summary — key decisions, not every detail. -->
+
+## Screenshots / Demo
+
+<!-- For UI changes: before/after screenshots or a short screen recording. -->
+<!-- Delete this section if not applicable. -->
 
 ## Risks
 
-<!-- List any risks introduced by this PR and how they are mitigated. -->
-<!-- If none, write "No significant risks." -->
+<!-- Risks introduced and how they're mitigated. "No significant risks" if none. -->
 
 ## Test Coverage
 
-<!-- What was tested and how. Include manual steps if automated tests don't cover it. -->
-<!-- e.g. Unit tests added for X, integration test for Y, manually verified Z -->
+<!-- What was tested: unit tests, integration tests, manual steps. -->
 
 ## Checklist
 
-- [ ] Matches the plan / ticket scope
+- [ ] Matches plan / ticket scope
 - [ ] Build and lint pass
 - [ ] Tests pass (or N/A with reason)
-- [ ] Risks documented above
+- [ ] Risks documented
 - [ ] No unintended side effects
 - [ ] Ready for review
 
 ---
 
+<details>
+<summary>Session info</summary>
+
 **Claude session:** <!-- $CLAUDE_SESSION_ID -->
+**Agent:** cass/swe
+**Plan file:** <!-- path if applicable -->
+
+</details>
