@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.2] - 2026-10-13
+
+### Added
+
+- `commands/init`: Step 0 prerequisite check — verifies `git` identity, `gh` installed + authenticated, and `uvx` installed before touching any files; fails fast with exact fix commands if anything is missing
+
 ## [0.8.1] - 2026-10-13
 
 ### Added

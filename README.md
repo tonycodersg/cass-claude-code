@@ -5,7 +5,7 @@
 > Hooks run automatically to guard against destructive commands and keep Claude context-aware.
 > Each repo gets its own `.cass/` customization layer — override commands, agents, hooks, and templates, committed alongside your code.
 
-**Latest stable: [v0.8.1](https://github.com/tonycodersg/cass-claude-code/releases/tag/v0.8.1)**
+**Latest stable: [v0.8.2](https://github.com/tonycodersg/cass-claude-code/releases/tag/v0.8.2)**
 
 ---
 
@@ -24,8 +24,8 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 ### 2. Clone the plugin
 
 ```bash
-# Latest stable (v0.8.1)
-git clone --branch v0.8.1 https://github.com/tonycodersg/cass-claude-code ~/.claude/plugins/cass
+# Latest stable (v0.8.2)
+git clone --branch v0.8.2 https://github.com/tonycodersg/cass-claude-code ~/.claude/plugins/cass
 
 # Or track latest
 git clone https://github.com/tonycodersg/cass-claude-code ~/.claude/plugins/cass
