@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.3] - 2026-10-13
+
+### Added
+
+- `commands/eject`: new `/cass:eject` command — removes all repo-local cass config (`.cass/`, `cass-.gitmessage`, `cass.projects` from settings, `.gitignore` entries, git commit template). Pass `--hard` to also remove `.claude/commands/` overrides. Global plugin untouched.
+
+### Changed
+
+- `README.md`: commands table updated — eject moved to Setup group, descriptions reflect latest features (post-PR hook, version in doctor, prerequisite check in init)
+
 ## [0.8.2] - 2026-10-13
 
 ### Added

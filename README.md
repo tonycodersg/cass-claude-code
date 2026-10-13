@@ -5,7 +5,7 @@
 > Hooks run automatically to guard against destructive commands and keep Claude context-aware.
 > Each repo gets its own `.cass/` customization layer — override commands, agents, hooks, and templates, committed alongside your code.
 
-**Latest stable: [v0.8.2](https://github.com/tonycodersg/cass-claude-code/releases/tag/v0.8.2)**
+**Latest stable: [v0.8.3](https://github.com/tonycodersg/cass-claude-code/releases/tag/v0.8.3)**
 
 ---
 
@@ -24,8 +24,8 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 ### 2. Clone the plugin
 
 ```bash
-# Latest stable (v0.8.2)
-git clone --branch v0.8.2 https://github.com/tonycodersg/cass-claude-code ~/.claude/plugins/cass
+# Latest stable (v0.8.3)
+git clone --branch v0.8.3 https://github.com/tonycodersg/cass-claude-code ~/.claude/plugins/cass
 
 # Or track latest
 git clone https://github.com/tonycodersg/cass-claude-code ~/.claude/plugins/cass
@@ -114,17 +114,17 @@ Prompt       injects repo / branch / worktree context into every message
 
 | Command | Role | What it does |
 |---|---|---|
-| `/cass:init [project]` | Setup | Register project paths, copy templates, create worktree folder |
-| `/cass:doctor` | Setup | Health check — tools, MCP servers, git config, project settings |
-| `/cass:customize` | Setup | Scaffold `.cass/` override package for this repo |
+| `/cass:init [project]` | Setup | Prerequisite check, create `.cass/` templates, save project config, wire git |
+| `/cass:doctor` | Setup | Health check — tools, MCP servers, git config, project settings, cass version |
+| `/cass:customize` | Setup | Scaffold `.cass/` override package — commands, agents, hooks, post-PR callback |
+| `/cass:eject` | Setup | Remove all cass config from this repo — undoes `/cass:init`. `--hard` also removes `.claude/commands/` |
 | `/cass:plan [text or doc]` | PO | Requirement → risk-assessed plan → Jira / GitHub issue / MD file |
 | `/cass:dev-feat [plan/ticket]` | Dev | Plan → feature branch + worktree → parallel SWE agents |
 | `/cass:commit` | Dev | Stage changes, generate semantic message, commit with co-author |
-| `/cass:pr` | Dev | Create PR from current worktree — auto-detects base branch |
+| `/cass:pr` | Dev | Create PR from current worktree — fires post-PR callback hook if configured |
 | `/cass:review [PR or branch]` | Dev | Code review via pr-reviewer agent — P1 / P2 / P3 findings |
 | `/cass:clean-wt` | Dev | List worktrees by project, pick to remove |
 | `/cass:test` | Dev | 13-step smoke test of cass mechanics in an isolated temp repo |
-| `/cass:eject` | Setup | Remove all cass config from this repo — undoes `/cass:init`. Pass `--hard` to also remove `.claude/commands/` overrides |
 
 ---
 
