@@ -1,0 +1,17 @@
+{
+  "hooks": [
+    {
+      "event": "PreToolUse",
+      "matcher": "Bash",
+      "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/pre-bash.sh"
+    },
+    {
+      "event": "Stop",
+      "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/stop.sh"
+    },
+    {
+      "event": "UserPromptSubmit",
+      "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/prompt-submit.sh"
+    }
+  ]
+}
