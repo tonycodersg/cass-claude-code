@@ -7,6 +7,7 @@ allowed-tools: [Bash, Read]
 
 - Working directory: !`pwd`
 - OS: !`uname -s`
+- cass version: !`cat "${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json" 2>/dev/null | python3 -c "import json,sys; print(json.load(sys.stdin).get('version','unknown'))" 2>/dev/null || echo "unknown"`
 - Git user name: !`git config user.name 2>/dev/null || echo "NOT SET"`
 - Git user email: !`git config user.email 2>/dev/null || echo "NOT SET"`
 - Git commit template: !`git config commit.template 2>/dev/null || echo "NOT SET"`
@@ -135,8 +136,8 @@ For each project, also check that `worktreePath` exists on disk:
 Print a formatted summary:
 
 ```
-cass doctor
-===========
+cass doctor  (v<cass version from context>)
+============================================
 
 Git
   ✓  user.name / user.email           configured
