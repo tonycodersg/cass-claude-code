@@ -104,6 +104,7 @@ my-repo-agent-works/
 | `/cass:review [PR or branch]` | Dev | Code review via pr-reviewer agent |
 | `/cass:clean-wt` | Dev | Remove merged worktrees |
 | `/cass:test` | Dev | Smoke test cass mechanics |
+| `/cass:release [version]` | Maintainer | Bump version, update changelog, tag, push, GitHub Release |
 | `/cass:plan-task` | Dev | Single-command plan + implement (legacy) |
 
 ---
