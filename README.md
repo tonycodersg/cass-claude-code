@@ -136,7 +136,22 @@ cp ~/.claude/plugins/cass/commands/pr.md .claude/commands/cass:pr.md
 cp ~/.claude/plugins/cass/agents/swe.md .cass/agents/swe.md
 ```
 
-**Add a repo-specific hook:**
+**Add a post-PR callback (Slack, webhooks, Jira transitions):**
+
+`/cass:pr` automatically runs `.cass/hooks/scripts/post-pr.sh` after every PR is created — if the file exists. The script receives `$1` PR URL, `$2` source branch, `$3` target branch.
+
+Run `/cass:customize hooks` to scaffold the stub, then uncomment the integration you want:
+
+```bash
+# .cass/hooks/scripts/post-pr.sh
+curl -s -X POST "$SLACK_WEBHOOK_URL" \
+  -H "Content-Type: application/json" \
+  -d "{\"text\": \"PR ready for review: $1 ($2 → $3)\"}"
+```
+
+Commit `.cass/hooks/scripts/post-pr.sh` — your whole team gets the notification automatically.
+
+**Add other repo-specific hooks:**
 Edit `.cass/hooks/hooks.json` — these run alongside the global plugin hooks.
 
 Commit `.cass/` to version-control so your whole team gets the same overrides.

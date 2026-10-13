@@ -145,6 +145,43 @@ Available agents to override:
 }
 ```
 
+Also write `.cass/hooks/scripts/post-pr.sh` — the callback stub that `/cass:pr` calls after every PR is created:
+
+```bash
+#!/usr/bin/env bash
+# post-pr.sh — called by /cass:pr after a PR is created
+#
+# Arguments:
+#   $1  PR URL      e.g. https://github.com/org/repo/pull/42
+#   $2  Source branch  e.g. feat/user-auth
+#   $3  Target branch  e.g. staging
+#
+# Uncomment and configure the integration you want:
+
+PR_URL="$1"
+BRANCH="$2"
+TARGET="$3"
+
+# --- Slack webhook ---
+# export SLACK_WEBHOOK_URL="https://hooks.slack.com/services/..."
+# curl -s -X POST "$SLACK_WEBHOOK_URL" \
+#   -H "Content-Type: application/json" \
+#   -d "{\"text\": \"PR ready for review: $PR_URL ($BRANCH → $TARGET)\"}"
+
+# --- Generic webhook ---
+# curl -s -X POST "$CASS_WEBHOOK_URL" \
+#   -H "Content-Type: application/json" \
+#   -d "{\"pr_url\":\"$PR_URL\",\"branch\":\"$BRANCH\",\"target\":\"$TARGET\"}"
+
+echo "[cass] post-pr hook ran — PR: $PR_URL"
+```
+
+Make it executable:
+
+```bash
+chmod +x .cass/hooks/scripts/post-pr.sh
+```
+
 ---
 
 ### Step 5 — Update .gitignore
