@@ -130,10 +130,40 @@ See [docs/TECHNICAL.md](docs/TECHNICAL.md) for full setup instructions.
 cd ~/.claude/plugins/cass && git pull
 ```
 
+**Pin to a release:**
+```bash
+cd ~/.claude/plugins/cass && git checkout v0.7.0
+```
+
 **Marketplace:**
 ```
 /plugin update cass@cass-marketplace
 /reload-plugins
+```
+
+---
+
+## Releasing (maintainers)
+
+```bash
+# 1. Make sure you're on master with everything merged
+git checkout master && git pull
+
+# 2. Update CHANGELOG.md — move [Unreleased] entries under a new [x.y.z] heading
+
+# 3. Bump version in .claude-plugin/plugin.json
+
+# 4. Commit
+git add CHANGELOG.md .claude-plugin/plugin.json
+git commit -m "chore(release): bump to vX.Y.Z"
+
+# 5. Tag and push
+git tag vX.Y.Z
+git push origin master
+git push origin vX.Y.Z
+
+# 6. Create GitHub Release
+gh release create vX.Y.Z --title "vX.Y.Z" --notes-file <(awk '/## \[X.Y.Z\]/{found=1; next} found && /## \[/{exit} found{print}' CHANGELOG.md)
 ```
 
 ---
