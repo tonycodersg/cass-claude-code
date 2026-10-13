@@ -35,19 +35,19 @@ Before doing anything, verify the required tools are available from context. Col
 | `gh` authenticated | auth status shows logged in | `gh auth login` |
 | `uvx` installed | `uvx --version` returned a version | `curl -LsSf https://astral.sh/uv/install.sh \| sh` |
 
-**If any check fails**, print a clear blocklist and stop:
+**If any check fails**, output a colored blocklist via `printf` and stop:
 
+```bash
+printf "\033[1;31m╔══════════════════════════════════════════╗\033[0m\n"
+printf "\033[1;31m║  cass init — prerequisites missing       ║\033[0m\n"
+printf "\033[1;31m╚══════════════════════════════════════════╝\033[0m\n\n"
+printf "\033[31m✗\033[0m  gh not installed     → brew install gh\n"
+printf "\033[31m✗\033[0m  gh not authenticated → gh auth login\n"
+printf "\033[31m✗\033[0m  uvx not installed    → curl -LsSf https://astral.sh/uv/install.sh | sh\n\n"
+printf "\033[2mFix the above, then re-run /cass:init.\033[0m\n"
 ```
-cass init — prerequisites missing
-===================================
-✗  gh not installed     → brew install gh
-✗  gh not authenticated → gh auth login
-✗  uvx not installed    → curl -LsSf https://astral.sh/uv/install.sh | sh
 
-Fix the above, then re-run /cass:init.
-```
-
-Do not proceed until all prerequisites pass.
+Only print the lines that actually failed. Do not proceed until all prerequisites pass.
 
 ---
 
@@ -183,31 +183,36 @@ mkdir -p <worktree path>
 
 ### Step 8 — Report
 
+Output the report via `printf` with ANSI color codes:
+
+```bash
+printf "\033[1;36m╔══════════════════════════════════════════╗\033[0m\n"
+printf "\033[1;36m║  cass init complete                      ║\033[0m\n"
+printf "\033[1;36m╚══════════════════════════════════════════╝\033[0m\n\n"
+printf "\033[2mProject:  \033[0m\033[1m<project name>\033[0m\n"
+printf "\033[2mRepo:     \033[0m<absolute path>  \033[2m(branch: <main branch>)\033[0m\n"
+printf "\033[2mWorktrees:\033[0m <worktree path>\n\n"
+
+printf "\033[1;36mPrerequisites\033[0m\n"
+printf "  \033[32m✓\033[0m  git identity      \033[2m<name> / <email>\033[0m\n"
+printf "  \033[32m✓\033[0m  gh installed      \033[2mgh version 2.x.x\033[0m\n"
+printf "  \033[32m✓\033[0m  gh authenticated  \033[2mlogged in as <user>\033[0m\n"
+printf "  \033[32m✓\033[0m  uvx installed     \033[2muv 0.x.x\033[0m\n\n"
+
+printf "\033[1;36mFiles\033[0m\n"
+printf "  \033[32m✓\033[0m  .claude/settings.local.json   \033[2msaved\033[0m\n"
+printf "  \033[32m✓\033[0m  .cass/commit-template.md      \033[2mcopied\033[0m\n"
+printf "  \033[32m✓\033[0m  .cass/pr-template.md          \033[2mcopied\033[0m\n"
+printf "  \033[32m✓\033[0m  cass-.gitmessage              \033[2mlinked\033[0m\n"
+printf "  \033[32m✓\033[0m  .gitignore                    \033[2mupdated\033[0m\n"
+printf "  \033[32m✓\033[0m  worktree base folder          \033[2mcreated\033[0m\n\n"
+
+printf "\033[2m──────────────────────────────────────────\033[0m\n"
+printf "\033[1;36mNext steps\033[0m\n"
+printf "  \033[33m1.\033[0m Commit .cass/ so your team gets the same templates:\n"
+printf "     \033[2mgit add .cass/ && git commit -m \"chore: add cass templates\"\033[0m\n"
+printf "  \033[33m2.\033[0m Verify full setup:  \033[1m/cass:doctor\033[0m\n"
+printf "  \033[33m3.\033[0m Start building:     \033[1m/cass:plan\033[0m  or  \033[1m/cass:dev-feat\033[0m\n"
 ```
-cass init complete
-==================
-Project:        <project name>
 
-  Main repo:      /absolute/path/to/repo   (branch: main)
-  Worktree base:  /absolute/path/to/repo-agent-works
-
-Prerequisites
-  ✓  git identity                     <name> / <email>
-  ✓  gh installed                     gh version 2.x.x
-  ✓  gh authenticated                 logged in as <user>
-  ✓  uvx installed                    uv 0.x.x
-
-Files
-  ✓  .claude/settings.local.json      saved
-  ✓  .cass/commit-template.md         copied  (or: skipped — already exists)
-  ✓  .cass/pr-template.md             copied  (or: skipped — already exists)
-  ✓  cass-.gitmessage                 linked from .cass/commit-template.md
-  ✓  .gitignore                       updated
-  ✓  worktree base folder             created  (or: already exists)
-
-Next steps
-  1. Commit .cass/ to version-control so your team gets the same templates:
-       git add .cass/ && git commit -m "chore: add cass templates"
-  2. Run /cass:doctor any time to verify the full setup.
-  3. Start your first feature: /cass:plan or /cass:dev-feat
-```
+Use actual values from context. For skipped files, replace `copied` with `skipped — already exists` in dim text.

@@ -133,56 +133,58 @@ For each project, also check that `worktreePath` exists on disk:
 
 ### Final report
 
-Print a formatted summary:
+Output the report by running a bash `printf` block with ANSI color codes so the output is colored in the terminal. Use this color scheme:
 
+- Cyan bold (`\033[1;36m`) — header box and section titles
+- Green (`\033[32m`) — ✓ PASS
+- Yellow (`\033[33m`) — ⚠ WARN
+- Red (`\033[31m`) — ✗ FAIL
+- Blue (`\033[34m`) — ℹ INFO
+- Dim (`\033[2m`) — detail values on the right
+- Reset (`\033[0m`) — after every colored segment
+
+Print the report using this structure:
+
+```bash
+printf "\033[1;36m╔══════════════════════════════════════════╗\033[0m\n"
+printf "\033[1;36m║  cass doctor  (v<version>)               ║\033[0m\n"
+printf "\033[1;36m╚══════════════════════════════════════════╝\033[0m\n\n"
+
+printf "\033[1;36mGit\033[0m\n"
+printf "  \033[32m✓\033[0m  user.name / user.email    \033[2m<name> / <email>\033[0m\n"
+printf "  \033[32m✓\033[0m  commit template            \033[2m.cass/commit-template.md\033[0m\n"
+printf "  \033[31m✗\033[0m  PR template                \033[2mnot found → run /cass:init\033[0m\n\n"
+
+printf "\033[1;36mGitHub CLI\033[0m\n"
+printf "  \033[32m✓\033[0m  gh installed               \033[2mgh version 2.x.x\033[0m\n"
+printf "  \033[32m✓\033[0m  gh authenticated           \033[2mlogged in as <user>\033[0m\n\n"
+
+printf "\033[1;36mSerena MCP\033[0m\n"
+printf "  \033[32m✓\033[0m  uvx installed              \033[2muv 0.x.x\033[0m\n"
+printf "  \033[33m⚠\033[0m  serena reachable           \033[2mtimed out — may fail at session start\033[0m\n\n"
+
+printf "\033[1;36mAtlassian MCP\033[0m\n"
+printf "  \033[32m✓\033[0m  server reachable           \033[2mHTTP 200\033[0m\n"
+printf "  \033[33m⚠\033[0m  ATLASSIAN_API_TOKEN        \033[2mnot set in environment\033[0m\n\n"
+
+printf "\033[1;36mcass projects\033[0m\n"
+printf "  \033[32m✓\033[0m  my-app    \033[2m/path/to/repo (branch: staging) | worktrees: /path/to/worktrees ✓\033[0m\n\n"
+
+printf "\033[2m──────────────────────────────────────────\033[0m\n"
+printf "  \033[32m%d passed\033[0m   \033[33m%d warnings\033[0m   \033[31m%d failed\033[0m\n\n" <X> <Y> <Z>
 ```
-cass doctor  (v<cass version from context>)
-============================================
 
-Git
-  ✓  user.name / user.email           configured
-  ✓  commit template                  .cass/commit-template.md
-  ✓  PR template                      .cass/pr-template.md
+Fill in actual values from the checks. After the summary line, if there are any FAIL or WARN items print an action block:
 
-GitHub CLI
-  ✓  gh installed                     gh version 2.x.x
-  ✓  gh authenticated                 Logged in to github.com as <user>
-
-Serena MCP
-  ✓  uvx installed                    uv 0.x.x
-  ✓  serena reachable                 package loads OK
-
-Atlassian MCP
-  ✓  server reachable                 https://mcp.atlassian.com (HTTP 200)
-  ⚠  ATLASSIAN_API_TOKEN              not set in environment
-
-Other MCP servers
-  ✓  <server-name>                    command found
-
-cass projects
-  ✓  my-app         /path/to/repo  (branch: staging) | worktrees: /path/to/repo-agent-works ✓
-  ✓  another-app    /path/to/other (branch: main)    | worktrees: /path/to/other-agent-works ✓
-
-─────────────────────────────────────
-  X passed   Y warnings   Z failed
-```
-
-Use:
-- `✓` for PASS
-- `⚠` for WARN
-- `✗` for FAIL
-- `ℹ` for INFO
-
-After the report, list any FAIL or WARN items with their fix commands grouped under:
-
-```
-Action needed
-─────────────
-✗ .cass/commit-template.md missing → run /cass:init
-⚠ ATLASSIAN_API_TOKEN not set → add to your shell profile: export ATLASSIAN_API_TOKEN=...
+```bash
+printf "\033[1;31mAction needed\033[0m\n"
+printf "\033[2m─────────────\033[0m\n"
+printf "\033[31m✗\033[0m  .cass/pr-template.md missing       → run /cass:init\n"
+printf "\033[33m⚠\033[0m  ATLASSIAN_API_TOKEN not set        → export ATLASSIAN_API_TOKEN=... in shell profile\n"
 ```
 
 If everything passes, print:
-```
-All checks passed. cass is ready to use.
+
+```bash
+printf "\033[1;32m✓ All checks passed. cass is ready to use.\033[0m\n"
 ```
