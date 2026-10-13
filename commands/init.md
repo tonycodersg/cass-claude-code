@@ -15,9 +15,41 @@ allowed-tools: [Bash, Read, Write, AskUserQuestion]
 - .cass/commit-template.md exists: !`[ -f .cass/commit-template.md ] && echo "yes" || echo "no"`
 - Existing settings: !`cat .claude/settings.local.json 2>/dev/null || echo "NOT FOUND"`
 - Default worktree path: !`echo "$(dirname $(git rev-parse --show-toplevel 2>/dev/null))/$(basename $(git rev-parse --show-toplevel 2>/dev/null))-agent-works"`
+- gh version: !`gh --version 2>/dev/null | head -1 || echo "NOT FOUND"`
+- gh auth: !`gh auth status 2>/dev/null | grep -i "logged in" | head -1 || echo "NOT AUTHENTICATED"`
+- uvx version: !`uvx --version 2>/dev/null || echo "NOT FOUND"`
+- git user name: !`git config user.name 2>/dev/null || echo "NOT SET"`
+- git user email: !`git config user.email 2>/dev/null || echo "NOT SET"`
 - User input: $ARGUMENTS
 
 ## Instructions
+
+### Step 0 — Prerequisite check
+
+Before doing anything, verify the required tools are available from context. Collect all failures and report them together — do not stop on the first one.
+
+| Tool | Check | Fix if missing |
+|---|---|---|
+| `git` identity | `git user.name` and `git user.email` both set | `git config --global user.name "Name"` and `git config --global user.email "you@example.com"` |
+| `gh` installed | `gh --version` returned a version | `brew install gh` or https://cli.github.com |
+| `gh` authenticated | auth status shows logged in | `gh auth login` |
+| `uvx` installed | `uvx --version` returned a version | `curl -LsSf https://astral.sh/uv/install.sh \| sh` |
+
+**If any check fails**, print a clear blocklist and stop:
+
+```
+cass init — prerequisites missing
+===================================
+✗  gh not installed     → brew install gh
+✗  gh not authenticated → gh auth login
+✗  uvx not installed    → curl -LsSf https://astral.sh/uv/install.sh | sh
+
+Fix the above, then re-run /cass:init.
+```
+
+Do not proceed until all prerequisites pass.
+
+---
 
 ### Step 1 — Resolve project name
 
@@ -159,6 +191,13 @@ Project:        <project name>
   Main repo:      /absolute/path/to/repo   (branch: main)
   Worktree base:  /absolute/path/to/repo-agent-works
 
+Prerequisites
+  ✓  git identity                     <name> / <email>
+  ✓  gh installed                     gh version 2.x.x
+  ✓  gh authenticated                 logged in as <user>
+  ✓  uvx installed                    uv 0.x.x
+
+Files
   ✓  .claude/settings.local.json      saved
   ✓  .cass/commit-template.md         copied  (or: skipped — already exists)
   ✓  .cass/pr-template.md             copied  (or: skipped — already exists)
@@ -166,7 +205,9 @@ Project:        <project name>
   ✓  .gitignore                       updated
   ✓  worktree base folder             created  (or: already exists)
 
-Tip: commit .cass/pr-template.md and .cass/commit-template.md so your whole team gets the same templates.
-
-Run /cass:doctor to verify the full setup.
+Next steps
+  1. Commit .cass/ to version-control so your team gets the same templates:
+       git add .cass/ && git commit -m "chore: add cass templates"
+  2. Run /cass:doctor any time to verify the full setup.
+  3. Start your first feature: /cass:plan or /cass:dev-feat
 ```
