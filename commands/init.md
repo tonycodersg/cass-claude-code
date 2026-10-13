@@ -1,5 +1,5 @@
 ---
-description: Initialise a project with the cass plugin setup — asks for project name, worktree path, and main branch, then generates .claude folder and copies commit and PR templates. Safe to run multiple times.
+description: Initialise a project with cass — creates a .cass/ folder with repo-specific templates (PR template, commit template), saves project config (worktree path, main branch), and wires up git. Safe to re-run — merges config, skips existing files.
 argument-hint: "[project name]"
 allowed-tools: [Bash, Read, Write, AskUserQuestion]
 ---
@@ -10,8 +10,9 @@ allowed-tools: [Bash, Read, Write, AskUserQuestion]
 - Repo root: !`git rev-parse --show-toplevel 2>/dev/null || pwd`
 - Repo name: !`basename $(git rev-parse --show-toplevel 2>/dev/null) 2>/dev/null || basename $(pwd)`
 - .claude folder exists: !`[ -d .claude ] && echo "yes" || echo "no"`
-- cass-.gitmessage exists: !`[ -f cass-.gitmessage ] && echo "yes" || echo "no"`
-- PR template exists: !`[ -f .github/cass-pull_request_template.md ] && echo "yes" || echo "no"`
+- .cass folder exists: !`[ -d .cass ] && echo "yes" || echo "no"`
+- .cass/pr-template.md exists: !`[ -f .cass/pr-template.md ] && echo "yes" || echo "no"`
+- .cass/commit-template.md exists: !`[ -f .cass/commit-template.md ] && echo "yes" || echo "no"`
 - Existing settings: !`cat .claude/settings.local.json 2>/dev/null || echo "NOT FOUND"`
 - Default worktree path: !`echo "$(dirname $(git rev-parse --show-toplevel 2>/dev/null))/$(basename $(git rev-parse --show-toplevel 2>/dev/null))-agent-works"`
 - User input: $ARGUMENTS
@@ -74,7 +75,8 @@ Write (or update) `.claude/settings.local.json` with a `cass.projects` entry for
       "<project name>": {
         "mainRepoPath": "<absolute path to repo root>",
         "mainBranch": "<branch>",
-        "worktreePath": "<resolved absolute worktree path>"
+        "worktreePath": "<resolved absolute worktree path>",
+        "prTemplate": ".cass/pr-template.md"
       }
     }
   }
@@ -87,56 +89,59 @@ If `.claude/settings.local.json` already exists:
 
 ---
 
-### Step 5 — Copy commit template
+### Step 5 — Create .cass/ folder and copy templates
 
-Copy `${CLAUDE_PLUGIN_ROOT}/assets/commit-template/.gitmessage` to `cass-.gitmessage` in the project root, then configure git:
+Create `.cass/` if it does not exist:
 
 ```bash
+mkdir -p .cass
+```
+
+**Commit template:**
+
+If `.cass/commit-template.md` already exists, skip and print:
+> "`.cass/commit-template.md` already exists — skipped."
+
+Otherwise copy `${CLAUDE_PLUGIN_ROOT}/assets/commit-template/.gitmessage` to `.cass/commit-template.md`, then wire git:
+
+```bash
+cp .cass/commit-template.md cass-.gitmessage
 git config commit.template cass-.gitmessage
 ```
 
-If `cass-.gitmessage` already exists, skip the copy and print:
-> "`cass-.gitmessage` already exists — skipped."
+**PR template:**
 
----
+If `.cass/pr-template.md` already exists, skip and print:
+> "`.cass/pr-template.md` already exists — skipped."
 
-### Step 6 — Set up PR template
-
-If `.github/cass-pull_request_template.md` already exists, skip this step and print:
-> "`.github/cass-pull_request_template.md` already exists — skipped."
-
-Otherwise, ask:
+Otherwise ask:
 
 > **PR template**
-> Would you like to use a custom PR template from this repo?
+> Would you like to use a custom PR template, or start with the cass default?
 >
 > 1. Use cass default template (recommended)
 > 2. Use an existing file from this repo — provide the path (e.g. `.github/pull_request_template.md`)
 
-**If option 1:** create `.github/` if it doesn't exist, then copy `${CLAUDE_PLUGIN_ROOT}/assets/pr-template/pull_request_template.md` to `.github/cass-pull_request_template.md`.
+**If option 1:** copy `${CLAUDE_PLUGIN_ROOT}/assets/pr-template/pull_request_template.md` to `.cass/pr-template.md`.
 
-**If option 2:** read the file at the path they provided. If it exists, copy it to `.github/cass-pull_request_template.md`. If the file doesn't exist, warn:
-> "File not found at `<path>`. Falling back to cass default template."
+**If option 2:** read the file at the provided path. If it exists, copy it to `.cass/pr-template.md`. If not:
+> "File not found at `<path>`. Falling back to cass default."
 And copy the default instead.
 
-Save the chosen template source to `.claude/settings.local.json` under the project config:
-```json
-{
-  "cass": {
-    "projects": {
-      "<project name>": {
-        "prTemplate": "default"  // or the path they provided
-      }
-    }
-  }
-}
+---
+
+### Step 6 — Update .gitignore
+
+Append to `.gitignore` (or create it) if these entries are not already present:
+
+```
+# cass — personal config, do not commit
+.cass/settings.local.json
 ```
 
 ---
 
 ### Step 7 — Create worktree base folder
-
-If the worktree path does not already exist, create it:
 
 ```bash
 mkdir -p <worktree path>
@@ -146,20 +151,22 @@ mkdir -p <worktree path>
 
 ### Step 8 — Report
 
-Print a final summary:
-
 ```
 cass init complete
 ==================
 Project:        <project name>
 
-  Main repo:      /absolute/path/to/repo   (branch: staging)
+  Main repo:      /absolute/path/to/repo   (branch: main)
   Worktree base:  /absolute/path/to/repo-agent-works
 
-  ✓  .claude/settings.local.json   saved
-  ✓  cass-.gitmessage              copied  (or: skipped — already exists)
-  ✓  .github/cass-pull_request_template.md   copied from <default / path they provided>  (or: skipped — already exists)
-  ✓  worktree base folder          created  (or: already exists)
+  ✓  .claude/settings.local.json      saved
+  ✓  .cass/commit-template.md         copied  (or: skipped — already exists)
+  ✓  .cass/pr-template.md             copied  (or: skipped — already exists)
+  ✓  cass-.gitmessage                 linked from .cass/commit-template.md
+  ✓  .gitignore                       updated
+  ✓  worktree base folder             created  (or: already exists)
+
+Tip: commit .cass/pr-template.md and .cass/commit-template.md so your whole team gets the same templates.
 
 Run /cass:doctor to verify the full setup.
 ```

@@ -1,7 +1,11 @@
 # cass
 
-> A Claude Code plugin that brings a structured **plan → build → review** pipeline to any project.
-> Role-split commands for POs and developers. Agents that work in parallel. Worktrees that keep your main branch clean.
+> A Claude Code **global plugin** that brings a structured **plan → build → review** pipeline to any project.
+> Role-split commands for POs and developers. Parallel agents work in isolated worktrees — your main branch never changes.
+> Hooks run automatically to guard against destructive commands and keep Claude context-aware.
+> Each repo gets its own `.cass/` customization layer — override commands, agents, hooks, and templates, committed alongside your code.
+
+**Latest stable: [v0.7.0](https://github.com/tonycodersg/cass-claude-code/releases/tag/v0.7.0)**
 
 ---
 
@@ -10,6 +14,10 @@
 ### Clone (recommended)
 
 ```bash
+# Latest stable (v0.7.0)
+git clone --branch v0.7.0 https://github.com/tonycodersg/cass-claude-code ~/.claude/plugins/cass
+
+# Or track latest
 git clone https://github.com/tonycodersg/cass-claude-code ~/.claude/plugins/cass
 ```
 
@@ -87,6 +95,7 @@ Prompt       injects repo / branch / worktree context into every message
 |---|---|---|
 | `/cass:init [project]` | Setup | Register project paths, copy templates, create worktree folder |
 | `/cass:doctor` | Setup | Health check — tools, MCP servers, git config, project settings |
+| `/cass:customize` | Setup | Scaffold `.cass/` override package for this repo |
 | `/cass:plan [text or doc]` | PO | Requirement → risk-assessed plan → Jira / GitHub issue / MD file |
 | `/cass:dev-feat [plan/ticket]` | Dev | Plan → feature branch + worktree → parallel SWE agents |
 | `/cass:commit` | Dev | Stage changes, generate semantic message, commit with co-author |
@@ -94,7 +103,58 @@ Prompt       injects repo / branch / worktree context into every message
 | `/cass:review [PR or branch]` | Dev | Code review via pr-reviewer agent — P1 / P2 / P3 findings |
 | `/cass:clean-wt` | Dev | List worktrees by project, pick to remove |
 | `/cass:test` | Dev | 13-step smoke test of cass mechanics in an isolated temp repo |
-| `/cass:doctor` | Dev | Health check for tools, MCP, and project config |
+
+---
+
+## Customising cass
+
+cass is a **global plugin** — it lives in `~/.claude/plugins/cass` and is shared across all your projects. Each repo can override any part of it without touching the plugin itself.
+
+Run `/cass:customize` to scaffold the override package:
+
+```
+.claude/commands/             ← command overrides (Claude Code loads here natively)
+  cass:pr.md                  ← this repo's version of /cass:pr
+.cass/                        ← committed to your repo
+  agents/                     ← agent overrides
+    swe.md
+  hooks/                      ← repo-specific hooks
+    hooks.json
+    scripts/
+  pr-template.md              ← PR body template
+  commit-template.md          ← commit message template
+```
+
+**Override a command:**
+```bash
+cp ~/.claude/plugins/cass/commands/pr.md .claude/commands/cass:pr.md
+# edit .claude/commands/cass:pr.md — Claude Code uses this version for this project
+```
+
+**Override an agent:**
+```bash
+cp ~/.claude/plugins/cass/agents/swe.md .cass/agents/swe.md
+```
+
+**Add a post-PR callback (Slack, webhooks, Jira transitions):**
+
+`/cass:pr` automatically runs `.cass/hooks/scripts/post-pr.sh` after every PR is created — if the file exists. The script receives `$1` PR URL, `$2` source branch, `$3` target branch.
+
+Run `/cass:customize hooks` to scaffold the stub, then uncomment the integration you want:
+
+```bash
+# .cass/hooks/scripts/post-pr.sh
+curl -s -X POST "$SLACK_WEBHOOK_URL" \
+  -H "Content-Type: application/json" \
+  -d "{\"text\": \"PR ready for review: $1 ($2 → $3)\"}"
+```
+
+Commit `.cass/hooks/scripts/post-pr.sh` — your whole team gets the notification automatically.
+
+**Add other repo-specific hooks:**
+Edit `.cass/hooks/hooks.json` — these run alongside the global plugin hooks.
+
+Commit `.cass/` to version-control so your whole team gets the same overrides.
 
 ---
 

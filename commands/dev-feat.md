@@ -218,7 +218,7 @@ Run /cass:clean-wt to remove worktrees after PRs are merged.
 
 ## Constraints
 
-- Never create worktrees without user approval
+- Always create a worktree for the main feature branch automatically — only ask when splitting into parallel sub-branches
 - Never start implementing without the user approving the plan
 - Always save worktree preference to `.claude/settings.local.json`
 - Sub-branch PRs always target the main feature branch, not staging/master

@@ -123,13 +123,41 @@ PR body structure:
 **Claude session:** <Claude session ID from context>
 ```
 
-If `.github/cass-pull_request_template.md` exists, use it as the base template and replace the `<!-- $CLAUDE_SESSION_ID -->` placeholder with the session ID from context.
+**Template resolution order:**
+1. `.cass/pr-template.md` — repo-specific (committed to repo, loaded in context above)
+2. `.github/cass-pull_request_template.md` — legacy location (still supported)
+3. Built-in structure above — fallback if neither exists
+
+Use whichever is found first. Replace `<!-- $CLAUDE_SESSION_ID -->` with the session ID from context.
 
 If `gh` is not available, output the filled PR body for the user to paste manually and provide the GitHub PR creation URL.
 
 ---
 
-### Step 6 — Report
+### Step 6 — Run post-PR callback
+
+After the PR is created, fire the callback hook if it exists:
+
+```bash
+PR_URL="<url from gh pr create output>"
+BRANCH="<current-branch>"
+TARGET="<target-branch>"
+
+if [ -f .cass/hooks/scripts/post-pr.sh ]; then
+  bash .cass/hooks/scripts/post-pr.sh "$PR_URL" "$BRANCH" "$TARGET"
+fi
+```
+
+This is the repo's customization point — teams wire Slack notifications, Jira transitions, webhook calls, etc. here. The script receives:
+- `$1` — PR URL
+- `$2` — source branch
+- `$3` — target branch
+
+If the script exits non-zero, log the error but do not fail the command.
+
+---
+
+### Step 7 — Report
 
 Output the PR URL and remind the user what comes next:
 

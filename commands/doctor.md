@@ -15,8 +15,11 @@ allowed-tools: [Bash, Read]
 - uvx installed: !`uvx --version 2>/dev/null || echo "NOT FOUND"`
 - node installed: !`node --version 2>/dev/null || echo "NOT FOUND"`
 - npx installed: !`npx --version 2>/dev/null || echo "NOT FOUND"`
+- .cass folder exists: !`[ -d .cass ] && echo "yes" || echo "no"`
+- .cass/commit-template.md exists: !`[ -f .cass/commit-template.md ] && echo "yes" || echo "no"`
+- .cass/pr-template.md exists: !`[ -f .cass/pr-template.md ] && echo "yes" || echo "no"`
 - cass-.gitmessage exists: !`[ -f cass-.gitmessage ] && echo "yes" || echo "no"`
-- PR template exists: !`[ -f .github/cass-pull_request_template.md ] && echo "yes" || echo "no"`
+- legacy PR template exists: !`[ -f .github/cass-pull_request_template.md ] && echo "yes" || echo "no"`
 - .mcp.json exists: !`[ -f .mcp.json ] && echo "yes" || echo "no"`
 - .mcp.json content: !`cat .mcp.json 2>/dev/null || echo "NOT FOUND"`
 - Claude settings: !`cat .claude/settings.json 2>/dev/null || cat ~/.claude/settings.json 2>/dev/null || echo "NOT FOUND"`
@@ -41,17 +44,18 @@ From context:
 ### Check 2 — Git commit template
 
 From context:
-- **PASS** if `git commit.template` points to `cass-.gitmessage` AND `cass-.gitmessage` exists in the working directory
-- **WARN** if `cass-.gitmessage` exists but the git config is not set → fix: `git config commit.template cass-.gitmessage`
-- **FAIL** if `cass-.gitmessage` does not exist → fix: run `/cass:init`
+- **PASS** if `.cass/commit-template.md` exists AND `git commit.template` points to `cass-.gitmessage`
+- **WARN** if `.cass/commit-template.md` exists but git config not set → fix: `git config commit.template cass-.gitmessage`
+- **FAIL** if `.cass/commit-template.md` does not exist → fix: run `/cass:init`
 
 ---
 
 ### Check 3 — PR template
 
 From context:
-- **PASS** if `.github/cass-pull_request_template.md` exists
-- **FAIL** if not → fix: run `/cass:init`
+- **PASS** if `.cass/pr-template.md` exists
+- **WARN** if only `.github/cass-pull_request_template.md` exists (legacy — still works, migrate by re-running `/cass:init`)
+- **FAIL** if neither exists → fix: run `/cass:init`
 
 ---
 
@@ -136,8 +140,8 @@ cass doctor
 
 Git
   ✓  user.name / user.email           configured
-  ✓  commit template                  cass-.gitmessage
-  ✓  PR template                      .github/cass-pull_request_template.md
+  ✓  commit template                  .cass/commit-template.md
+  ✓  PR template                      .cass/pr-template.md
 
 GitHub CLI
   ✓  gh installed                     gh version 2.x.x
@@ -173,7 +177,7 @@ After the report, list any FAIL or WARN items with their fix commands grouped un
 ```
 Action needed
 ─────────────
-✗ cass-.gitmessage missing → run /cass:init
+✗ .cass/commit-template.md missing → run /cass:init
 ⚠ ATLASSIAN_API_TOKEN not set → add to your shell profile: export ATLASSIAN_API_TOKEN=...
 ```
 
