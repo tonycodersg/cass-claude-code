@@ -150,7 +150,17 @@ gh pr create \
   --body "<body>"
 ```
 
-Construct the PR body using this structure:
+**Before constructing the PR body, resolve the template:**
+
+```
+1. Read .cass/pr-template.md        → use if exists
+2. Read .github/cass-pull_request_template.md → use if exists
+3. Use built-in fallback below       → if neither found
+```
+
+Fill the resolved template with content from the plan and implementation. Replace `<!-- $CLAUDE_SESSION_ID -->` with the actual Claude session ID (from `$CLAUDE_SESSION_ID` env var, or `unknown` if not set).
+
+**Built-in fallback** (used when no template file exists):
 
 ```markdown
 ## What
@@ -162,6 +172,15 @@ Construct the PR body using this structure:
 ## How
 <approach summary from the plan>
 
+## Screenshots / Demo
+<!-- For UI changes: before/after screenshots or a short screen recording. Delete if not applicable. -->
+
+## Risks
+<risks from the plan's Risks table, or "No significant risks">
+
+## Test Coverage
+<what was tested — unit tests, integration tests, manual verification steps>
+
 ## Implementation Steps
 <numbered list of what was actually done, derived from the TodoWrite task list>
 
@@ -170,16 +189,20 @@ Construct the PR body using this structure:
 - [ ] <success criterion 2 from plan>
 - [ ] Build and lint pass
 - [ ] Tests pass
-- [ ] SA must-fix items resolved
+- [ ] Risks documented
 - [ ] No out-of-scope changes
+
+---
+
+<details>
+<summary>Session info</summary>
+
+**Claude session:** <!-- $CLAUDE_SESSION_ID -->
+**Agent:** cass/swe
+**Plan file:** <!-- path if applicable -->
+
+</details>
 ```
-
-**Template resolution order:**
-1. `.cass/pr-template.md` — repo-specific (committed to repo)
-2. `.github/cass-pull_request_template.md` — legacy location (still supported)
-3. Built-in structure above — fallback if neither exists
-
-Replace `<!-- $CLAUDE_SESSION_ID -->` with the actual session ID.
 
 If `gh` is not available, output the filled PR body for the user to paste manually.
 
