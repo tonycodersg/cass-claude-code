@@ -1,7 +1,9 @@
 # cass
 
-> A Claude Code plugin that brings a structured **plan → build → review** pipeline to any project.
-> Role-split commands for POs and developers. Agents that work in parallel. Worktrees that keep your main branch clean.
+> A Claude Code **global plugin** that brings a structured **plan → build → review** pipeline to any project.
+> Role-split commands for POs and developers. Parallel agents work in isolated worktrees — your main branch never changes.
+> Hooks run automatically to guard against destructive commands and keep Claude context-aware.
+> Each repo gets its own `.cass/` customization layer — override commands, agents, hooks, and templates, committed alongside your code.
 
 **Latest stable: [v0.7.0](https://github.com/tonycodersg/cass-claude-code/releases/tag/v0.7.0)**
 
