@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-10-13
+
+### Added
+
+- `hooks/hooks.json`: first hooks in cass — `PreToolUse`, `Stop`, and `UserPromptSubmit`
+  - `PreToolUse` on `Bash`: blocks destructive git commands (`push --force`, `reset --hard`, `checkout --`, `restore .`, `clean -f`, `branch -D`, `rm -rf`) — user can override via `! <cmd>` in terminal
+  - `Stop`: nudges `/cass:commit` after Claude finishes a turn when working tree is dirty
+  - `UserPromptSubmit`: injects repo / branch / worktree count / dirty file count into every prompt so Claude is always workspace-aware
+- `commands/commit`: new `/cass:commit` command — stages changes, generates semantic commit message from diff, confirms with user, commits with `Co-authored-by: Claude` footer
+- `commands/init`: creates `.cass/` folder with repo-specific `pr-template.md` and `commit-template.md` — teams commit these so everyone gets the same templates on clone
+- `commands/init`: adds `.gitignore` entries — templates committed, `settings.local.json` ignored
+- `assets/pr-template`: added `## Screenshots / Demo` section; moved session info into a collapsible `<details>` block with `Claude session`, `Agent`, and `Plan file` fields
+- `commands/pr`: template resolution order — `.cass/pr-template.md` → `.github/cass-pull_request_template.md` → built-in fallback
+- `agents/swe`: same template resolution order as `pr` command
+
+### Changed
+
+- `commands/dev-feat`: feature branch worktree is now created automatically — no longer asks the user; only prompts when plan has parallel workstreams requiring sub-branch splitting
+- `commands/pr`: removed optional SA review prompt (Step 4) — review is now a separate manual step via `/cass:review`
+- `commands/init`: PR template choice (default vs custom) saved as `prTemplate` field in `settings.local.json`
+- `commands/doctor`: Check 3 updated to look for `.cass/pr-template.md` first; warns on legacy `.github/` location
+- All command `description` fields updated to accurately reflect current behaviour
+- `README.md`: full rewrite — workflow diagram, hooks section, agents table, release instructions, pin-to-version install
+
+### Fixed
+
+- `commands/test`: hardened assertions for Tests 2–4 — now checks file content (Co-authored-by, Risks section, CLAUDE_SESSION_ID, prTemplate field) not just file existence
+
 ## [0.6.0] - 2026-07-25
 
 ### Added
