@@ -73,18 +73,7 @@ Search for a matching plan or requirement file to use as PR context:
 
 ---
 
-### Step 4 — Optional SA review
-
-Ask the user:
-> "Would you like the SA agent to do a quick code review before creating the PR? (Recommended)"
-
-**If yes:** invoke the `sa` agent with the current branch diff and plan file (if found). Wait for findings. Apply must-fix items. Ask about should-fix items.
-
-**If no:** proceed directly.
-
----
-
-### Step 5 — Push
+### Step 4 — Push
 
 ```bash
 git push -u origin <current-branch>
@@ -92,7 +81,7 @@ git push -u origin <current-branch>
 
 ---
 
-### Step 6 — Create PR
+### Step 5 — Create PR
 
 ```bash
 gh pr create \
@@ -112,9 +101,6 @@ PR body structure:
 
 ## How
 <approach summary>
-
-## Architecture Review
-<SA findings if review was run; otherwise "SA review not run">
 
 ## Implementation Steps
 <numbered list of what was done>
@@ -143,7 +129,7 @@ If `gh` is not available, output the filled PR body for the user to paste manual
 
 ---
 
-### Step 7 — Report
+### Step 6 — Report
 
 Output the PR URL and remind the user what comes next:
 
