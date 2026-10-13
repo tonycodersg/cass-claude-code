@@ -11,7 +11,17 @@
 
 ## Install
 
-### Clone (recommended)
+### 1. Prerequisites
+
+```bash
+# GitHub CLI — required for PRs, issues, branch management
+brew install gh && gh auth login
+
+# uv — required for Serena MCP (code intelligence)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+### 2. Clone the plugin
 
 ```bash
 # Latest stable (v0.8.1)
@@ -23,18 +33,26 @@ git clone https://github.com/tonycodersg/cass-claude-code ~/.claude/plugins/cass
 
 Loads automatically in every Claude Code session. No restart needed.
 
-### Marketplace
+### 3. Verify
 
+Open any project in Claude Code, then:
+
+```bash
+/cass:doctor
+```
+
+All checks green = ready to use.
+
+### Other install methods
+
+**Marketplace:**
 ```bash
 /plugin marketplace add tonycodersg/cass-claude-code
 /plugin install cass@cass-marketplace --global
 /reload-plugins
 ```
 
-> Requires an SSH key added to GitHub. See the [GitHub SSH guide](https://docs.github.com/en/authentication/connecting-to-github-with-ssh).
-
-### Per session
-
+**Per session:**
 ```bash
 claude --plugin-dir /path/to/cass-claude-code
 ```
@@ -44,11 +62,14 @@ claude --plugin-dir /path/to/cass-claude-code
 ## Quick start
 
 ```bash
-# 1. Set up cass in your project
+# First time in a project — register paths and create templates
 /cass:init my-app
 
-# 2. Verify your environment
+# Verify your environment
 /cass:doctor
+
+# Run the automated smoke test
+/cass:test
 ```
 
 ---
