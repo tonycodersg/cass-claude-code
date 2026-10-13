@@ -1,5 +1,5 @@
 ---
-description: Clean up worktrees — lists initialized projects, shows worktrees with branch name and last modified date, removes the ones you select
+description: Clean up worktrees — lists projects from cass config, shows each worktree with branch name and last modified date, removes selected worktrees and optionally deletes remote branches
 argument-hint: "[optional: worktree base path override]"
 allowed-tools: [Bash, AskUserQuestion]
 model: haiku

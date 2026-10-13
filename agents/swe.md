@@ -195,7 +195,12 @@ Construct the PR body using this structure:
 - [ ] No out-of-scope changes
 ```
 
-If `.github/cass-pull_request_template.md` exists, use it as the base and append the **Architecture Review** and **Implementation Steps** sections.
+**Template resolution order:**
+1. `.cass/pr-template.md` — repo-specific template (team customizes this, committed to repo)
+2. `.github/cass-pull_request_template.md` — legacy location (still supported)
+3. Built-in structure above — fallback if neither exists
+
+Use whichever is found first. Replace `<!-- $CLAUDE_SESSION_ID -->` with the actual session ID.
 
 If `gh` is not available, output the filled PR body for the user to paste manually.
 

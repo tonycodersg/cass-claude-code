@@ -1,5 +1,5 @@
 ---
-description: Smoke test — creates an isolated temp repo, runs 13 mechanical checks covering init, plan output structure (Technical Context + Risks), dev-feat worktree creation, and clean-wt listing and removal; reports pass/fail per step then cleans up
+description: Smoke test — creates an isolated temp repo, runs 13 mechanical checks covering init (.cass/ folder, templates, settings), plan output structure (Risks + Technical Context), dev-feat worktree creation, and clean-wt listing and removal. Reports pass/fail per step, cleans up after itself.
 allowed-tools: [Bash, Read]
 ---
 

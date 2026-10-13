@@ -1,5 +1,5 @@
 ---
-description: Stage changes, generate a semantic commit message from the diff, and commit with Claude co-authorship. Called by dev-feat/SWE agent or run manually.
+description: Stage changes, generate a semantic commit message from the diff, confirm with user, and commit with Claude co-authorship. Uses .cass/commit-template.md if present. Can be run manually or called by the SWE agent.
 argument-hint: "[optional: commit message hint or ticket ref]"
 allowed-tools: [Bash, AskUserQuestion]
 model: haiku

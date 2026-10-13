@@ -1,5 +1,5 @@
 ---
-description: PO workflow — accept a requirement as text or doc file, investigate risks and gaps using parallel agents, present a structured plan with risk assessment and suggestions, then save as Jira ticket (with optional epic) or MD file
+description: PO workflow — take a requirement as text or doc file, run parallel SA + planner investigation, present a risk-assessed plan with Risks table and Suggestions, then save as Jira ticket, GitHub issue, or docs/ MD file with embedded Technical Context for dev-feat
 argument-hint: "[requirement text or path to doc]"
 allowed-tools: [EnterPlanMode, ExitPlanMode, AskUserQuestion, Write, Read, Glob, Grep, Bash, Agent, mcp__atlassian__*, mcp__github__*]
 model: haiku

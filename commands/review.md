@@ -1,5 +1,5 @@
 ---
-description: Review a PR or the current branch — spawns the pr-reviewer agent to check logic, performance, code quality, and plan compliance
+description: Code review — spawns the pr-reviewer agent to check logic, performance, code quality, and plan compliance. Pass a PR number/URL or omit to review the current branch. Reports P1/P2/P3 findings.
 argument-hint: "[PR number or URL — omit to review current branch]"
 allowed-tools: [Agent, Bash, AskUserQuestion, Read]
 model: sonnet

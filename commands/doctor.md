@@ -1,5 +1,5 @@
 ---
-description: Health check — verifies that all cass dependencies are installed, MCP servers are reachable, git is configured, and Claude Code integrations are working
+description: Health check — verifies git identity, commit template, PR template (.cass/ folder), gh CLI auth, Serena MCP (uvx), Atlassian MCP, and cass project config. Reports pass/warn/fail for each with fix instructions.
 allowed-tools: [Bash, Read]
 ---
 
@@ -15,8 +15,11 @@ allowed-tools: [Bash, Read]
 - uvx installed: !`uvx --version 2>/dev/null || echo "NOT FOUND"`
 - node installed: !`node --version 2>/dev/null || echo "NOT FOUND"`
 - npx installed: !`npx --version 2>/dev/null || echo "NOT FOUND"`
+- .cass folder exists: !`[ -d .cass ] && echo "yes" || echo "no"`
+- .cass/pr-template.md exists: !`[ -f .cass/pr-template.md ] && echo "yes" || echo "no"`
+- .cass/commit-template.md exists: !`[ -f .cass/commit-template.md ] && echo "yes" || echo "no"`
 - cass-.gitmessage exists: !`[ -f cass-.gitmessage ] && echo "yes" || echo "no"`
-- PR template exists: !`[ -f .github/cass-pull_request_template.md ] && echo "yes" || echo "no"`
+- legacy PR template exists: !`[ -f .github/cass-pull_request_template.md ] && echo "yes" || echo "no"`
 - .mcp.json exists: !`[ -f .mcp.json ] && echo "yes" || echo "no"`
 - .mcp.json content: !`cat .mcp.json 2>/dev/null || echo "NOT FOUND"`
 - Claude settings: !`cat .claude/settings.json 2>/dev/null || cat ~/.claude/settings.json 2>/dev/null || echo "NOT FOUND"`
@@ -50,8 +53,9 @@ From context:
 ### Check 3 — PR template
 
 From context:
-- **PASS** if `.github/cass-pull_request_template.md` exists
-- **FAIL** if not → fix: run `/cass:init`
+- **PASS** if `.cass/pr-template.md` exists
+- **WARN** if only `.github/cass-pull_request_template.md` exists (legacy location — still works, but consider migrating to `.cass/pr-template.md` by re-running `/cass:init`)
+- **FAIL** if neither exists → fix: run `/cass:init`
 
 ---
 

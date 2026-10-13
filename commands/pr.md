@@ -1,5 +1,5 @@
 ---
-description: Create a PR from the current branch — runs in the worktree where the feature branch is checked out. Sub-task branches PR into the main feature branch; main feature branches PR into staging (default) with option to change target.
+description: Create a PR from the current branch — auto-detects base branch (sub-task → parent feature branch, main feature → staging). Uses .cass/pr-template.md for the PR body with session ID injected.
 argument-hint: "[optional: base branch override]"
 allowed-tools: [Bash, Read, Write, AskUserQuestion, Agent, mcp__github__*]
 model: sonnet
@@ -14,6 +14,7 @@ model: sonnet
 - Today's date: !`date +%Y-%m-%d`
 - All worktrees: !`git worktree list --porcelain 2>/dev/null`
 - cass settings: !`cat .claude/settings.local.json 2>/dev/null || echo "NOT FOUND"`
+- repo PR template: !`cat .cass/pr-template.md 2>/dev/null || echo "NOT FOUND"`
 - Claude session ID: !`echo "${CLAUDE_SESSION_ID:-unknown}"`
 - User override: $ARGUMENTS
 
@@ -123,7 +124,12 @@ PR body structure:
 **Claude session:** <Claude session ID from context>
 ```
 
-If `.github/cass-pull_request_template.md` exists, use it as the base template and replace the `<!-- $CLAUDE_SESSION_ID -->` placeholder with the session ID from context.
+**Template resolution order:**
+1. `.cass/pr-template.md` — repo-specific template (team customizes this, committed to repo)
+2. `.github/cass-pull_request_template.md` — legacy location (still supported)
+3. Built-in structure above — fallback if neither exists
+
+Use whichever is found first. Replace the `<!-- $CLAUDE_SESSION_ID -->` placeholder with the session ID from context.
 
 If `gh` is not available, output the filled PR body for the user to paste manually and provide the GitHub PR creation URL.
 

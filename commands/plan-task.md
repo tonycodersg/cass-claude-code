@@ -1,5 +1,5 @@
 ---
-description: Plan a feature or task — enters plan mode, clarifies requirements, writes a detailed plan file, then hands off to the SWE agent (Sonnet) for implementation
+description: Dev shortcut — enters plan mode, clarifies requirements with the user, writes a structured plan file, then hands off directly to the SWE agent for implementation. Use this instead of /cass:plan when you are the dev and want to plan and build in one flow.
 argument-hint: "[feature description or Jira ticket]"
 allowed-tools: [EnterPlanMode, ExitPlanMode, AskUserQuestion, Write, Read, Glob, Grep, Bash, Agent, mcp__atlassian__*, mcp__github__*]
 model: haiku
