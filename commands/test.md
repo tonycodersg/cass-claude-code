@@ -60,19 +60,36 @@ mkdir -p "$TEST_REPO/.claude"
 cp "${CLAUDE_PLUGIN_ROOT}/assets/commit-template/.gitmessage" "$TEST_REPO/cass-.gitmessage"
 ```
 
-- **PASS** if `cass-.gitmessage` exists and is non-empty
+Check file exists and contains `Co-authored-by` and semantic type hints:
+
+```bash
+[ -f "$TEST_REPO/cass-.gitmessage" ] \
+  && grep -q "Co-authored-by" "$TEST_REPO/cass-.gitmessage" \
+  && grep -q "feat:" "$TEST_REPO/cass-.gitmessage"
+```
+
+- **PASS** if file exists with both markers
 - **FAIL** otherwise
 
 ---
 
-### Test 3 — init: PR template copied
+### Test 3 — init: PR template copied and contains required sections
 
 ```bash
 mkdir -p "$TEST_REPO/.github"
 cp "${CLAUDE_PLUGIN_ROOT}/assets/pr-template/pull_request_template.md" "$TEST_REPO/.github/cass-pull_request_template.md"
 ```
 
-- **PASS** if `.github/cass-pull_request_template.md` exists
+Check file exists and contains Risks, Test Coverage, and Claude session placeholder:
+
+```bash
+[ -f "$TEST_REPO/.github/cass-pull_request_template.md" ] \
+  && grep -q "## Risks" "$TEST_REPO/.github/cass-pull_request_template.md" \
+  && grep -q "## Test Coverage" "$TEST_REPO/.github/cass-pull_request_template.md" \
+  && grep -q "CLAUDE_SESSION_ID" "$TEST_REPO/.github/cass-pull_request_template.md"
+```
+
+- **PASS** if file exists and all three sections are present
 - **FAIL** otherwise
 
 ---
@@ -87,7 +104,8 @@ cat > "$TEST_REPO/.claude/settings.local.json" <<EOF
       "cass-test-repo": {
         "mainRepoPath": "$TEST_REPO",
         "mainBranch": "main",
-        "worktreePath": "$TEST_WT"
+        "worktreePath": "$TEST_WT",
+        "prTemplate": "default"
       }
     }
   }
@@ -95,19 +113,20 @@ cat > "$TEST_REPO/.claude/settings.local.json" <<EOF
 EOF
 ```
 
-Verify all three fields round-trip correctly:
+Verify all four fields round-trip correctly:
 
 ```bash
 python3 -c "
 import json, sys
 s = json.load(open('$TEST_REPO/.claude/settings.local.json'))
 p = s['cass']['projects']['cass-test-repo']
-ok = p['mainRepoPath'] == '$TEST_REPO' and p['mainBranch'] == 'main' and p['worktreePath'] == '$TEST_WT'
+ok = (p['mainRepoPath'] == '$TEST_REPO' and p['mainBranch'] == 'main'
+      and p['worktreePath'] == '$TEST_WT' and p['prTemplate'] == 'default')
 sys.exit(0 if ok else 1)
 " 2>/dev/null || node -e "
   const s = JSON.parse(require('fs').readFileSync('$TEST_REPO/.claude/settings.local.json'));
   const p = s.cass.projects['cass-test-repo'];
-  const ok = p.mainRepoPath === '$TEST_REPO' && p.mainBranch === 'main' && p.worktreePath === '$TEST_WT';
+  const ok = p.mainRepoPath === '$TEST_REPO' && p.mainBranch === 'main' && p.worktreePath === '$TEST_WT' && p.prTemplate === 'default';
   process.exit(ok ? 0 : 1);
 "
 ```
@@ -318,20 +337,20 @@ rm -rf "$TEST_DIR"
 ```
 cass smoke test results
 =======================
-Test 1   init: .claude folder                  PASS
-Test 2   init: commit template                 PASS
-Test 3   init: PR template                     PASS
-Test 4   init: settings.local.json shape       PASS
-Test 5   init: worktree base folder            PASS
-Test 6   init: re-run merges projects          PASS
-Test 7   plan: requirement file readable       PASS
-Test 8   plan: docs/ output + MD naming        PASS
-Test 9   dev-feat: worktree creation           PASS
-Test 10  clean-wt: listing branch + date       PASS
-Test 11  clean-wt: remote branch check         PASS
-Test 12  clean-wt: worktree removal            PASS
-Test 13  teardown: temp dir removed            PASS
-────────────────────────────────────────────────────
+Test 1   init: .claude folder                        PASS
+Test 2   init: commit template (Co-authored-by)      PASS
+Test 3   init: PR template (Risks + session ID)      PASS
+Test 4   init: settings.local.json shape + prTemplate PASS
+Test 5   init: worktree base folder                  PASS
+Test 6   init: re-run merges projects                PASS
+Test 7   plan: requirement file readable             PASS
+Test 8   plan: docs/ output (Risks + Tech Context)   PASS
+Test 9   dev-feat: worktree creation                 PASS
+Test 10  clean-wt: listing branch + date             PASS
+Test 11  clean-wt: remote branch check               PASS
+Test 12  clean-wt: worktree removal                  PASS
+Test 13  teardown: temp dir removed                  PASS
+──────────────────────────────────────────────────────
 13 passed  0 failed
 ```
 
