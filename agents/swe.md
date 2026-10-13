@@ -74,17 +74,19 @@ First, determine whether you are being spawned by `/cass:dev-feat` with a pre-co
 
 Ask the user:
 > "How would you like to set up the workspace?
-> 1. **Start from staging** — check out `staging`, create a feature branch from it, and set up a worktree to work in isolation
+> 1. **Start from main branch** — check out the configured `mainBranch`, create a feature branch from it, and set up a worktree to work in isolation
 > 2. **Use current branch** — create a feature branch from where I am now and set up a worktree
 > 3. **No worktree** — just create and check out the feature branch directly"
 
+Read `mainBranch` from `cass.projects` in `.claude/settings.local.json`. If not configured, default to `main`.
+
 Based on the answer:
 
-**Option 1 — From staging with worktree:**
+**Option 1 — From main branch with worktree:**
 ```bash
 git fetch origin
-git checkout staging
-git pull origin staging
+git checkout <mainBranch>
+git pull origin <mainBranch>
 git checkout -b feat/<kebab-case-plan-title>
 git worktree add ../<repo-name>-<kebab-case-plan-title> feat/<kebab-case-plan-title>
 ```
@@ -129,25 +131,6 @@ After all tasks are complete:
 3. Present a summary of what was implemented against the plan's success criteria
 4. Ask the user to review the changes
 
-**Step 6b — SA review (optional but recommended)**
-
-After presenting the implementation summary, ask the user:
-
-> "Implementation is complete. Would you like the SA agent to review the changes against the plan before we create the PR? (Recommended — SA findings will be included in the PR description.)"
-
-**If the user says yes:**
-
-1. Invoke the `sa` agent with the plan file path and current branch. Tell it:
-   > "Review the implementation on this branch against the plan at `<plan file path>`. Provide findings grouped by must-fix, should-fix, and consider."
-2. Wait for the SA agent to complete and capture its full findings output.
-3. If the SA agent flagged **must-fix** items, fix them now following SA's proposed changes. Re-run build/lint/test after fixing.
-4. If the SA agent flagged **should-fix** items, ask the user:
-   > "SA flagged these should-fix items: [list]. Fix them now or defer to a follow-up?"
-   Apply only what the user confirms.
-5. Once all agreed fixes are applied, confirm with the user that the implementation is approved.
-
-**If the user says no:** proceed directly to Step 7.
-
 **Step 7 — Push and create PR**
 
 Once the user confirms the changes are complete and correct:
@@ -158,7 +141,7 @@ git push origin <current-branch>
 
 Determine the PR target branch:
 - **If spawned by `/cass:dev-feat` with a PR target specified** → use that target (may be the main feature branch, not staging)
-- **If this is a standalone invocation** → target `staging` (or ask the user if staging doesn't exist)
+- **If this is a standalone invocation** → read `mainBranch` from `cass.projects` in `.claude/settings.local.json` and target that; if not configured, ask the user
 
 ```bash
 gh pr create \
@@ -179,10 +162,6 @@ Construct the PR body using this structure:
 ## How
 <approach summary from the plan>
 
-## Architecture Review
-<If SA review was run: paste the full SA review findings here, grouped as Must Fix / Should Fix / Consider.
- If SA review was skipped: "SA review not run for this PR.">
-
 ## Implementation Steps
 <numbered list of what was actually done, derived from the TodoWrite task list>
 
@@ -195,11 +174,14 @@ Construct the PR body using this structure:
 - [ ] No out-of-scope changes
 ```
 
-If `.github/cass-pull_request_template.md` exists, use it as the base and append the **Architecture Review** and **Implementation Steps** sections.
+**Template resolution order:**
+1. `.cass/pr-template.md` — repo-specific (committed to repo)
+2. `.github/cass-pull_request_template.md` — legacy location (still supported)
+3. Built-in structure above — fallback if neither exists
+
+Replace `<!-- $CLAUDE_SESSION_ID -->` with the actual session ID.
 
 If `gh` is not available, output the filled PR body for the user to paste manually.
-
-If `staging` branch does not exist on the remote, ask the user which base branch to target before creating the PR.
 
 ## Constraints
 

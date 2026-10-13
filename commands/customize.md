@@ -11,7 +11,7 @@ model: haiku
 - Repo name: !`basename $(git rev-parse --show-toplevel 2>/dev/null) 2>/dev/null || basename $(pwd)`
 - Plugin root: !`echo "${CLAUDE_PLUGIN_ROOT}"`
 - .cass exists: !`[ -d .cass ] && echo "yes" || echo "no"`
-- .cass/commands exists: !`[ -d .cass/commands ] && echo "yes" || echo "no"`
+- .claude/commands exists: !`[ -d .claude/commands ] && echo "yes" || echo "no"`
 - .cass/agents exists: !`[ -d .cass/agents ] && echo "yes" || echo "no"`
 - .cass/hooks exists: !`[ -d .cass/hooks ] && echo "yes" || echo "no"`
 - User input: $ARGUMENTS
@@ -41,11 +41,11 @@ Otherwise, ask:
 
 ### Step 2 — Create folder structure
 
-Create the requested folders under `.cass/`:
+Create the requested folders:
 
 ```bash
-mkdir -p .cass/commands
-mkdir -p .cass/agents
+mkdir -p .claude/commands   # command overrides — Claude Code loads from here natively
+mkdir -p .cass/agents       # agent overrides
 mkdir -p .cass/hooks/scripts
 ```
 
@@ -98,20 +98,22 @@ This folder contains repo-specific overrides for the global [cass plugin](https:
 
 ### Step 4 — Write example stubs
 
-**If commands selected**, write `.cass/commands/.gitkeep` and a `HOWTO.md`:
+**If commands selected**, write `.claude/commands/HOWTO.md`:
 
 ```markdown
-# Customising commands
+# Customising cass commands
 
-Copy any command from the global plugin and edit it here:
+Claude Code loads commands from .claude/commands/ — files here override the global plugin.
 
-  cp ~/.claude/plugins/cass/commands/pr.md .cass/commands/cass:pr.md
+Copy any command from the global plugin and edit it:
 
-Claude Code will use this version instead of the plugin's when running /cass:pr in this project.
+  cp ~/.claude/plugins/cass/commands/pr.md .claude/commands/cass:pr.md
+
+Claude Code will use .claude/commands/cass:pr.md instead of the plugin version for this project.
 
 Available commands to override:
   cass:init, cass:plan, cass:plan-task, cass:dev-feat, cass:commit,
-  cass:pr, cass:review, cass:clean-wt, cass:test, cass:doctor
+  cass:pr, cass:review, cass:clean-wt, cass:test, cass:doctor, cass:customize
 ```
 
 **If agents selected**, write `.cass/agents/HOWTO.md`:

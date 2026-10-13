@@ -123,7 +123,12 @@ PR body structure:
 **Claude session:** <Claude session ID from context>
 ```
 
-If `.github/cass-pull_request_template.md` exists, use it as the base template and replace the `<!-- $CLAUDE_SESSION_ID -->` placeholder with the session ID from context.
+**Template resolution order:**
+1. `.cass/pr-template.md` — repo-specific (committed to repo, loaded in context above)
+2. `.github/cass-pull_request_template.md` — legacy location (still supported)
+3. Built-in structure above — fallback if neither exists
+
+Use whichever is found first. Replace `<!-- $CLAUDE_SESSION_ID -->` with the session ID from context.
 
 If `gh` is not available, output the filled PR body for the user to paste manually and provide the GitHub PR creation URL.
 

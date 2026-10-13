@@ -113,10 +113,10 @@ cass is a **global plugin** — it lives in `~/.claude/plugins/cass` and is shar
 Run `/cass:customize` to scaffold the override package:
 
 ```
+.claude/commands/             ← command overrides (Claude Code loads here natively)
+  cass:pr.md                  ← this repo's version of /cass:pr
 .cass/                        ← committed to your repo
-  commands/                   ← override any /cass:<name> command
-    cass:pr.md                ← this repo's version of /cass:pr
-  agents/                     ← override any cass agent
+  agents/                     ← agent overrides
     swe.md
   hooks/                      ← repo-specific hooks
     hooks.json
@@ -127,8 +127,8 @@ Run `/cass:customize` to scaffold the override package:
 
 **Override a command:**
 ```bash
-cp ~/.claude/plugins/cass/commands/pr.md .cass/commands/cass:pr.md
-# edit .cass/commands/cass:pr.md — this repo now uses your version
+cp ~/.claude/plugins/cass/commands/pr.md .claude/commands/cass:pr.md
+# edit .claude/commands/cass:pr.md — Claude Code uses this version for this project
 ```
 
 **Override an agent:**
