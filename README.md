@@ -69,7 +69,8 @@ PO
   /cass:plan [text or doc]     investigate requirement → risks + plan → save as ticket or MD
 
 Dev
-  /cass:dev-feat [plan/ticket] read plan → dev questions → implementation → worktrees + agents
+  /cass:dev-feat [plan/ticket] read plan → creates feature branch + worktree automatically
+                               parallel workstreams → asks before splitting into sub-worktrees
   /cass:pr                     from inside worktree → PR to staging (confirm target)
   /cass:review [PR or branch]  code review via pr-reviewer agent
   /cass:clean-wt               list worktrees by project → pick to remove
@@ -79,10 +80,15 @@ Dev
 ```
 my-repo/                        ← main folder (stays on main/staging — merge & test only)
 my-repo-agent-works/
-  ├── feat-user-auth/           ← main feature worktree
-  ├── feat-user-auth-api/       ← agent 1 → PR to feat-user-auth
-  └── feat-user-auth-ui/        ← agent 2 → PR to feat-user-auth
+  ├── feat-user-auth/           ← created automatically by /cass:dev-feat
+  ├── feat-user-auth-api/       ← agent 1 → PR to feat-user-auth (parallel only)
+  └── feat-user-auth-ui/        ← agent 2 → PR to feat-user-auth (parallel only)
 ```
+
+**Hooks (automatic, no setup needed):**
+- Blocks destructive git commands (`push --force`, `reset --hard`, etc.) — run `! <cmd>` to override
+- Nudges `/cass:commit` after Claude stops if working tree is dirty
+- Injects repo/branch/worktree context into every message
 
 ---
 

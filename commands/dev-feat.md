@@ -153,19 +153,17 @@ git push -u origin feat/<kebab-feature-title>
 
 Derive `<kebab-feature-title>` from the requirement title (lowercase, hyphens).
 
-If the plan has parallel workstreams AND the user approved worktree mode:
-
-**Ask before creating parallel structure:**
-> "The plan has [N] parallel workstreams. Shall I create a separate worktree + sub-branch for each so agents can work simultaneously? Each sub-branch will target `feat/<kebab-feature-title>` and get its own PR into that branch."
-
-**If approved — create main feature worktree:**
+**Always create a worktree for the main feature branch — no prompt needed:**
 
 ```bash
 mkdir -p <worktree-base>
 git worktree add <worktree-base>/feat-<kebab-feature-title> feat/<kebab-feature-title>
 ```
 
-**For each parallel workstream:**
+**If the plan has parallel workstreams**, ask before creating sub-branches:
+> "The plan has [N] parallel workstreams. Shall I create a separate sub-branch + worktree for each so agents can work simultaneously? Each will PR into `feat/<kebab-feature-title>`."
+
+**If approved — for each parallel workstream:**
 
 Derive a short label: `<ticket-number>-<stream-label>` (e.g. `PROJ-123-api-layer`, `PROJ-123-ui`).
 If no ticket number exists, use `<feature-kebab>-<stream-label>`.
@@ -175,14 +173,6 @@ git checkout feat/<kebab-feature-title>
 git checkout -b feat/<stream-label>
 git push -u origin feat/<stream-label>
 git worktree add <worktree-base>/<stream-label> feat/<stream-label>
-```
-
-**If no parallel workstreams OR user declined parallel split:**
-
-Create single worktree (if worktree mode):
-```bash
-mkdir -p <worktree-base>
-git worktree add <worktree-base>/feat-<kebab-feature-title> feat/<kebab-feature-title>
 ```
 
 ### Step 7 — Spawn SWE agents
