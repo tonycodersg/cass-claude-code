@@ -124,6 +124,7 @@ Prompt       injects repo / branch / worktree context into every message
 | `/cass:review [PR or branch]` | Dev | Code review via pr-reviewer agent — P1 / P2 / P3 findings |
 | `/cass:clean-wt` | Dev | List worktrees by project, pick to remove |
 | `/cass:test` | Dev | 13-step smoke test of cass mechanics in an isolated temp repo |
+| `/cass:eject` | Setup | Remove all cass config from this repo — undoes `/cass:init`. Pass `--hard` to also remove `.claude/commands/` overrides |
 
 ---
 
