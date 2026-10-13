@@ -3,6 +3,8 @@
 > A Claude Code plugin that brings a structured **plan → build → review** pipeline to any project.
 > Role-split commands for POs and developers. Agents that work in parallel. Worktrees that keep your main branch clean.
 
+**Latest stable: [v0.7.0](https://github.com/tonycodersg/cass-claude-code/releases/tag/v0.7.0)**
+
 ---
 
 ## Install
@@ -10,6 +12,10 @@
 ### Clone (recommended)
 
 ```bash
+# Latest stable (v0.7.0)
+git clone --branch v0.7.0 https://github.com/tonycodersg/cass-claude-code ~/.claude/plugins/cass
+
+# Or track latest
 git clone https://github.com/tonycodersg/cass-claude-code ~/.claude/plugins/cass
 ```
 
