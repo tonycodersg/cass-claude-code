@@ -54,42 +54,42 @@ mkdir -p "$TEST_REPO/.claude"
 
 ---
 
-### Test 2 — init: commit template copied
+### Test 2 — init: commit template copied to .cass/
 
 ```bash
-cp "${CLAUDE_PLUGIN_ROOT}/assets/commit-template/.gitmessage" "$TEST_REPO/cass-.gitmessage"
+mkdir -p "$TEST_REPO/.cass"
+cp "${CLAUDE_PLUGIN_ROOT}/assets/commit-template/.gitmessage" "$TEST_REPO/.cass/commit-template.md"
 ```
 
-Check file exists and contains `Co-authored-by` and semantic type hints:
+Check file exists in `.cass/` and contains `Co-authored-by` and semantic type hints:
 
 ```bash
-[ -f "$TEST_REPO/cass-.gitmessage" ] \
-  && grep -q "Co-authored-by" "$TEST_REPO/cass-.gitmessage" \
-  && grep -q "feat:" "$TEST_REPO/cass-.gitmessage"
+[ -f "$TEST_REPO/.cass/commit-template.md" ] \
+  && grep -q "Co-authored-by" "$TEST_REPO/.cass/commit-template.md" \
+  && grep -q "feat:" "$TEST_REPO/.cass/commit-template.md"
 ```
 
-- **PASS** if file exists with both markers
+- **PASS** if file exists in `.cass/` with both markers
 - **FAIL** otherwise
 
 ---
 
-### Test 3 — init: PR template copied and contains required sections
+### Test 3 — init: PR template copied to .cass/ and contains required sections
 
 ```bash
-mkdir -p "$TEST_REPO/.github"
-cp "${CLAUDE_PLUGIN_ROOT}/assets/pr-template/pull_request_template.md" "$TEST_REPO/.github/cass-pull_request_template.md"
+cp "${CLAUDE_PLUGIN_ROOT}/assets/pr-template/pull_request_template.md" "$TEST_REPO/.cass/pr-template.md"
 ```
 
-Check file exists and contains Risks, Test Coverage, and Claude session placeholder:
+Check file exists in `.cass/` and contains Risks, Test Coverage, and Claude session placeholder:
 
 ```bash
-[ -f "$TEST_REPO/.github/cass-pull_request_template.md" ] \
-  && grep -q "## Risks" "$TEST_REPO/.github/cass-pull_request_template.md" \
-  && grep -q "## Test Coverage" "$TEST_REPO/.github/cass-pull_request_template.md" \
-  && grep -q "CLAUDE_SESSION_ID" "$TEST_REPO/.github/cass-pull_request_template.md"
+[ -f "$TEST_REPO/.cass/pr-template.md" ] \
+  && grep -q "## Risks" "$TEST_REPO/.cass/pr-template.md" \
+  && grep -q "## Test Coverage" "$TEST_REPO/.cass/pr-template.md" \
+  && grep -q "CLAUDE_SESSION_ID" "$TEST_REPO/.cass/pr-template.md"
 ```
 
-- **PASS** if file exists and all three sections are present
+- **PASS** if file exists in `.cass/` with all three sections
 - **FAIL** otherwise
 
 ---
@@ -338,8 +338,8 @@ rm -rf "$TEST_DIR"
 cass smoke test results
 =======================
 Test 1   init: .claude folder                        PASS
-Test 2   init: commit template (Co-authored-by)      PASS
-Test 3   init: PR template (Risks + session ID)      PASS
+Test 2   init: .cass/commit-template.md (Co-authored-by) PASS
+Test 3   init: .cass/pr-template.md (Risks + session ID) PASS
 Test 4   init: settings.local.json shape + prTemplate PASS
 Test 5   init: worktree base folder                  PASS
 Test 6   init: re-run merges projects                PASS

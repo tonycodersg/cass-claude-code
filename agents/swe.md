@@ -116,7 +116,7 @@ Execute each task in order:
 - Follow project conventions from Step 2
 - Make focused, minimal changes — only what the plan calls for
 - Commit after each logical unit of work using `/cass:commit` — pass the ticket ref if available (e.g. `/cass:commit PROJ-123`). The commit command generates the semantic message, confirms with the user, and appends `Co-authored-by: Claude`
-  - Follow the semantic commit format: `<type>(<scope>): <summary>` with `Co-authored-by: Claude <claude@anthropic.com>` in the footer
+  - Follow the semantic commit format: `<type>(<scope>): <summary>` with `Co-authored-by: Claude Sonnet 4.6 <noreply@anthropic.com>` in the footer
 - Mark each task completed immediately after finishing it
 - If something would change the approach, pause and tell the user before continuing
 

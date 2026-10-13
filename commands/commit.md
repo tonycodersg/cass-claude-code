@@ -11,6 +11,7 @@ model: haiku
 - Git status: !`git status --short 2>/dev/null`
 - Staged diff: !`git diff --cached --stat 2>/dev/null`
 - Unstaged diff: !`git diff --stat 2>/dev/null`
+- Commit template: !`cat .cass/commit-template.md 2>/dev/null || cat cass-.gitmessage 2>/dev/null || echo "NOT FOUND"`
 - User hint: $ARGUMENTS
 
 ## Process
@@ -45,7 +46,9 @@ Read the full staged diff:
 git diff --cached
 ```
 
-Generate a semantic commit message following this format:
+**If `.cass/commit-template.md` exists** (from context), use it as the message format — follow whatever structure the team has defined there.
+
+**Otherwise**, use the cass default format:
 
 ```
 <type>(<scope>): <short summary>
@@ -53,7 +56,7 @@ Generate a semantic commit message following this format:
 <body — optional, only if the change needs explanation>
 
 Refs: <ticket ref if provided in $ARGUMENTS>
-Co-authored-by: Claude <claude@anthropic.com>
+Co-authored-by: Claude Sonnet 4.6 <noreply@anthropic.com>
 ```
 
 Rules:
@@ -103,5 +106,5 @@ Print the commit hash and summary on success:
 
 - Never commit without user confirmation
 - Never use `--no-verify` or skip hooks
-- Always include `Co-authored-by: Claude <claude@anthropic.com>` in the footer
+- Always include `Co-authored-by: Claude Sonnet 4.6 <noreply@anthropic.com>` in the footer
 - Never stage `.env`, credential files, or binary files — warn the user if any are detected in the unstaged list

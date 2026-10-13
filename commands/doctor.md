@@ -136,8 +136,8 @@ cass doctor
 
 Git
   ✓  user.name / user.email           configured
-  ✓  commit template                  cass-.gitmessage
-  ✓  PR template                      .github/cass-pull_request_template.md
+  ✓  commit template                  .cass/commit-template.md
+  ✓  PR template                      .cass/pr-template.md
 
 GitHub CLI
   ✓  gh installed                     gh version 2.x.x
