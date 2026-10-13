@@ -93,6 +93,7 @@ Prompt       injects repo / branch / worktree context into every message
 |---|---|---|
 | `/cass:init [project]` | Setup | Register project paths, copy templates, create worktree folder |
 | `/cass:doctor` | Setup | Health check — tools, MCP servers, git config, project settings |
+| `/cass:customize` | Setup | Scaffold `.cass/` override package for this repo |
 | `/cass:plan [text or doc]` | PO | Requirement → risk-assessed plan → Jira / GitHub issue / MD file |
 | `/cass:dev-feat [plan/ticket]` | Dev | Plan → feature branch + worktree → parallel SWE agents |
 | `/cass:commit` | Dev | Stage changes, generate semantic message, commit with co-author |
@@ -100,7 +101,43 @@ Prompt       injects repo / branch / worktree context into every message
 | `/cass:review [PR or branch]` | Dev | Code review via pr-reviewer agent — P1 / P2 / P3 findings |
 | `/cass:clean-wt` | Dev | List worktrees by project, pick to remove |
 | `/cass:test` | Dev | 13-step smoke test of cass mechanics in an isolated temp repo |
-| `/cass:doctor` | Dev | Health check for tools, MCP, and project config |
+
+---
+
+## Customising cass
+
+cass is a **global plugin** — it lives in `~/.claude/plugins/cass` and is shared across all your projects. Each repo can override any part of it without touching the plugin itself.
+
+Run `/cass:customize` to scaffold the override package:
+
+```
+.cass/                        ← committed to your repo
+  commands/                   ← override any /cass:<name> command
+    cass:pr.md                ← this repo's version of /cass:pr
+  agents/                     ← override any cass agent
+    swe.md
+  hooks/                      ← repo-specific hooks
+    hooks.json
+    scripts/
+  pr-template.md              ← PR body template
+  commit-template.md          ← commit message template
+```
+
+**Override a command:**
+```bash
+cp ~/.claude/plugins/cass/commands/pr.md .cass/commands/cass:pr.md
+# edit .cass/commands/cass:pr.md — this repo now uses your version
+```
+
+**Override an agent:**
+```bash
+cp ~/.claude/plugins/cass/agents/swe.md .cass/agents/swe.md
+```
+
+**Add a repo-specific hook:**
+Edit `.cass/hooks/hooks.json` — these run alongside the global plugin hooks.
+
+Commit `.cass/` to version-control so your whole team gets the same overrides.
 
 ---
 
