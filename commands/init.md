@@ -53,38 +53,41 @@ Only print the lines that actually failed. Do not proceed until all prerequisite
 
 ### Step 1 — Resolve project name
 
-If `$ARGUMENTS` is provided, use it as the project name.
+If `$ARGUMENTS` is provided, use it as the project name. Skip to Step 2.
 
-If `$ARGUMENTS` is empty, ask:
-> "What is the project name? (press Enter to use the repo folder name: `<repo name from context>`)"
+If `$ARGUMENTS` is empty, use `AskUserQuestion`:
+- header: "Project name"
+- question: "What is the project name?"
+- options:
+  - label: "`<repo name from context>` (Recommended)", description: "Use the repo folder name"
+  - label: "Custom name", description: "Type a different name"
 
-If the user presses Enter or leaves it blank, use the repo folder name from context.
+If the user picks the repo name option, use the repo folder name from context. If they pick "Custom name" with user text, use that text.
 
 ---
 
 ### Step 2 — Ask workspace setup questions
 
-Ask the user these two questions together in a single message:
+Use `AskUserQuestion` with two questions:
 
-> **cass init — workspace setup for `<project name>`**
->
-> **1. Worktree folder path**
-> Feature branches will be checked out as worktrees here so agents work in isolation without touching this main repo folder.
->
-> Default: `<default worktree path from context>`
->
-> Press Enter to use the default, or type a custom absolute path.
->
-> **2. Main branch**
-> This main repo folder will stay checked out on this branch (for merging and testing only — agents work in worktrees).
->
-> 1. `main` (default)
-> 2. `staging`
-> 3. Other — type the branch name
+**Question 1 — Main branch**
+- header: "Main branch"
+- question: "Which branch does this repo's main folder stay on? (agents work in worktrees — this branch is for merging and testing only)"
+- options:
+  - label: "main (Recommended)", description: "Use `main` as the base branch"
+  - label: "staging", description: "Use `staging` as the base branch"
+  - label: "Other", description: "Type a custom branch name"
+
+**Question 2 — Worktree folder path**
+- header: "Worktree path"
+- question: "Where should feature worktrees be created? (default: `<default worktree path from context>`)"
+- options:
+  - label: "Use default path (Recommended)", description: "`<default worktree path from context>`"
+  - label: "Custom path", description: "Type an absolute path"
 
 Resolve answers:
-- Worktree path: if blank/Enter → use the default from context. Expand `~` to home directory if present.
-- Main branch: if they chose 1 or pressed Enter → `main`. If they chose 2 → `staging`. If they typed a custom name → use it as-is.
+- Main branch: "main (Recommended)" → `main`. "staging" → `staging`. "Other" with user text → use that text as-is.
+- Worktree path: "Use default path (Recommended)" → use the default from context. "Custom path" with user text → use that text, expanding `~` to the home directory.
 
 ---
 
