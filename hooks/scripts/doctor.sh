@@ -156,3 +156,6 @@ printf "  ${C_GREEN}${PASS} passed${C_RESET}  ${C_YELLOW}${WARN} warnings${C_RES
 if [ $FAIL -eq 0 ] && [ $WARN -eq 0 ]; then
   printf "${C_GREEN}✓ All checks passed. cass is ready to use.${C_RESET}\n\n"
 fi
+
+# machine-readable summary for Claude to reformat as its text response
+printf "CASS_SUMMARY: v%s | %d passed | %d warnings | %d failed\n" "$VERSION" "$PASS" "$WARN" "$FAIL"

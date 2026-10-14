@@ -5,19 +5,19 @@ allowed-tools: [Bash]
 model: haiku
 ---
 
-Plugin version: !`python3 -c "import json; print(json.load(open('${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json'))['version'])" 2>/dev/null || echo "unknown"`
-
 Run the script:
 
 ```bash
 bash "${CLAUDE_PLUGIN_ROOT}/hooks/scripts/doctor.sh" $ARGUMENTS
 ```
 
-After it runs, your entire text response must follow this exact format — nothing more:
+The script output ends with a line: `CASS_SUMMARY: v{ver} | {n} passed | {n} warnings | {n} failed`
+
+Your entire text response must be exactly two lines (or one if no action needed):
 
 ```
-cass v{VERSION}  ✓ {N} passed  ⚠ {N} warnings  ✗ {N} failed
-{one line fix if needed, or omit}
+cass v{ver}  ✓ {n} passed  ⚠ {n} warnings  ✗ {n} failed
+Run /cass:init to fix.   ← only include this line if warnings > 0 or failed > 0
 ```
 
-No summaries. No lists. No explanations.
+No other text.
