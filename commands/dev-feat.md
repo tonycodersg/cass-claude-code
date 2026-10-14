@@ -14,6 +14,13 @@ model: sonnet
 - User input: $ARGUMENTS
 - cass settings: !`cat .claude/settings.local.json 2>/dev/null || echo "NOT FOUND"`
 
+## Flags
+
+Parse from `$ARGUMENTS`:
+- `--god` — fully autonomous mode: SWE agents implement → create PRs → pr-reviewer spawns automatically → P1 fixes applied → review posted as GitHub comment. No manual steps after plan approval.
+
+Store this flag at the start — it affects Steps 7 and 8.
+
 ## Your Role
 
 You are a senior SWE/SA. Your job is to read a requirement document, write a concrete implementation plan with test coverage, identify parallel workstreams, set up the right git/worktree structure, and spawn SWE agents to implement — with the user's explicit approval at each decision point.
@@ -186,6 +193,7 @@ Spawn one SWE agent per workstream simultaneously. For each agent, pass:
 - The specific tasks for that stream (extracted from the plan)
 - The requirement file path
 - Instruction: "Create a PR targeting `feat/<kebab-feature-title>` when done — not staging"
+- If `--god` mode: "After creating the PR, output the PR number on a line starting with `PR_NUMBER:`"
 
 **If single workstream with worktree:**
 
@@ -194,14 +202,25 @@ Spawn one SWE agent with:
 - The feature branch name
 - PR target: `<base-branch>` (staging or equivalent)
 - The requirement file path
+- If `--god` mode: "After creating the PR, output the PR number on a line starting with `PR_NUMBER:`"
 
 **If main folder:**
 
 Spawn one SWE agent working in the current directory with the feature branch already checked out.
 
+**If `--god` mode — after all SWE agents complete:**
+
+For each PR created by SWE agents, spawn a `pr-reviewer` agent with `--auto-post --pr <PR number>`. Pass the plan file path so it can check plan compliance. The pr-reviewer will:
+1. Review the diff against the plan
+2. Fix all P1 issues automatically
+3. Push the fixes
+4. Post the full review as a GitHub PR comment
+
+Wait for all pr-reviewer agents to complete before reporting.
+
 ### Step 8 — Report
 
-Once agents are spawned, report to the user:
+**Standard mode** — once agents are spawned, report to the user:
 
 ```
 ## Started
@@ -214,6 +233,20 @@ Worktrees:
 
 Agents running. Run /cass:pr when ready to create a PR from any branch.
 Run /cass:clean-wt to remove worktrees after PRs are merged.
+```
+
+**God mode** — after SWE + pr-reviewer agents complete, report:
+
+```
+## Done — God mode
+
+Feature branch: feat/<kebab-feature-title>
+
+PRs created and reviewed:
+  PR #<n> — <branch>  →  <target>  (review posted, P1s fixed)
+
+All PRs are ready for human approval. Review the GitHub comments for findings.
+Run /cass:clean-wt once PRs are merged.
 ```
 
 ## Constraints
