@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-10-14
+
+### Added
+
+- `commands/dev-feat`: `--god` flag — fully autonomous mode: SWE implements → creates PR → pr-reviewer agent spawns automatically → P1 issues fixed → review posted as GitHub PR comment
+- `agents/pr-reviewer`: Step 6 — after review, asks user to post findings as a GitHub PR comment; `--auto-post` skips the prompt and posts immediately; `--pr <number>` targets a specific PR
+- `commands/review`: Step 5 — fetches all PR review threads via GitHub GraphQL, lists each with `✓ resolved` / `✗ unresolved` / `(outdated)` status; offers to walk through unresolved threads one by one (fix / dismiss / skip)
+
+### Fixed
+
+- `commands/init`: replaced "press Enter for default" prompts with `AskUserQuestion` — prevents empty string being saved as branch name or project name
+- `commands/pr`, `agents/swe`, `assets/pr-template`: replaced `CLAUDE_SESSION_ID` (never set) with `git rev-parse --short HEAD` as session ref
+
 ## [0.8.5] - 2026-10-14
 
 ### Changed
