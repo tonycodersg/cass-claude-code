@@ -2,14 +2,11 @@
 description: Health check — verifies that all cass dependencies are installed, MCP servers are reachable, git is configured, and Claude Code integrations are working
 argument-hint: "[--debug]"
 allowed-tools: [Bash]
+model: haiku
 ---
 
-## Instructions
-
-Run the doctor script, passing through any arguments:
+IMPORTANT: Your entire response is ONE bash tool call. No text before it, no text after it, no summary, no interpretation.
 
 ```bash
 bash "${CLAUDE_PLUGIN_ROOT}/hooks/scripts/doctor.sh" $ARGUMENTS
 ```
-
-Do not add any additional output or interpretation — the script handles everything.
