@@ -5,7 +5,7 @@
 > Hooks run automatically to guard against destructive commands and keep Claude context-aware.
 > Each repo gets its own `.cass/` customization layer — override commands, agents, hooks, and templates, committed alongside your code.
 
-**Latest stable: [v0.8.4](https://github.com/tonycodersg/cass-claude-code/releases/tag/v0.8.4)**
+**Latest stable: [v0.8.5](https://github.com/tonycodersg/cass-claude-code/releases/tag/v0.8.5)**
 
 ---
 
@@ -64,6 +64,12 @@ Easier to install, but cache can get stuck on old versions:
 /plugin install cass@cass-marketplace --global
 /reload-plugins
 ```
+
+> **Still seeing the old version after reinstall?** The marketplace cache can persist. Full reset:
+> ```
+> /plugin uninstall cass@cass-marketplace
+> ```
+> Then close and reopen Claude Code, reinstall, and `/reload-plugins`.
 
 ### 2c. Per session (one-off)
 
