@@ -11,6 +11,8 @@
 
 ## Install
 
+> **Pick one install method and stick with it.** Mixing clone + marketplace causes the marketplace cache to take precedence and get stuck on old versions.
+
 ### 1. Prerequisites
 
 ```bash
@@ -21,41 +23,63 @@ brew install gh && gh auth login
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-### 2. Clone the plugin
+### 2a. Clone (recommended)
+
+Reliable, always up-to-date with `git pull`:
 
 ```bash
 # Latest stable (v0.8.3)
-git clone --branch v0.8.3 https://github.com/tonycodersg/cass-claude-code ~/.claude/plugins/cass
+git clone --branch v0.8.3 https://tonycodersg@github.com/tonycodersg/cass-claude-code ~/.claude/plugins/cass
 
 # Or track latest
-git clone https://github.com/tonycodersg/cass-claude-code ~/.claude/plugins/cass
+git clone https://tonycodersg@github.com/tonycodersg/cass-claude-code ~/.claude/plugins/cass
 ```
 
 Loads automatically in every Claude Code session. No restart needed.
 
-### 3. Verify
-
-Open any project in Claude Code, then:
-
+**Update:**
 ```bash
-/cass:doctor
+cd ~/.claude/plugins/cass && git pull
 ```
 
-All checks green = ready to use.
+### 2b. Marketplace
 
-### Other install methods
+Easier to install, but cache can get stuck on old versions:
 
-**Marketplace:**
-```bash
+```
 /plugin marketplace add tonycodersg/cass-claude-code
 /plugin install cass@cass-marketplace --global
 /reload-plugins
 ```
 
-**Per session:**
+**Update:**
+```
+/plugin update cass@cass-marketplace
+/reload-plugins
+```
+
+**If stuck on an old version**, reinstall fresh:
+```
+/plugin uninstall cass@cass-marketplace
+/plugin install cass@cass-marketplace --global
+/reload-plugins
+```
+
+### 2c. Per session (one-off)
+
 ```bash
 claude --plugin-dir /path/to/cass-claude-code
 ```
+
+### 3. Verify
+
+Open any project in Claude Code, then:
+
+```
+/cass:doctor
+```
+
+All checks green = ready to use.
 
 ---
 
