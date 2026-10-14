@@ -5,7 +5,7 @@ allowed-tools: [Bash]
 model: haiku
 ---
 
-IMPORTANT: Your entire response is ONE bash tool call. No text before it, no text after it, no summary, no interpretation.
+Run the bash tool below. When it completes, you are done — do not write any text response, not even one sentence.
 
 ```bash
 bash "${CLAUDE_PLUGIN_ROOT}/hooks/scripts/doctor.sh" $ARGUMENTS
