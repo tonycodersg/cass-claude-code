@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.4] - 2026-10-14
+
+### Added
+
+- `commands/doctor`: `--debug` flag — shows `PLUGIN_ROOT`, working dir, settings path, raw command outputs, and per-check values for easier issue reporting
+
+### Changed
+
+- `commands/doctor`: moved all checks to `hooks/scripts/doctor.sh` — deterministic bash output, no Claude interpretation; uninitialised project is `ℹ INFO` not `✗ FAIL`
+- `README.md`: clarified install methods — warn against mixing clone + marketplace; added reinstall fix for stuck cache
+
+### Fixed
+
+- `commands/doctor`: no longer fails when `/cass:init` hasn't been run
+
 ## [0.8.3] - 2026-10-13
 
 ### Added
