@@ -115,19 +115,19 @@ For each additional server found in `.mcp.json` (beyond `atlassian` and `serena`
 
 From `cass.projects` in `.claude/settings.local.json`:
 
-- **INFO** if `cass.projects` is empty or missing — init has not been run yet. Do not count as a failure. Show: `ℹ not initialised → run /cass:init <project-name> to set up`
-- **PASS** if at least one project is configured
+**CRITICAL: missing `cass.projects` is NOT a failure. It is expected when init has not been run yet.**
 
-This check never blocks the report — doctor must always complete and show all checks regardless of whether init has been run.
+- If `cass.projects` is empty or missing → output **`ℹ`** (INFO, blue) — do NOT use `✗`, do NOT increment failed counter, do NOT add to Action needed block. Show: `ℹ  not initialised  run /cass:init <project-name> to set up`
+- If at least one project is configured → **PASS**
 
-For each project found, show:
+For each configured project, show:
 ```
   Project: <name>
     Main repo:      <mainRepoPath>   (branch: <mainBranch>)
     Worktree base:  <worktreePath>
 ```
 
-For each project, also check that `worktreePath` exists on disk:
+For each project, check that `worktreePath` exists on disk:
 - **PASS** if folder exists
 - **WARN** if it doesn't → fix: `mkdir -p <worktreePath>` or re-run `/cass:init <project-name>`
 
