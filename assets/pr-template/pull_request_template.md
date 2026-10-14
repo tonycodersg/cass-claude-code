@@ -33,4 +33,4 @@
 
 ---
 
-**Session ref:** <!-- short git hash at time of PR -->
+**Session ref:** <!-- $CLAUDE_SESSION_ID -->

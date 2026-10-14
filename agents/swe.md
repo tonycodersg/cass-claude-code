@@ -197,7 +197,7 @@ Fill the resolved template with content from the plan and implementation. Replac
 <details>
 <summary>Session info</summary>
 
-**Session ref:** <!-- git rev-parse --short HEAD -->
+**Session ref:** <!-- $CLAUDE_SESSION_ID -->
 **Agent:** cass/swe
 **Plan file:** <!-- path if applicable -->
 
