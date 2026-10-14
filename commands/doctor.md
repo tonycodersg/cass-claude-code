@@ -5,7 +5,7 @@ allowed-tools: [Bash]
 model: haiku
 ---
 
-In this command context, your text responses are not displayed to the user — only the bash tool output is shown. Run the script below. Do not generate any text.
+Run the script. After it completes, output at most one short recommendation line if there are failures or warnings — nothing else. No summaries, no lists, no re-stating what the script already printed.
 
 ```bash
 bash "${CLAUDE_PLUGIN_ROOT}/hooks/scripts/doctor.sh" $ARGUMENTS
