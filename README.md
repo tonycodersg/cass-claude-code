@@ -218,6 +218,13 @@ cd ~/.claude/plugins/cass && git pull
 /reload-plugins
 ```
 
+If the marketplace cache is stuck on an old version, reinstall fresh:
+```
+/plugin uninstall cass@cass-marketplace
+/plugin install cass@cass-marketplace --global
+/reload-plugins
+```
+
 ---
 
 ## Docs
