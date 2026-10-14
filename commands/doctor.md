@@ -115,8 +115,10 @@ For each additional server found in `.mcp.json` (beyond `atlassian` and `serena`
 
 From `cass.projects` in `.claude/settings.local.json`:
 
-- **FAIL** if `cass.projects` is empty or missing → fix: run `/cass:init <project-name>`
+- **INFO** if `cass.projects` is empty or missing — init has not been run yet. Do not count as a failure. Show: `ℹ not initialised → run /cass:init <project-name> to set up`
 - **PASS** if at least one project is configured
+
+This check never blocks the report — doctor must always complete and show all checks regardless of whether init has been run.
 
 For each project found, show:
 ```
@@ -183,8 +185,12 @@ printf "\033[31m✗\033[0m  .cass/pr-template.md missing       → run /cass:ini
 printf "\033[33m⚠\033[0m  ATLASSIAN_API_TOKEN not set        → export ATLASSIAN_API_TOKEN=... in shell profile\n"
 ```
 
-If everything passes, print:
+INFO items (like uninitialised project) do not count as failures and do not appear in the action block. They are shown inline in the cass projects section only.
+
+If everything passes (no FAIL, no WARN), print:
 
 ```bash
 printf "\033[1;32m✓ All checks passed. cass is ready to use.\033[0m\n"
 ```
+
+If only INFO items remain (no FAIL, no WARN), still print the all-passed line — INFO is not a problem.
