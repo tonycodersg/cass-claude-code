@@ -1,7 +1,7 @@
 ---
 description: Review a PR or the current branch — spawns the pr-reviewer agent to check logic, performance, code quality, and plan compliance
 argument-hint: "[PR number or URL — omit to review current branch]"
-allowed-tools: [Agent, Bash, AskUserQuestion, Read]
+allowed-tools: [Agent, Bash, AskUserQuestion, Read, Edit, Write, Glob, Grep]
 model: sonnet
 ---
 
@@ -67,3 +67,71 @@ Present the pr-reviewer agent's output to the user. Ask:
 > "Would you like to fix any of the findings now? (P1 items are strongly recommended before merging)"
 
 If the user wants to fix items, guide them or invoke the SWE agent for specific fixes. Do not apply fixes yourself unless the user explicitly asks.
+
+---
+
+### Step 5 — List all PR comment threads and their status
+
+If a PR number is known, fetch all review threads and list each one with its resolved status.
+
+Use the GitHub GraphQL API to get threads with resolved state:
+
+```bash
+gh api graphql -f query='
+{
+  repository(owner: "<owner>", name: "<repo>") {
+    pullRequest(number: <PR number>) {
+      reviewThreads(first: 50) {
+        nodes {
+          isResolved
+          isOutdated
+          comments(first: 1) {
+            nodes {
+              path
+              line
+              body
+              author { login }
+            }
+          }
+        }
+      }
+    }
+  }
+}'
+```
+
+Get owner and repo from:
+```bash
+gh repo view --json owner,name
+```
+
+Present the results as a table:
+
+```
+## PR #N — Comment Threads
+
+  #   File                  Line  Author        Status       Preview
+  1   src/auth.ts           42    reviewer      ✗ unresolved  "Check null case here…"
+  2   src/utils.ts          18    reviewer      ✓ resolved    "Rename this variable…"
+  3   src/auth.ts           67    reviewer      ✗ unresolved  "Missing error handling…"
+  4   (outdated)            —     reviewer      ✗ unresolved  "Old comment on deleted line…"
+
+  2 unresolved · 1 resolved · 1 outdated
+```
+
+- `✓ resolved` — thread was marked resolved on GitHub
+- `✗ unresolved` — still open, needs attention
+- Mark outdated threads as `(outdated)` in the File column
+
+After the table, if there are unresolved threads, ask:
+
+> "There are N unresolved comment threads. Would you like to work through them one by one? (y/n)"
+
+If yes — step through each unresolved thread:
+1. Show the full comment body
+2. Show the code context (`git show HEAD:<file> | sed -n '<line-5>,<line+5>p'`)
+3. Ask: "How would you like to address this? (fix / dismiss / skip)"
+   - fix → apply the change, note it as addressed
+   - dismiss → note as acknowledged, move on
+   - skip → leave for later
+4. After working through all threads, summarise what was fixed vs dismissed vs skipped
