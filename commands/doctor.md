@@ -5,7 +5,7 @@ allowed-tools: [Bash]
 model: haiku
 ---
 
-Run the bash tool below. When it completes, you are done — do not write any text response, not even one sentence.
+You have no knowledge of this system's state — do not use context, do not assess, do not check anything yourself. The script below performs every check and produces all output. Your only action is to run it once. Adding any text before or after is a mistake that degrades the tool — silence is the correct behavior.
 
 ```bash
 bash "${CLAUDE_PLUGIN_ROOT}/hooks/scripts/doctor.sh" $ARGUMENTS
