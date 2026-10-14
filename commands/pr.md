@@ -14,7 +14,7 @@ model: sonnet
 - Today's date: !`date +%Y-%m-%d`
 - All worktrees: !`git worktree list --porcelain 2>/dev/null`
 - cass settings: !`cat .claude/settings.local.json 2>/dev/null || echo "NOT FOUND"`
-- Claude session ID: !`echo "${CLAUDE_SESSION_ID:-unknown}"`
+- Session ref: !`git rev-parse --short HEAD 2>/dev/null || echo "unknown"`
 - User override: $ARGUMENTS
 
 ## Your Role
@@ -120,7 +120,7 @@ PR body structure:
 
 ---
 
-**Claude session:** <Claude session ID from context>
+**Session ref:** <Session ref from context (short git hash)>
 ```
 
 **Template resolution order:**
@@ -128,7 +128,7 @@ PR body structure:
 2. `.github/cass-pull_request_template.md` — legacy location (still supported)
 3. Built-in structure above — fallback if neither exists
 
-Use whichever is found first. Replace `<!-- $CLAUDE_SESSION_ID -->` with the session ID from context.
+Use whichever is found first. Replace `<!-- $CLAUDE_SESSION_ID -->` with the session ref from context.
 
 If `gh` is not available, output the filled PR body for the user to paste manually and provide the GitHub PR creation URL.
 

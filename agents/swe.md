@@ -158,7 +158,7 @@ gh pr create \
 3. Use built-in fallback below       → if neither found
 ```
 
-Fill the resolved template with content from the plan and implementation. Replace `<!-- $CLAUDE_SESSION_ID -->` with the actual Claude session ID (from `$CLAUDE_SESSION_ID` env var, or `unknown` if not set).
+Fill the resolved template with content from the plan and implementation. Replace `<!-- $CLAUDE_SESSION_ID -->` with the short git hash of HEAD (`git rev-parse --short HEAD`).
 
 **Built-in fallback** (used when no template file exists):
 
@@ -197,7 +197,7 @@ Fill the resolved template with content from the plan and implementation. Replac
 <details>
 <summary>Session info</summary>
 
-**Claude session:** <!-- $CLAUDE_SESSION_ID -->
+**Session ref:** <!-- git rev-parse --short HEAD -->
 **Agent:** cass/swe
 **Plan file:** <!-- path if applicable -->
 
