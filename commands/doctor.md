@@ -5,8 +5,19 @@ allowed-tools: [Bash]
 model: haiku
 ---
 
-Run the script. After it completes, output at most one short recommendation line if there are failures or warnings — nothing else. No summaries, no lists, no re-stating what the script already printed.
+Plugin version: !`python3 -c "import json; print(json.load(open('${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json'))['version'])" 2>/dev/null || echo "unknown"`
+
+Run the script:
 
 ```bash
 bash "${CLAUDE_PLUGIN_ROOT}/hooks/scripts/doctor.sh" $ARGUMENTS
 ```
+
+After it runs, your entire text response must follow this exact format — nothing more:
+
+```
+cass v{VERSION}  ✓ {N} passed  ⚠ {N} warnings  ✗ {N} failed
+{one line fix if needed, or omit}
+```
+
+No summaries. No lists. No explanations.
