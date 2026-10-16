@@ -278,6 +278,36 @@ Print confirmation:
 
 ---
 
+### Step 7c — Branch protection (merge gate)
+
+Set up branch protection on the main branch to require at least one approval before any PR can be merged. This prevents agents (or anyone) from merging unreviewed code.
+
+Run:
+
+```bash
+gh api repos/{owner}/{repo}/branches/<mainBranch>/protection \
+  --method PUT \
+  --header "Accept: application/vnd.github+json" \
+  --field enforce_admins=false \
+  --field required_status_checks=null \
+  --field restrictions=null \
+  --field "required_pull_request_reviews[required_approving_review_count]=1" \
+  --field "required_pull_request_reviews[dismiss_stale_reviews]=true"
+```
+
+Get owner and repo from:
+```bash
+gh repo view --json owner,name --jq '"\(.owner.login)/\(.name)"'
+```
+
+**If the command succeeds**, print:
+> "✓ Branch protection set on `<mainBranch>` — 1 approval required before merge, stale reviews dismissed"
+
+**If it fails** (e.g. not a repo admin), print a warning but do not stop init:
+> "⚠ Could not set branch protection — you may not have admin access. Set it manually: repo Settings → Branches → Add rule → require pull request reviews"
+
+---
+
 ### Step 8 — Report
 
 Output the report via `printf` with ANSI color codes:
@@ -303,7 +333,8 @@ printf "  \033[32m✓\033[0m  .cass/pr-template.md          \033[2mcopied\033[0m
 printf "  \033[32m✓\033[0m  cass-.gitmessage              \033[2mlinked\033[0m\n"
 printf "  \033[32m✓\033[0m  .gitignore                    \033[2mupdated\033[0m\n"
 printf "  \033[32m✓\033[0m  worktree base folder          \033[2mcreated\033[0m\n"
-printf "  \033[32m✓\033[0m  cass-bot                      \033[2mconfigured\033[0m\n\n"  # or: "skipped"
+printf "  \033[32m✓\033[0m  cass-bot                      \033[2mconfigured\033[0m\n"   # or: "skipped"
+printf "  \033[32m✓\033[0m  branch protection             \033[2m1 approval required\033[0m\n\n"  # or: "⚠ skipped — insufficient permissions"
 
 printf "\033[2m──────────────────────────────────────────\033[0m\n"
 printf "\033[1;36mNext steps\033[0m\n"
