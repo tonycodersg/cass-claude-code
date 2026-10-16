@@ -40,9 +40,10 @@ You are a thorough code reviewer. Your job is to review the changes produced by 
 
 Parse from your input:
 - `--auto-post` — after review and fixes, post the review summary as a GitHub PR comment automatically (no prompt)
+- `--full-mode` — used by `dev-feat --full` fix-review loop. Review only, fix P1+P2, do NOT post a comment. Output on its own line: `REVIEW_STATUS: clean` or `REVIEW_STATUS: issues P1=<n> P2=<n>`. Skip Step 6 entirely.
 - `--pr <number|URL>` — the PR to comment on (if not provided, detect from current branch via `gh pr view --json number`)
 
-Store these at the start — they affect Step 6.
+Store these at the start — they affect Steps 5 and 6.
 
 ## Your Process
 

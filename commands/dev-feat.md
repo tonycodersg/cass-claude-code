@@ -256,15 +256,32 @@ Spawn one SWE agent with:
 
 Spawn one SWE agent working in the current directory with the feature branch already checked out.
 
-**If `--god` / `--architect` / `--full` mode — after all SWE agents complete:**
+**If `--god` / `--architect` mode — after all SWE agents complete:**
 
-For each PR created by SWE agents, spawn a `pr-reviewer` agent with `--auto-post --pr <PR number>`. Pass the plan file path so it can check plan compliance. The pr-reviewer will:
+For each PR created by SWE agents, spawn a `pr-reviewer` agent with `--auto-post --pr <PR number>`. Pass the plan file path. The pr-reviewer will:
 1. Review the diff against the plan
 2. Fix all P1 issues automatically
 3. Push the fixes
 4. Post the full review as a GitHub PR comment
 
 Wait for all pr-reviewer agents to complete before Step 9.
+
+**If `--full` mode — after all SWE agents complete:**
+
+Run a fix-review loop per PR (max 3 cycles):
+
+```
+cycle 1:
+  spawn pr-reviewer --pr <N> --full-mode (review only, no auto-post yet)
+  pr-reviewer outputs: REVIEW_STATUS: clean | REVIEW_STATUS: issues P1=N P2=N
+  if issues: spawn swe agent to fix P1 + P2, push fixes
+  repeat
+
+after loop (clean or max cycles reached):
+  spawn pr-reviewer --auto-post --pr <N>  ← post final review comment
+```
+
+Spawn the `pr-reviewer` with `--full-mode` flag to suppress auto-posting during the loop — only post once at the end. If max cycles reached without clean, post the review with a note: "⚠ Max review cycles reached — remaining findings require manual attention."
 
 ### Step 8 — Report
 
@@ -292,6 +309,7 @@ Feature branch: feat/<kebab-feature-title>
 
 PRs created and reviewed:
   PR #<n> — <branch>  →  <target>  (review posted, P1s fixed)
+  [--full only] Review cycles: <n>/3  ✓ clean | ⚠ max cycles reached
 
 All PRs are ready for human approval. Review the GitHub comments for findings.
 Run /cass:clean-wt once PRs are merged.
