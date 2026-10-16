@@ -17,9 +17,16 @@ model: sonnet
 ## Flags
 
 Parse from `$ARGUMENTS`:
-- `--god` — fully autonomous mode: SWE agents implement → create PRs → pr-reviewer spawns automatically → P1 fixes applied → review posted as GitHub comment. No manual steps after plan approval.
+- `--god` — fully autonomous, zero human touch. SWE writes plan itself (no approval prompt), implements, creates PR, pr-reviewer reviews + fixes P1s + posts GitHub comment, then comments on the original ticket with PR link + status.
+- `--architect` — same as `--god` but SA agent reviews the plan before implementation begins (coming soon).
+- `--full` — same as `--architect` but adds a fix-review loop until clean (coming soon).
 
-Store this flag at the start — it affects Steps 7 and 8.
+Store flags at the start — they affect Steps 3, 4, 6, 7, 8, and 9.
+
+Also track the **ticket source** from Step 1:
+- GitHub issue → store issue number (e.g. `42`)
+- Jira ticket → store ticket key (e.g. `PROJ-123`)
+- MD file / inline → no ticket to comment on
 
 ## Your Role
 
@@ -59,18 +66,15 @@ Extract: goal, scope, functional requirements, non-functional requirements, succ
 
 ### Step 3 — Enter plan mode
 
-Enter plan mode immediately. Do not modify any files until the user approves the plan.
+**Standard mode:** enter plan mode immediately. Do not modify any files until the user approves the plan.
+
+**`--god` / `--architect` / `--full` mode:** skip plan mode — proceed directly to Step 3b. No human approval gate.
 
 ### Step 3b — Raise dev questions
 
-After reading the plan (and Technical Context if present), identify anything that would block or significantly change the implementation — things the PO plan left ambiguous for the dev to decide:
+**Standard mode:** identify ambiguities, ask in a single numbered list, wait for answers.
 
-- Which library / pattern to use for a specific piece
-- Where to put new code given existing module structure
-- Whether to extend an existing module or create a new one
-- Edge cases not covered by the success criteria
-
-Ask all of them in a single numbered list. Wait for answers before writing the implementation plan. If nothing is ambiguous, proceed directly.
+**`--god` / `--architect` / `--full` mode:** skip — make reasonable decisions autonomously based on project conventions read in Step 2. Document decisions made in the plan under a `### Autonomous Decisions` section.
 
 ---
 
@@ -109,10 +113,11 @@ Produce a structured implementation plan:
 - <item>
 ```
 
-Present this plan to the user. Ask:
+**Standard mode:** present the plan to the user and ask:
 > "Does this plan look right? Any changes before we proceed?"
-
 Iterate until the user approves.
+
+**`--god` / `--architect` / `--full` mode:** skip the approval prompt — proceed directly to Step 5.
 
 ### Step 5 — Workspace setup
 
@@ -167,8 +172,11 @@ mkdir -p <worktree-base>
 git worktree add <worktree-base>/feat-<kebab-feature-title> feat/<kebab-feature-title>
 ```
 
-**If the plan has parallel workstreams**, ask before creating sub-branches:
-> "The plan has [N] parallel workstreams. Shall I create a separate sub-branch + worktree for each so agents can work simultaneously? Each will PR into `feat/<kebab-feature-title>`."
+**If the plan has parallel workstreams:**
+
+- **Standard mode:** ask before creating sub-branches:
+  > "The plan has [N] parallel workstreams. Shall I create a separate sub-branch + worktree for each so agents can work simultaneously? Each will PR into `feat/<kebab-feature-title>`."
+- **`--god` / `--architect` / `--full` mode:** create sub-branches automatically — no prompt.
 
 **If approved — for each parallel workstream:**
 
@@ -208,7 +216,7 @@ Spawn one SWE agent with:
 
 Spawn one SWE agent working in the current directory with the feature branch already checked out.
 
-**If `--god` mode — after all SWE agents complete:**
+**If `--god` / `--architect` / `--full` mode — after all SWE agents complete:**
 
 For each PR created by SWE agents, spawn a `pr-reviewer` agent with `--auto-post --pr <PR number>`. Pass the plan file path so it can check plan compliance. The pr-reviewer will:
 1. Review the diff against the plan
@@ -216,7 +224,7 @@ For each PR created by SWE agents, spawn a `pr-reviewer` agent with `--auto-post
 3. Push the fixes
 4. Post the full review as a GitHub PR comment
 
-Wait for all pr-reviewer agents to complete before reporting.
+Wait for all pr-reviewer agents to complete before Step 9.
 
 ### Step 8 — Report
 
@@ -235,10 +243,10 @@ Agents running. Run /cass:pr when ready to create a PR from any branch.
 Run /cass:clean-wt to remove worktrees after PRs are merged.
 ```
 
-**God mode** — after SWE + pr-reviewer agents complete, report:
+**`--god` / `--architect` / `--full` mode** — after SWE + pr-reviewer agents complete, report:
 
 ```
-## Done — God mode
+## Done — <mode> mode
 
 Feature branch: feat/<kebab-feature-title>
 
@@ -249,10 +257,41 @@ All PRs are ready for human approval. Review the GitHub comments for findings.
 Run /cass:clean-wt once PRs are merged.
 ```
 
+### Step 9 — Comment on original ticket (autonomous modes only)
+
+Skip this step in standard mode or if the requirement came from an MD file / inline description.
+
+**GitHub issue:**
+```bash
+gh issue comment <issue-number> --body "<comment>"
+```
+
+**Jira ticket:** post via Atlassian MCP.
+
+Comment body:
+
+```markdown
+⚙️ cass/swe · Implementation complete
+
+**Branch:** `feat/<kebab-feature-title>`
+**PRs:**
+- PR #<n> → <target branch> — [view](<PR URL>)
+
+**Review summary:** ✓ <N> passed · ⚠ <N> warnings · ✗ 0 failed (P1s fixed automatically)
+
+**Plan decisions:**
+<bullet list from ### Autonomous Decisions section>
+
+---
+*Implemented by [cass](https://github.com/tonycodersg/cass-claude-code) · v<version> · <short git hash>*
+```
+
 ## Constraints
 
-- Always create a worktree for the main feature branch automatically — only ask when splitting into parallel sub-branches
-- Never start implementing without the user approving the plan
+- Always create a worktree for the main feature branch automatically — only ask when splitting into parallel sub-branches (standard mode only)
+- **Standard mode:** never start implementing without the user approving the plan
+- **Autonomous modes (`--god`, `--architect`, `--full`):** no human approval at any step — proceed end to end
 - Always save worktree preference to `.claude/settings.local.json`
 - Sub-branch PRs always target the main feature branch, not staging/master
 - The main feature branch PR targets staging/master
+- Never auto-merge — PRs always wait for human approval
