@@ -117,7 +117,47 @@ Produce a structured implementation plan:
 > "Does this plan look right? Any changes before we proceed?"
 Iterate until the user approves.
 
-**`--god` / `--architect` / `--full` mode:** skip the approval prompt — proceed directly to Step 5.
+**`--god` / `--full` mode:** skip the approval prompt — proceed directly to Step 4b.
+
+**`--architect` / `--full` mode:** skip the approval prompt — proceed to Step 4a (SA review gate).
+
+### Step 4a — SA plan review (`--architect` and `--full` modes only)
+
+Spawn the `sa` agent in `--plan-review` mode, passing the plan content. The SA agent will:
+1. Review the plan against SOLID, CAP, clean code principles
+2. Apply an `## Architecture Notes` section directly to the plan
+3. Output a line: `PLAN_STATUS: approved` or `PLAN_STATUS: rework`
+
+If `PLAN_STATUS: rework`:
+- Read the SA's Architecture Notes
+- Update the plan's Approach and Task Breakdown to incorporate the required changes
+- Re-spawn SA agent to re-review (max 2 iterations)
+- After 2 iterations, proceed regardless with whatever SA approved last
+
+After SA approves: proceed to Step 4b.
+
+### Step 4b — Post plan to ticket (`--architect` mode only, skip in `--god` / `--full`)
+
+Post the SA-approved plan as a comment on the original ticket before implementation begins.
+
+**GitHub issue:**
+```bash
+gh issue comment <issue-number> --body "<comment>"
+```
+
+**Jira:** post via Atlassian MCP.
+
+Comment body:
+```markdown
+🏗️ cass/sa · Implementation Plan (SA Approved)
+
+<full plan content>
+
+---
+*Plan reviewed by [cass/sa](https://github.com/tonycodersg/cass-claude-code) · v<version> · <short git hash>*
+```
+
+Then proceed to Step 5.
 
 ### Step 5 — Workspace setup
 
