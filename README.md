@@ -5,7 +5,7 @@
 > Hooks run automatically to guard against destructive commands and keep Claude context-aware.
 > Each repo gets its own `.cass/` customization layer — override commands, agents, hooks, and templates, committed alongside your code.
 
-**Latest stable: [v0.9.0](https://github.com/tonycodersg/cass-claude-code/releases/tag/v0.9.0)**
+**Latest stable: [v0.9.1](https://github.com/tonycodersg/cass-claude-code/releases/tag/v0.9.1)**
 
 ---
 
@@ -149,7 +149,7 @@ Prompt       injects repo / branch / worktree context into every message
 | `/cass:customize` | Setup | Scaffold `.cass/` override package — commands, agents, hooks, post-PR callback |
 | `/cass:eject` | Setup | Remove all cass config from this repo — undoes `/cass:init`. `--hard` also removes `.claude/commands/` |
 | `/cass:plan [text or doc]` | PO | Requirement → risk-assessed plan → Jira / GitHub issue / MD file |
-| `/cass:dev-feat [plan/ticket]` | Dev | Plan → feature branch + worktree → parallel SWE agents. `--god` flag: fully autonomous — SWE creates PR, pr-reviewer reviews + fixes P1s + posts GitHub comment |
+| `/cass:dev-feat [plan/ticket]` | Dev | Plan → feature branch + worktree → parallel SWE agents. Three autonomous modes: `--god` (SWE writes plan + implements), `--architect` (SA reviews plan first), `--full` (SA review + fix-review loop until clean, max 3 cycles). All modes post results to original ticket. |
 | `/cass:commit` | Dev | Stage changes, generate semantic message, commit with co-author |
 | `/cass:pr` | Dev | Create PR from current worktree — fires post-PR callback hook if configured |
 | `/cass:review [PR or branch]` | Dev | Code review via pr-reviewer agent — P1 / P2 / P3 findings, lists all PR comment threads with resolved/unresolved status, walks through unresolved one by one |

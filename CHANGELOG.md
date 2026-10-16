@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.1] - 2026-10-16
+
+### Added
+
+- `commands/dev-feat`: three fully autonomous modes — zero human touch from ticket to PR:
+  - `--god`: SWE writes plan → implements → PR → pr-reviewer fixes P1s + posts GitHub comment → comments on original ticket
+  - `--architect`: same as `--god` but SA agent reviews the plan technically before any code is written; SA-approved plan posted to ticket first
+  - `--full`: same as `--architect` but adds a fix-review loop — pr-reviewer reviews → SWE fixes P1+P2 → re-review, up to 3 cycles; final review posted when clean
+- `agents/sa`: `--plan-review` flag for autonomous plan review — applies Architecture Notes directly, outputs `PLAN_STATUS: approved` or `PLAN_STATUS: rework` for machine-to-machine handoff
+- `agents/pr-reviewer`: `--full-mode` flag for loop-friendly review — fixes P1+P2 without posting, outputs `REVIEW_STATUS: clean` or `REVIEW_STATUS: issues P1=N P2=N`
+
+### Changed
+
+- `commands/dev-feat`: all autonomous modes skip human approval prompts and sub-branch confirmation; standard mode unchanged
+
 ## [0.9.0] - 2026-10-14
 
 ### Added
