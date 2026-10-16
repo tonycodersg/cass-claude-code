@@ -142,7 +142,7 @@ Post the SA-approved plan as a comment on the original ticket before implementat
 
 **GitHub issue:**
 ```bash
-gh issue comment <issue-number> --body "<comment>"
+bash "${CLAUDE_PLUGIN_ROOT}/hooks/scripts/bot-comment.sh" issue <issue-number> "<comment>"
 ```
 
 **Jira:** post via Atlassian MCP.
@@ -319,9 +319,9 @@ Run /cass:clean-wt once PRs are merged.
 
 Skip this step in standard mode or if the requirement came from an MD file / inline description.
 
-**GitHub issue:**
+**GitHub issue** — use `bot-comment.sh` (cass-bot identity if configured, personal token fallback):
 ```bash
-gh issue comment <issue-number> --body "<comment>"
+bash "${CLAUDE_PLUGIN_ROOT}/hooks/scripts/bot-comment.sh" issue <issue-number> "<comment>"
 ```
 
 **Jira ticket:** post via Atlassian MCP.

@@ -163,19 +163,21 @@ Format the review summary as a clean GitHub comment:
 
 Omit sections with no findings.
 
-**If `--auto-post` is set:** post immediately without asking:
-```bash
-gh pr comment <PR number> --body "<review markdown>"
-```
+**If `--auto-post` is set:** post immediately without asking.
 
 **Otherwise**, ask the user:
 > "Would you like to post this review as a GitHub PR comment?
 > 1. Yes — post now
 > 2. No — skip"
 
-If they choose yes, post using the `gh` command above. If no PR number was provided, detect it:
+If no PR number was provided, detect it:
 ```bash
 gh pr view --json number --jq '.number'
+```
+
+Post using `bot-comment.sh` (uses cass-bot identity if configured, falls back to personal token):
+```bash
+bash "${CLAUDE_PLUGIN_ROOT}/hooks/scripts/bot-comment.sh" pr <PR number> "<review markdown>"
 ```
 
 ## Constraints

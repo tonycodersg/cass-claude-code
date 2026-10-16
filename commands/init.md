@@ -184,6 +184,130 @@ mkdir -p <worktree path>
 
 ---
 
+### Step 7b — cass-bot GitHub App setup (optional)
+
+Ask the user using `AskUserQuestion`:
+- header: "cass-bot"
+- question: "Would you like to set up a cass-bot GitHub App so agent comments post under a bot identity instead of your personal account?"
+- options:
+  - label: "Set up cass-bot (Recommended)", description: "Agent comments (reviews, plans, ticket updates) will show as cass-bot, not your personal account"
+  - label: "Skip", description: "Agent comments will post using your personal GitHub account"
+
+If the user skips, proceed to Step 8.
+
+**If setting up cass-bot:**
+
+**Check if bot already configured globally:**
+
+```python
+import json
+d = json.load(open(f"{HOME}/.claude/settings.local.json"))
+app_id = d.get("cassBot", {}).get("appId", "")
+```
+
+**If `appId` exists** — bot is already created, just install it on this repo:
+
+```bash
+# Get installation URL for this repo
+gh api /apps/cass-bot/installations
+```
+
+Tell the user:
+> "cass-bot is already configured (App ID: `<id>`). Installing on this repo..."
+
+Use `gh api` to install, or give the user the one-click install URL:
+> "Open this URL to install cass-bot on this repo: `https://github.com/apps/cass-bot/installations/new`"
+
+**If `appId` is empty** — first-time setup:
+
+1. Generate the app manifest URL and tell the user:
+
+> **Create cass-bot in one click**
+>
+> Open this URL in your browser — GitHub will pre-fill the app settings:
+>
+> `https://github.com/settings/apps/new?manifest=<URL-encoded manifest below>`
+>
+> Manifest:
+> ```json
+> {
+>   "name": "cass-bot",
+>   "description": "cass AI agent — posts code reviews, plans, and status updates",
+>   "public": false,
+>   "default_permissions": {
+>     "issues": "write",
+>     "pull_requests": "write",
+>     "contents": "read"
+>   },
+>   "default_events": []
+> }
+> ```
+>
+> After clicking **Create GitHub App**:
+> 1. Note the **App ID** shown on the app settings page
+> 2. Scroll down and click **Generate a private key** — a `.pem` file will download
+
+2. Ask the user for the two values using `AskUserQuestion`:
+   - "Paste the App ID:" (text input via Other)
+   - "Paste the full path to the downloaded .pem file:" (text input via Other)
+
+3. Save to `~/.claude/settings.local.json` globally:
+
+```python
+import json, os
+path = os.path.expanduser("~/.claude/settings.local.json")
+d = json.load(open(path)) if os.path.exists(path) else {}
+d.setdefault("cassBot", {})
+d["cassBot"]["appId"] = "<app id>"
+d["cassBot"]["privateKeyPath"] = "<pem path>"
+json.dump(d, open(path, "w"), indent=2)
+```
+
+4. Save as repo secrets:
+
+```bash
+gh secret set CASS_BOT_APP_ID --body "<app id>"
+gh secret set CASS_BOT_PRIVATE_KEY < "<pem path>"
+```
+
+5. Give the user the install URL:
+> "One more step — install cass-bot on this repo: `https://github.com/apps/cass-bot/installations/new`"
+
+Print confirmation:
+> "✓ cass-bot configured — agent comments will now post under the bot identity"
+
+---
+
+### Step 7c — Branch protection (merge gate)
+
+Set up branch protection on the main branch to require at least one approval before any PR can be merged. This prevents agents (or anyone) from merging unreviewed code.
+
+Run:
+
+```bash
+gh api repos/{owner}/{repo}/branches/<mainBranch>/protection \
+  --method PUT \
+  --header "Accept: application/vnd.github+json" \
+  --field enforce_admins=false \
+  --field required_status_checks=null \
+  --field restrictions=null \
+  --field "required_pull_request_reviews[required_approving_review_count]=1" \
+  --field "required_pull_request_reviews[dismiss_stale_reviews]=true"
+```
+
+Get owner and repo from:
+```bash
+gh repo view --json owner,name --jq '"\(.owner.login)/\(.name)"'
+```
+
+**If the command succeeds**, print:
+> "✓ Branch protection set on `<mainBranch>` — 1 approval required before merge, stale reviews dismissed"
+
+**If it fails** (e.g. not a repo admin), print a warning but do not stop init:
+> "⚠ Could not set branch protection — you may not have admin access. Set it manually: repo Settings → Branches → Add rule → require pull request reviews"
+
+---
+
 ### Step 8 — Report
 
 Output the report via `printf` with ANSI color codes:
@@ -208,7 +332,9 @@ printf "  \033[32m✓\033[0m  .cass/commit-template.md      \033[2mcopied\033[0m
 printf "  \033[32m✓\033[0m  .cass/pr-template.md          \033[2mcopied\033[0m\n"
 printf "  \033[32m✓\033[0m  cass-.gitmessage              \033[2mlinked\033[0m\n"
 printf "  \033[32m✓\033[0m  .gitignore                    \033[2mupdated\033[0m\n"
-printf "  \033[32m✓\033[0m  worktree base folder          \033[2mcreated\033[0m\n\n"
+printf "  \033[32m✓\033[0m  worktree base folder          \033[2mcreated\033[0m\n"
+printf "  \033[32m✓\033[0m  cass-bot                      \033[2mconfigured\033[0m\n"   # or: "skipped"
+printf "  \033[32m✓\033[0m  branch protection             \033[2m1 approval required\033[0m\n\n"  # or: "⚠ skipped — insufficient permissions"
 
 printf "\033[2m──────────────────────────────────────────\033[0m\n"
 printf "\033[1;36mNext steps\033[0m\n"
