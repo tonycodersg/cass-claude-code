@@ -10,7 +10,7 @@ TYPE="$1"   # pr | issue
 NUMBER="$2"
 BODY="$3"
 
-LOGO_URL="https://raw.githubusercontent.com/tonycodersg/cass-claude-code/master/assets/logo.svg"
+LOGO_URL="https://raw.githubusercontent.com/tonycodersg/cass-claude-code/master/assets/logo.png"
 SIGNATURE=$'\n\n---\n<img src="'"$LOGO_URL"'" width="16" align="left" /> *Posted by [cass-bot](https://github.com/tonycodersg/cass-claude-code)*'
 BODY="${BODY}${SIGNATURE}"
 
