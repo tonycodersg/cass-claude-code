@@ -10,6 +10,10 @@ TYPE="$1"   # pr | issue
 NUMBER="$2"
 BODY="$3"
 
+LOGO_URL="https://raw.githubusercontent.com/tonycodersg/cass-claude-code/master/assets/logo.svg"
+SIGNATURE=$'\n\n---\n<img src="'"$LOGO_URL"'" width="16" align="left" /> *Posted by [cass-bot](https://github.com/tonycodersg/cass-claude-code)*'
+BODY="${BODY}${SIGNATURE}"
+
 if [ -z "$TYPE" ] || [ -z "$NUMBER" ] || [ -z "$BODY" ]; then
   echo "Usage: bot-comment.sh <pr|issue> <number> <body>" >&2
   exit 1

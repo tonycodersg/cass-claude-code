@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/logo.svg" width="120" alt="cass logo" />
+</p>
+
 # cass
 
 > A Claude Code **global plugin** that brings a structured **plan → build → review** pipeline to any project.
