@@ -150,15 +150,23 @@ gh pr create \
   --body "<body>"
 ```
 
-**Before constructing the PR body, resolve the template:**
+**Before constructing the PR body, resolve the template and substitute the session ref using bash:**
 
-```
-1. Read .cass/pr-template.md        → use if exists
-2. Read .github/cass-pull_request_template.md → use if exists
-3. Use built-in fallback below       → if neither found
+```bash
+SESSION_REF=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+
+if [ -f .cass/pr-template.md ]; then
+  TEMPLATE=$(cat .cass/pr-template.md)
+elif [ -f .github/cass-pull_request_template.md ]; then
+  TEMPLATE=$(cat .github/cass-pull_request_template.md)
+else
+  TEMPLATE=""
+fi
+
+TEMPLATE=$(echo "$TEMPLATE" | sed "s|<!-- \$CLAUDE_SESSION_ID -->|$SESSION_REF|g")
 ```
 
-Fill the resolved template with content from the plan and implementation. Replace `<!-- $CLAUDE_SESSION_ID -->` with the short git hash of HEAD (`git rev-parse --short HEAD`).
+Fill all remaining `<!-- ... -->` comment placeholders with real values from the plan and implementation. Do not leave any placeholder unfilled.
 
 **Built-in fallback** (used when no template file exists):
 
@@ -197,9 +205,9 @@ Fill the resolved template with content from the plan and implementation. Replac
 <details>
 <summary>Session info</summary>
 
-**Session ref:** <!-- $CLAUDE_SESSION_ID -->
+**Session ref:** $SESSION_REF
 **Agent:** cass/swe
-**Plan file:** <!-- path if applicable -->
+**Plan file:** <!-- path to plan file, or omit -->
 
 </details>
 ```
