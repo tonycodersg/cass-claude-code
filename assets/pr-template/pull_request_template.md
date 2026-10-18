@@ -33,7 +33,6 @@
 
 ---
 
-**Session ref:** <!-- $CLAUDE_SESSION_ID -->
-
 ---
-<img src="https://raw.githubusercontent.com/tonycodersg/cass-claude-code/master/assets/logo.png" width="20" align="left" /> *Generated with [cass](https://github.com/tonycodersg/cass-claude-code) — Claude Code plugin*
+
+<img src="https://raw.githubusercontent.com/tonycodersg/cass-claude-code/master/assets/logo.png" width="20" align="left" /> *Generated with [cass](https://github.com/tonycodersg/cass-claude-code) — Claude Code plugin · Session: `<!-- $CLAUDE_SESSION_ID -->`*

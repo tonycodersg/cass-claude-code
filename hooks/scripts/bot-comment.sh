@@ -11,7 +11,8 @@ NUMBER="$2"
 BODY="$3"
 
 LOGO_URL="https://raw.githubusercontent.com/tonycodersg/cass-claude-code/master/assets/logo.png"
-SIGNATURE=$'\n\n---\n<img src="'"$LOGO_URL"'" width="16" align="left" /> *Posted by [cass-bot](https://github.com/tonycodersg/cass-claude-code)*'
+SESSION_REF=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+SIGNATURE=$'\n\n---\n<img src="'"$LOGO_URL"'" width="16" align="left" /> *Posted by [cass-bot](https://github.com/tonycodersg/cass-claude-code) — Claude Code plugin · Session: `'"$SESSION_REF"'`*'
 BODY="${BODY}${SIGNATURE}"
 
 if [ -z "$TYPE" ] || [ -z "$NUMBER" ] || [ -z "$BODY" ]; then
