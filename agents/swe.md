@@ -154,6 +154,8 @@ gh pr create \
 
 ```bash
 SESSION_REF=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+REPO_URL=$(gh repo view --json url --jq '.url' 2>/dev/null)
+SESSION_LINK="[$SESSION_REF]($REPO_URL/commit/$SESSION_REF)"
 
 if [ -f .cass/pr-template.md ]; then
   TEMPLATE=$(cat .cass/pr-template.md)
@@ -163,7 +165,7 @@ else
   TEMPLATE=""
 fi
 
-TEMPLATE=$(echo "$TEMPLATE" | sed "s|<!-- \$CLAUDE_SESSION_ID -->|$SESSION_REF|g")
+TEMPLATE=$(echo "$TEMPLATE" | sed "s|<!-- \$CLAUDE_SESSION_ID -->|$SESSION_LINK|g")
 ```
 
 Fill all remaining `<!-- ... -->` comment placeholders with real values from the plan and implementation. Do not leave any placeholder unfilled.

@@ -12,7 +12,9 @@ BODY="$3"
 
 LOGO_URL="https://raw.githubusercontent.com/tonycodersg/cass-claude-code/master/assets/logo.png"
 SESSION_REF=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
-SIGNATURE=$'\n\n---\n<img src="'"$LOGO_URL"'" width="16" align="left" /> *Posted by [cass-bot](https://github.com/tonycodersg/cass-claude-code) — Claude Code plugin · Session: `'"$SESSION_REF"'`*'
+REPO_URL=$(gh repo view --json url --jq '.url' 2>/dev/null)
+SESSION_LINK="[$SESSION_REF]($REPO_URL/commit/$SESSION_REF)"
+SIGNATURE=$'\n\n---\n<img src="'"$LOGO_URL"'" width="16" align="left" /> *Posted by [cass-bot](https://github.com/tonycodersg/cass-claude-code) — Claude Code plugin · Session: '"$SESSION_LINK"'*'
 BODY="${BODY}${SIGNATURE}"
 
 if [ -z "$TYPE" ] || [ -z "$NUMBER" ] || [ -z "$BODY" ]; then

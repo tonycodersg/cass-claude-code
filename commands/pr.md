@@ -87,6 +87,8 @@ git push -u origin <current-branch>
 
 ```bash
 SESSION_REF=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+REPO_URL=$(gh repo view --json url --jq '.url' 2>/dev/null)
+SESSION_LINK="[$SESSION_REF]($REPO_URL/commit/$SESSION_REF)"
 
 # Template resolution order:
 # 1. .cass/pr-template.md  (repo-specific)
@@ -101,8 +103,8 @@ else
   TEMPLATE=""
 fi
 
-# Replace the session ref placeholder
-TEMPLATE=$(echo "$TEMPLATE" | sed "s|<!-- \$CLAUDE_SESSION_ID -->|$SESSION_REF|g")
+# Replace the session ref placeholder with a clickable commit link
+TEMPLATE=$(echo "$TEMPLATE" | sed "s|<!-- \$CLAUDE_SESSION_ID -->|$SESSION_LINK|g")
 ```
 
 Fill in all `<!-- ... -->` comment placeholders in the template with the actual values from the plan/context. Do not leave any comment placeholders unfilled.
