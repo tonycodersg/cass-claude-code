@@ -144,7 +144,7 @@ Prompt       injects repo / branch / worktree context into every message
 
 | Command | Role | What it does |
 |---|---|---|
-| `/cass:init [project]` | Setup | Prerequisite check, create `.cass/` templates, save project config, wire git |
+| `/cass:init [project]` | Setup | Wizard-style setup — asks all questions upfront (project name, branch, worktree path, PR template, cass-bot, Playwright CI, post-PR hook), confirms, then executes silently |
 | `/cass:doctor` | Setup | Health check — tools, MCP servers, git config, project settings, cass version |
 | `/cass:customize` | Setup | Scaffold `.cass/` override package — commands, agents, hooks, post-PR callback |
 | `/cass:eject` | Setup | Remove all cass config from this repo — undoes `/cass:init`. `--hard` also removes `.claude/commands/` |
