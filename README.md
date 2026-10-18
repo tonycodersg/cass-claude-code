@@ -28,8 +28,8 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 Reliable, always up-to-date with `git pull`:
 
 ```bash
-# Latest stable (v0.8.4)
-git clone --branch v0.8.4 https://tonycodersg@github.com/tonycodersg/cass-claude-code ~/.claude/plugins/cass
+# Latest stable (v0.9.1)
+git clone --branch v0.9.1 https://tonycodersg@github.com/tonycodersg/cass-claude-code ~/.claude/plugins/cass
 
 # Or track latest
 git clone https://tonycodersg@github.com/tonycodersg/cass-claude-code ~/.claude/plugins/cass
