@@ -81,16 +81,32 @@ git push -u origin <current-branch>
 
 ---
 
-### Step 5 — Create PR
+### Step 5 — Build PR body and create PR
+
+**Resolve the template and substitute the session ref using bash:**
 
 ```bash
-gh pr create \
-  --base <target-branch> \
-  --title "<type>(<scope>): <summary>" \
-  --body "<body>"
+CLAUDE_SESSION="${CLAUDE_CODE_SESSION_ID:-unknown}"
+
+# Template resolution order:
+# 1. .cass/pr-template.md  (repo-specific)
+# 2. .github/cass-pull_request_template.md  (legacy)
+# 3. built-in fallback
+
+if [ -f .cass/pr-template.md ]; then
+  TEMPLATE=$(cat .cass/pr-template.md)
+elif [ -f .github/cass-pull_request_template.md ]; then
+  TEMPLATE=$(cat .github/cass-pull_request_template.md)
+else
+  TEMPLATE=""
+fi
+
+TEMPLATE=$(echo "$TEMPLATE" | sed "s|<!-- \$CLAUDE_SESSION_ID -->|$CLAUDE_SESSION|g")
 ```
 
-PR body structure:
+Fill in all `<!-- ... -->` comment placeholders in the template with the actual values from the plan/context. Do not leave any comment placeholders unfilled.
+
+Built-in body structure (use as fallback if no template, or as guide for filling placeholders):
 
 ```markdown
 ## What
@@ -120,15 +136,17 @@ PR body structure:
 
 ---
 
-**Session ref:** <Session ref from context (short git hash)>
+**Session ref:** <SESSION_REF value from above>
 ```
 
-**Template resolution order:**
-1. `.cass/pr-template.md` — repo-specific (committed to repo, loaded in context above)
-2. `.github/cass-pull_request_template.md` — legacy location (still supported)
-3. Built-in structure above — fallback if neither exists
+Then create the PR:
 
-Use whichever is found first. Replace `<!-- $CLAUDE_SESSION_ID -->` with the session ref from context.
+```bash
+gh pr create \
+  --base <target-branch> \
+  --title "<type>(<scope>): <summary>" \
+  --body "$TEMPLATE"
+```
 
 If `gh` is not available, output the filled PR body for the user to paste manually and provide the GitHub PR creation URL.
 
