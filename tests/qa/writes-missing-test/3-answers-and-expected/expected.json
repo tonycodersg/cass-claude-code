@@ -1,0 +1,8 @@
+{
+  "files": ["src/math.test.ts"],
+  "output": {
+    "contains": [],
+    "not_contains": []
+  },
+  "verifier_prompt": "The qa agent must write tests for the untested divide() function in src/math.ts. The updated test file (src/math.test.ts or a new file) must cover: (1) the happy path — divide(6, 2) returns 3, (2) the error path — divide(n, 0) throws 'Division by zero'. All tests must pass. Fail if divide() has no tests, if the zero-division error path is not tested, or if any test fails."
+}
