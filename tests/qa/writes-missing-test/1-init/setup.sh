@@ -75,7 +75,8 @@ describe("add", () => {
 });
 EOF
 
-npm install --save-dev jest ts-jest typescript @types/jest 2>/dev/null || true
+# Note: no npm install here — the test harness evaluates agent output via a
+# verifier LLM, not by actually running jest in CI. node_modules are not needed.
 
 git add .
 git commit -m "initial: add math module with one untested function"

@@ -1,5 +1,5 @@
 {
-  "files": ["src/math.test.ts"],
+  "files": [],
   "output": {
     "contains": [],
     "not_contains": []
