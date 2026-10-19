@@ -235,9 +235,14 @@ Triggers `pr-reviewer` agent. Reports P1 / P2 / P3 / Plan Compliance. Never appl
 3. User picks which to remove by number
 4. Removes worktrees and local branches; checks remote before prompting remote deletion
 
-### `/cass:test`
+### `/cass:test-suite`
 
-13-step smoke test in an isolated temp repo. Covers init, plan doc structure (Risks + Technical Context), worktree creation, branch/date listing, remote branch check, and worktree removal. Cleans up after itself.
+End-to-end test suite (plugin repo only). Discovers all test cases under `tests/`, runs each via `tools/run-test.sh` in parallel, and prints an aggregated report.
+
+```
+/cass:test-suite              # run all tests
+/cass:test-suite tests/doctor # run only doctor tests
+```
 
 ### `/cass:plan-task`
 
@@ -254,6 +259,97 @@ Legacy single-command pipeline — planning + SA review + SWE implementation in 
 
 ---
 
+## Testing
+
+The plugin ships with an end-to-end test suite that runs each slash command in an isolated temp repo.
+
+### Structure
+
+```
+tests/<command>/<scenario>/
+  1-init/setup.sh                    ← bash script: scaffold an isolated git repo
+  2-test/run.md                      ← the slash command to run (first non-empty line)
+  3-answers-and-expected/
+    answers.json                     ← AskUserQuestion responses (keyed by header)
+    expected.json                    ← assertions + verifier prompt
+```
+
+### expected.json schema
+
+```json
+{
+  "files": [
+    { "path": ".cass/pr-template.md", "exists": true },
+    { "path": ".claude/settings.local.json", "contains": "staging" }
+  ],
+  "output": {
+    "contains": ["✓", "cass v"],
+    "not_contains": ["error"]
+  },
+  "tool_calls": [
+    { "tool": "Bash", "input_contains": "mkdir -p .cass" },
+    { "tool": "AskUserQuestion", "count": 1 }
+  ],
+  "verifier_prompt": "Describe what success looks like — the LLM judge reads this"
+}
+```
+
+### answers.json schema
+
+Map by question header (the `header:` field in `AskUserQuestion`). The runner injects them into the prompt:
+
+```json
+{
+  "Main branch": "staging",
+  "PR template": "cass default",
+  "Confirm setup": "Looks good"
+}
+```
+
+Empty `{}` for commands that ask no questions (e.g. `cass:doctor`).
+
+### Tools
+
+| Script | Purpose |
+|---|---|
+| `tools/run-test.sh <folder>` | Run one test case end-to-end |
+| `tools/run-suite.sh [folder]` | Run all (or a subset of) test cases in parallel |
+| `tools/assert-results.py` | Mechanical assertions against results.json + expected.json |
+| `tools/verify-output.sh` | LLM-as-judge — returns `✓ good`, `⚠ comment`, or `✗ fail` |
+
+### Env overrides
+
+`setup.sh` can write a `.cass-test-env` file (`KEY=VALUE` lines) to override environment variables before Claude runs — used to stub tools like `gh`:
+
+```bash
+# setup.sh
+cat > ./bin/gh <<'EOF'
+#!/usr/bin/env bash
+exit 127
+EOF
+chmod +x ./bin/gh
+echo "PATH=$(pwd)/bin:$PATH" > .cass-test-env
+```
+
+### Report format
+
+```
+cass test suite  4 test(s) discovered
+═══════════════════════════════════════════════════
+  ✓ good    doctor / all-pass
+  ✓ good    doctor / missing-gh
+  ✓ good    init / happy-path
+  ✗ fail    pr-reviewer / planted-bug   bug not caught
+═══════════════════════════════════════════════════
+
+  3 passed  ·  0 comment  ·  1 failed
+
+Failed test folders kept for debugging:
+  /tmp/cass-test-abc123/planted-bug/
+```
+
+---
+
 ## Plugin structure
 
 ```
@@ -264,5 +360,7 @@ agents/                        subagents Claude can spawn
 assets/                        template files copied by /cass:init
 docs/                          documentation
 hooks/hooks.json               event hooks
+tests/                         e2e test cases
+tools/                         test runner scripts
 .mcp.json                      MCP server config
 ```
