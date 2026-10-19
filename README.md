@@ -102,8 +102,8 @@ All checks green = ready to use.
 # Verify your environment
 /cass:doctor
 
-# Run the automated smoke test
-/cass:test
+# Run the e2e test suite (plugin repo only)
+/cass:test-suite
 ```
 
 ---
@@ -158,7 +158,7 @@ Prompt       injects repo / branch / worktree context into every message
 | `/cass:pr` | Dev | Create PR from current worktree — fires post-PR callback hook if configured |
 | `/cass:review [PR or branch]` | Dev | Code review via pr-reviewer agent — P1 / P2 / P3 findings, lists all PR comment threads with resolved/unresolved status, walks through unresolved one by one |
 | `/cass:clean-wt` | Dev | List worktrees by project, pick to remove |
-| `/cass:test` | Dev | 13-step smoke test of cass mechanics in an isolated temp repo |
+| `/cass:test-suite` | Dev | End-to-end test suite — discovers all test cases under `tests/`, runs runner + LLM verifier per case in parallel, prints a `✓ good / ⚠ comment / ✗ fail` report. Plugin repo only. |
 
 ---
 
@@ -258,6 +258,50 @@ If the marketplace cache is stuck on an old version, reinstall fresh:
 /plugin install cass@cass-marketplace --global
 /reload-plugins
 ```
+
+---
+
+## Testing
+
+The plugin ships with an end-to-end test suite under `tests/`. Each test case has three stages:
+
+```
+tests/<command>/<scenario>/
+  1-init/setup.sh                         ← scaffold an isolated temp repo
+  2-test/run.md                           ← the slash command to run
+  3-answers-and-expected/
+    answers.json                          ← pre-filled AskUserQuestion responses
+    expected.json                         ← file, output, and tool-call assertions
+```
+
+**Run all tests:**
+
+```bash
+bash tools/run-suite.sh
+```
+
+**Run one test:**
+
+```bash
+bash tools/run-test.sh tests/doctor/all-pass
+```
+
+**`expected.json` format:**
+
+```json
+{
+  "files": [
+    { "path": ".cass/pr-template.md", "exists": true }
+  ],
+  "output": {
+    "contains": ["✓", "cass v", "✗ 0 failed"],
+    "not_contains": ["Run /cass:init to fix"]
+  },
+  "verifier_prompt": "Doctor should report all checks passing with version number shown"
+}
+```
+
+After mechanical assertions, an LLM verifier (haiku) reads `verifier_prompt` and returns `✓ good`, `⚠ comment`, or `✗ fail`. Failed test folders are kept at `/tmp/cass-test-<id>/` for debugging.
 
 ---
 
