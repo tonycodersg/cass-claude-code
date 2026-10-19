@@ -25,6 +25,8 @@ if [ ! -d "$TEST_FOLDER" ]; then
   exit 1
 fi
 
+# resolve to absolute path so subshells work regardless of cwd
+TEST_FOLDER="$(cd "$TEST_FOLDER" && pwd)"
 TEST_NAME="$(basename "$TEST_FOLDER")"
 
 # --- locate required files ---
@@ -57,7 +59,7 @@ echo "  command:   $COMMAND"
 
 # --- run setup ---
 echo "  [1/3] setup..."
-(cd "$WORK_DIR" && bash "$PLUGIN_ROOT/$INIT_SCRIPT") 2>&1 | sed 's/^/    /'
+(cd "$WORK_DIR" && bash "$INIT_SCRIPT") 2>&1 | sed 's/^/    /'
 
 # --- run claude ---
 echo "  [2/3] executing command..."
