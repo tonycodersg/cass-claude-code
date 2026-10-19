@@ -1,0 +1,8 @@
+{
+  "files": [],
+  "output": {
+    "contains": [],
+    "not_contains": []
+  },
+  "verifier_prompt": "The pr-reviewer ran on a diff that adds getFirstItem(arr: string[]): string, which accesses arr[0] without checking for an empty array. When arr is empty, arr[0] is undefined, but the return type declares string — callers will not expect undefined and may crash. The review must flag this as a P1 bug (unchecked array access / missing empty-array guard). Fail if the review does not identify this unsafe array access as a P1 finding."
+}

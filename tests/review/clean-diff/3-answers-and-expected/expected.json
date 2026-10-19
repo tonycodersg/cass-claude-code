@@ -1,0 +1,8 @@
+{
+  "files": [],
+  "output": {
+    "contains": [],
+    "not_contains": []
+  },
+  "verifier_prompt": "The pr-reviewer ran on a clean diff that only adds a subtract(a, b) function returning a - b. There are no bugs, no logic errors, and no null dereferences. The review should produce no P1 findings. P2 or P3 suggestions are acceptable. Fail if the review flags any P1 issues on this simple arithmetic function."
+}
