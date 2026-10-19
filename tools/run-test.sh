@@ -154,8 +154,22 @@ else
   echo "  (no expected.json — skipping assertions)"
 fi
 
+# --- LLM verifier (qualitative judgment) ---
+VERIFY_EXIT=0
+if [ -f "$EXPECTED_FILE" ]; then
+  echo ""
+  VERDICT=$(bash "$PLUGIN_ROOT/tools/verify-output.sh" \
+    --results  "$RESULTS_FILE" \
+    --expected "$EXPECTED_FILE" \
+    --test-name "$TEST_NAME" \
+    2>/dev/null) || VERIFY_EXIT=$?
+  if [ -n "$VERDICT" ]; then
+    echo "  Verifier: $VERDICT"
+  fi
+fi
+
 # --- final pass/fail ---
-if [ $EXIT_CODE -ne 0 ] || [ $ASSERT_EXIT -ne 0 ]; then
+if [ $EXIT_CODE -ne 0 ] || [ $ASSERT_EXIT -ne 0 ] || [ $VERIFY_EXIT -ne 0 ]; then
   [ $EXIT_CODE -ne 0 ] && echo "FAIL  $TEST_NAME  (claude exited $EXIT_CODE)"
   echo "  Debug folder kept: $WORK_DIR"
   exit 1
