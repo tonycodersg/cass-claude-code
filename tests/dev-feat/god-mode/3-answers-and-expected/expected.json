@@ -1,0 +1,3 @@
+{
+  "verifier_prompt": "dev-feat --god should run autonomously with no questions asked. It should read the plan doc, create a feature branch, set up a worktree, and spawn SWE agents to implement. The output should mention a feature branch being created (feat/add-greeting or similar) and either implementation progress or a PR being created. The command should NOT stop to ask the user questions."
+}
