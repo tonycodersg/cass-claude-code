@@ -1,0 +1,10 @@
+{
+  "files": [
+    { "path": "agent-works/feat-user-auth", "exists": false }
+  ],
+  "output": {
+    "contains": ["feat-user-auth", "Removed"],
+    "not_contains": ["error", "Error"]
+  },
+  "verifier_prompt": "clean-wt should list the feat-user-auth worktree, the user selects it (option 1), and the output confirms it was removed. The agent-works/feat-user-auth directory should no longer exist. A 'Removed' confirmation or similar success message is expected."
+}
