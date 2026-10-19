@@ -1,0 +1,8 @@
+{
+  "files": [".cass/ONBOARDING.md"],
+  "output": {
+    "contains": [],
+    "not_contains": []
+  },
+  "verifier_prompt": "The onboarder agent must create .cass/ONBOARDING.md containing at least three of the following sections: (1) a description of what the repo does (widget API / REST API / widgets), (2) a tech stack section listing Node.js or TypeScript and PostgreSQL or pg, (3) a local setup section with numbered steps. Fail if the file does not exist, if fewer than three of the required sections are present, or if any section contains unfilled placeholder text like <TBD> or angle-bracket tokens."
+}
