@@ -331,21 +331,51 @@ chmod +x ./bin/gh
 echo "PATH=$(pwd)/bin:$PATH" > .cass-test-env
 ```
 
+### Current test cases
+
+| Test | Command | What it covers |
+|---|---|---|
+| `doctor/all-pass` | `/cass:doctor` | All checks green — git identity, templates, `gh`, `uvx` |
+| `doctor/missing-gh` | `/cass:doctor` | `gh` stubbed to exit 127 — failure detection + fix instructions |
+| `init/happy-path` | `/cass:init` | Full 8-question wizard — settings + templates created |
+| `commit/happy-path` | `/cass:commit` | Unstaged file — stage all, confirm, commit hash + co-author footer |
+| `commit/empty-staging` | `/cass:commit` | Clean working tree — "Nothing to commit" without a commit |
+| `eject/happy-path` | `/cass:eject` | Removes `.cass/`, gitmessage, settings cass key, gitignore entries |
+| `eject/hard-flag` | `/cass:eject --hard` | Same + removes `.claude/commands/` overrides |
+| `review/clean-diff` | `/cass:review` | Clean subtract function — verifies no P1 findings |
+| `review/bugs-flagged` | `/cass:review` | Unchecked `arr[0]` access — verifier asserts P1 raised |
+| `pr-reviewer/planted-bug` | (agent) | Async/await null deref planted in `src/auth.ts` — P1 caught |
+| `pr/happy-path` | `/cass:pr` | `gh` stubbed — PR body structure + URL in output |
+| `customize/happy-path` | `/cass:customize` | Clean repo — `.cass/` override scaffold created |
+| `clean-wt/remove-one` | `/cass:clean-wt` | Simulated worktree + settings — removal flow |
+| `plan/to-file` | `/cass:plan` | Auth requirement → Goal/Scope/Risks saved as MD in `docs/` |
+| `dev-feat/god-mode` | `/cass:dev-feat --god` | Trivial plan doc → zero-touch implementation flow |
+
+> `plan` and `dev-feat` spawn internal sub-agents and take longer (~2–5 min each). `pr/happy-path` stubs `gh` so no real GitHub repo is required.
+
 ### Report format
 
 ```
-cass test suite  4 test(s) discovered
+cass test suite  15 test(s) discovered
 ═══════════════════════════════════════════════════
+  ✓ good    clean-wt / remove-one
+  ✓ good    commit / empty-staging
+  ✓ good    commit / happy-path
+  ✓ good    customize / happy-path
+  ✓ good    dev-feat / god-mode
   ✓ good    doctor / all-pass
   ✓ good    doctor / missing-gh
+  ✓ good    eject / happy-path
+  ✓ good    eject / hard-flag
   ✓ good    init / happy-path
-  ✗ fail    pr-reviewer / planted-bug   bug not caught
+  ✓ good    plan / to-file
+  ✓ good    pr-reviewer / planted-bug
+  ✓ good    pr / happy-path
+  ✓ good    review / bugs-flagged
+  ✓ good    review / clean-diff
 ═══════════════════════════════════════════════════
 
-  3 passed  ·  0 comment  ·  1 failed
-
-Failed test folders kept for debugging:
-  /tmp/cass-test-abc123/planted-bug/
+  15 passed  ·  0 comment  ·  0 failed
 ```
 
 ---
