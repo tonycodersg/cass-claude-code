@@ -1,0 +1,13 @@
+{
+  "files": [
+    { "path": ".cass/pr-template.md", "exists": true },
+    { "path": ".cass/commit-template.md", "exists": true },
+    { "path": ".claude/settings.local.json", "exists": true },
+    { "path": ".claude/settings.local.json", "contains": "staging" }
+  ],
+  "output": {
+    "contains": ["cass init complete", "✓"],
+    "not_contains": ["prerequisites missing", "✗"]
+  },
+  "verifier_prompt": "Init should complete without errors, create .cass/ templates, and save staging as the main branch in settings.local.json"
+}

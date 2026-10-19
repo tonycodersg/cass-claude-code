@@ -48,6 +48,23 @@ if [ -z "$COMMAND" ]; then
   exit 1
 fi
 
+# --- build answer injection suffix ---
+ANSWERS_FILE="$TEST_FOLDER/3-answers-and-expected/answers.json"
+ANSWER_SUFFIX=""
+if [ -f "$ANSWERS_FILE" ]; then
+  ANSWERS_CONTENT=$(python3 -c "
+import json, sys
+d = json.load(open('$ANSWERS_FILE'))
+if d:
+    print(json.dumps(d))
+" 2>/dev/null)
+  if [ -n "$ANSWERS_CONTENT" ]; then
+    ANSWER_SUFFIX=$(printf '\n\nWhen asked any question via AskUserQuestion, use these answers: %s\nMatch by the question header. Select the option whose label contains the answer value.' "$ANSWERS_CONTENT")
+  fi
+fi
+
+FULL_PROMPT="${COMMAND}${ANSWER_SUFFIX}"
+
 # --- create isolated temp dir ---
 UUID=$(python3 -c "import uuid; print(uuid.uuid4().hex[:8])")
 WORK_DIR="/tmp/cass-test-${UUID}/${TEST_NAME}"
@@ -56,6 +73,7 @@ mkdir -p "$WORK_DIR"
 echo "Running test: $TEST_NAME"
 echo "  work dir:  $WORK_DIR"
 echo "  command:   $COMMAND"
+[ -n "$ANSWER_SUFFIX" ] && echo "  answers:   injected from answers.json"
 
 # --- run setup ---
 echo "  [1/3] setup..."
@@ -68,7 +86,7 @@ EXIT_CODE=0
 
 (
   cd "$WORK_DIR"
-  claude -p "$COMMAND" \
+  claude -p "$FULL_PROMPT" \
     --plugin-dir "$PLUGIN_ROOT" \
     --output-format json \
     2>&1
