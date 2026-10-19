@@ -1,0 +1,14 @@
+{
+  "files": [
+    { "path": ".cass/README.md", "exists": true },
+    { "path": ".claude/commands/HOWTO.md", "exists": true },
+    { "path": ".cass/agents/HOWTO.md", "exists": true },
+    { "path": ".cass/hooks/hooks.json", "exists": true },
+    { "path": ".cass/hooks/scripts/post-pr.sh", "exists": true }
+  ],
+  "output": {
+    "contains": [],
+    "not_contains": []
+  },
+  "verifier_prompt": "The customize command ran with 'all' argument and should have scaffolded the full .cass/ package: .cass/README.md, .claude/commands/HOWTO.md, .cass/agents/HOWTO.md, .cass/hooks/hooks.json, and .cass/hooks/scripts/post-pr.sh. The output should confirm what was created with a summary report. Fail if the output suggests an error or if no files were scaffolded."
+}
