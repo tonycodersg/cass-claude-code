@@ -1,0 +1,7 @@
+{
+  "output": {
+    "contains": ["github.com", "pull"],
+    "not_contains": ["error", "Error", "failed"]
+  },
+  "verifier_prompt": "The pr command should create a pull request and output a GitHub PR URL containing 'github.com' and 'pull'. The stub gh returns https://github.com/test-org/test-repo/pull/42. The output should include that URL or a similar PR creation confirmation. No error messages should appear."
+}
