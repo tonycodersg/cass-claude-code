@@ -1,0 +1,7 @@
+{
+  "output": {
+    "contains": ["Nothing to commit"],
+    "not_contains": ["Committed"]
+  },
+  "verifier_prompt": "The commit command should detect a clean working tree and print a message like 'Nothing to commit — working tree is clean.' without attempting to create a commit."
+}

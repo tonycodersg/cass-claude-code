@@ -1,0 +1,12 @@
+{
+  "files": [
+    { "path": ".cass", "exists": false },
+    { "path": "cass-.gitmessage", "exists": false },
+    { "path": ".claude/commands", "exists": false }
+  ],
+  "output": {
+    "contains": ["ejected", "removed"],
+    "not_contains": ["error", "Error"]
+  },
+  "verifier_prompt": "The eject --hard command should remove .cass/, cass-.gitmessage, settings cass key, .gitignore entries AND .claude/commands/ overrides. The output should confirm .claude/commands/ was also removed (hard mode), with a 'cass ejected' or similar success banner."
+}
