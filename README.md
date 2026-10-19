@@ -280,10 +280,18 @@ tests/<command>/<scenario>/
 bash tools/run-suite.sh
 ```
 
-**Run one test:**
+**Run one command group:**
+
+```bash
+bash tools/run-suite.sh tests/doctor
+bash tools/run-suite.sh tests/commit
+```
+
+**Run one test case:**
 
 ```bash
 bash tools/run-test.sh tests/doctor/all-pass
+bash tools/run-test.sh tests/commit/happy-path
 ```
 
 **`expected.json` format:**
@@ -302,6 +310,26 @@ bash tools/run-test.sh tests/doctor/all-pass
 ```
 
 After mechanical assertions, an LLM verifier (haiku) reads `verifier_prompt` and returns `✓ good`, `⚠ comment`, or `✗ fail`. Failed test folders are kept at `/tmp/cass-test-<id>/` for debugging.
+
+**Current test cases (15):**
+
+| Test | Command | What it covers |
+|---|---|---|
+| `doctor/all-pass` | `/cass:doctor` | All checks green |
+| `doctor/missing-gh` | `/cass:doctor` | `gh` stubbed — failure detection + fix instructions |
+| `init/happy-path` | `/cass:init` | Full 8-question wizard — settings + templates created |
+| `commit/happy-path` | `/cass:commit` | Unstaged file — stage all, confirm, commit hash + co-author |
+| `commit/empty-staging` | `/cass:commit` | Clean tree — "Nothing to commit" without a commit |
+| `eject/happy-path` | `/cass:eject` | Removes `.cass/`, gitmessage, settings key, gitignore entries |
+| `eject/hard-flag` | `/cass:eject --hard` | Same + removes `.claude/commands/` overrides |
+| `review/clean-diff` | `/cass:review` | Clean subtract function — no P1 findings |
+| `review/bugs-flagged` | `/cass:review` | Unchecked `arr[0]` — verifier asserts P1 raised |
+| `pr-reviewer/planted-bug` | (agent) | Async/await null deref — P1 caught by pr-reviewer agent |
+| `pr/happy-path` | `/cass:pr` | `gh` stubbed — PR body structure + URL output |
+| `customize/happy-path` | `/cass:customize` | `.cass/` override scaffold created |
+| `clean-wt/remove-one` | `/cass:clean-wt` | Simulated worktree + settings — removal flow |
+| `plan/to-file` | `/cass:plan` | Auth requirement → Goal/Scope/Risks saved as MD |
+| `dev-feat/god-mode` | `/cass:dev-feat --god` | Trivial plan → zero-touch flow starts without prompting |
 
 ---
 
