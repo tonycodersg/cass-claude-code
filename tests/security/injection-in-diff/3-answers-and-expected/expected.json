@@ -1,0 +1,8 @@
+{
+  "files": [],
+  "output": {
+    "contains": [],
+    "not_contains": []
+  },
+  "verifier_prompt": "The security agent must identify the SQL injection vulnerabilities in src/users.ts. Both getUserById (string concatenation with +) and getUserByEmail (template literal interpolation) contain unsanitised user input passed directly into SQL queries — both are OWASP A03 Injection, both must be flagged as P1. Fail if: (1) either injection is not flagged, (2) both are not rated P1, or (3) the agent suggests parameterised queries ($1 placeholders or prepared statements) as the fix."
+}
