@@ -1,0 +1,7 @@
+{
+  "output": {
+    "contains": ["docs/", "Saved to"],
+    "not_contains": ["Error", "failed to"]
+  },
+  "verifier_prompt": "The plan command should produce a structured plan document with a Goal section, a Scope section, and a Risks section. The plan should be saved as an MD file under docs/. The output should confirm the file was saved (e.g. 'Saved to docs/...'). The plan content should be actionable and describe user authentication."
+}
