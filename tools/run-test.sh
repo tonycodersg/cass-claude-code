@@ -123,12 +123,24 @@ PYEOF
 
 echo ""
 
-# --- evaluate pass/fail based on exit code only (mechanical assertions in p3) ---
-if [ $EXIT_CODE -ne 0 ]; then
-  echo "FAIL  $TEST_NAME  (claude exited $EXIT_CODE)"
+# --- mechanical assertions ---
+ASSERT_EXIT=0
+if [ -f "$EXPECTED_FILE" ]; then
+  python3 "$PLUGIN_ROOT/tools/assert-results.py" \
+    --results  "$RESULTS_FILE" \
+    --expected "$EXPECTED_FILE" \
+    --work-dir "$WORK_DIR" \
+    --test-name "$TEST_NAME" \
+    || ASSERT_EXIT=$?
+else
+  echo "  (no expected.json — skipping assertions)"
+fi
+
+# --- final pass/fail ---
+if [ $EXIT_CODE -ne 0 ] || [ $ASSERT_EXIT -ne 0 ]; then
+  [ $EXIT_CODE -ne 0 ] && echo "FAIL  $TEST_NAME  (claude exited $EXIT_CODE)"
   echo "  Debug folder kept: $WORK_DIR"
   exit 1
 else
-  echo "PASS  $TEST_NAME"
   rm -rf "/tmp/cass-test-${UUID}"
 fi
