@@ -1,0 +1,8 @@
+{
+  "files": [],
+  "output": {
+    "contains": [],
+    "not_contains": []
+  },
+  "verifier_prompt": "The pr-reviewer must catch the null dereference bug in getUserDisplayName: getUser is async and returns Promise<User|null>, but the result is used synchronously as if it were a User — calling .email on an unresolved Promise. The review should flag this as a P1 bug. Fail if the review output does not mention this async/await issue or the unsafe property access."
+}
