@@ -70,6 +70,12 @@ UUID=$(python3 -c "import uuid; print(uuid.uuid4().hex[:8])")
 WORK_DIR="/tmp/cass-test-${UUID}/${TEST_NAME}"
 mkdir -p "$WORK_DIR"
 
+STEPS_FILE="$WORK_DIR/steps.jsonl"
+step() {
+  local n="$1" action="$2" status="$3"
+  printf '{"step":%d,"action":"%s","status":"%s"}\n' "$n" "$action" "$status" >> "$STEPS_FILE"
+}
+
 echo "Running test: $TEST_NAME"
 echo "  work dir:  $WORK_DIR"
 echo "  command:   $COMMAND"
@@ -78,6 +84,7 @@ echo "  command:   $COMMAND"
 # --- run setup ---
 echo "  [1/3] setup..."
 (cd "$WORK_DIR" && bash "$INIT_SCRIPT") 2>&1 | sed 's/^/    /'
+step 1 "setup complete" "pass"
 
 # --- run claude ---
 echo "  [2/3] executing command..."
@@ -91,6 +98,7 @@ EXIT_CODE=0
     --output-format json \
     2>&1
 ) > "$CLAUDE_OUTPUT_FILE" || EXIT_CODE=$?
+step 2 "command executed" "$([ $EXIT_CODE -eq 0 ] && echo pass || echo fail)"
 
 # --- write results.json ---
 echo "  [3/3] writing results..."
@@ -150,8 +158,10 @@ if [ -f "$EXPECTED_FILE" ]; then
     --work-dir "$WORK_DIR" \
     --test-name "$TEST_NAME" \
     || ASSERT_EXIT=$?
+  step 3 "mechanical assertions" "$([ $ASSERT_EXIT -eq 0 ] && echo pass || echo fail)"
 else
   echo "  (no expected.json — skipping assertions)"
+  step 3 "mechanical assertions" "skipped"
 fi
 
 # --- LLM verifier (qualitative judgment) ---
@@ -166,6 +176,19 @@ if [ -f "$EXPECTED_FILE" ]; then
   if [ -n "$VERDICT" ]; then
     echo "  Verifier: $VERDICT"
   fi
+  step 4 "llm verification" "$([ $VERIFY_EXIT -eq 0 ] && echo pass || echo fail)"
+  # write verdict.json for suite aggregation
+  python3 -c "
+import json
+verdict_line = '''${VERDICT}'''
+if verdict_line.startswith('✗'):
+    state = 'fail'
+elif verdict_line.startswith('⚠'):
+    state = 'comment'
+else:
+    state = 'good'
+json.dump({'test': '${TEST_NAME}', 'state': state, 'verdict': verdict_line}, open('$WORK_DIR/verdict.json', 'w'))
+" 2>/dev/null || true
 fi
 
 # --- final pass/fail ---
