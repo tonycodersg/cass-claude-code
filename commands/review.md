@@ -1,6 +1,6 @@
 ---
-description: Review a PR or the current branch — spawns the pr-reviewer agent to check logic, performance, code quality, and plan compliance
-argument-hint: "[PR number or URL — omit to review current branch]"
+description: Review a PR or the current branch — spawns the pr-reviewer agent to check logic, performance, code quality, and plan compliance. Pass --security to also run the security agent for an OWASP/SAST scan.
+argument-hint: "[PR number or URL — omit to review current branch] [--security]"
 allowed-tools: [Agent, Bash, AskUserQuestion, Read, Edit, Write, Glob, Grep]
 model: sonnet
 ---
@@ -13,7 +13,12 @@ model: sonnet
 
 ## Your Role
 
-Trigger a code review using the `pr-reviewer` agent. Works for both an open PR and local branch changes.
+Trigger a code review using the `pr-reviewer` agent. Works for both an open PR and local branch changes. When `--security` is passed, also spawn the `security` agent in parallel and present both reports together.
+
+## Flags
+
+Parse from `$ARGUMENTS`:
+- `--security` — also run the `security` agent alongside `pr-reviewer`
 
 ## Process
 
@@ -60,9 +65,20 @@ Spawn the `pr-reviewer` agent with this context:
 > Group findings as P1 (must fix), P2 (should fix), P3 (consider), and Plan Compliance checklist.
 > Do not apply any fixes — report only."
 
+### Step 3b — Invoke security agent (if --security flag is set)
+
+If `--security` was passed, spawn the `security` agent in parallel with the pr-reviewer:
+
+> "Run a security review on the current branch diff.
+> Head branch: [branch name]. Base branch: [target branch].
+> Run semgrep if available. Review against OWASP Top 10.
+> Output findings in P1/P2/P3 format. Do not apply any fixes — report only."
+
 ### Step 4 — Report findings
 
-Present the pr-reviewer agent's output to the user. Ask:
+Present the pr-reviewer agent's output to the user. If `--security` was passed, also present the security agent's findings as a separate **Security Review** section.
+
+Ask:
 
 > "Would you like to fix any of the findings now? (P1 items are strongly recommended before merging)"
 
