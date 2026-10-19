@@ -1,0 +1,10 @@
+{
+  "Project name": "Recommended",
+  "Main branch": "staging",
+  "Worktree path": "Recommended",
+  "PR template": "cass default",
+  "cass-bot": "Skip for now",
+  "Playwright CI": "Skip",
+  "Post-PR hook": "Skip",
+  "Confirm setup": "Looks good"
+}
