@@ -63,7 +63,17 @@ if d:
   fi
 fi
 
-FULL_PROMPT="${COMMAND}${ANSWER_SUFFIX}"
+# Build the plugin fallback instruction so Claude runs the command even
+# when slash-command dispatch doesn't fire in -p / headless mode.
+COMMAND_NAME="${COMMAND#/}"          # strip leading /  → e.g. "cass:doctor"
+COMMAND_FILE="$PLUGIN_ROOT/commands/${COMMAND_NAME#*:}.md"   # commands/doctor.md
+FALLBACK=""
+if [ -f "$COMMAND_FILE" ]; then
+  FALLBACK=$(printf '\n\nThe cass plugin is loaded from %s. The command is defined in %s. If the slash command does not dispatch automatically, read that file and execute it directly using the Bash tool.' \
+    "$PLUGIN_ROOT" "$COMMAND_FILE")
+fi
+
+FULL_PROMPT="${COMMAND}${FALLBACK}${ANSWER_SUFFIX}"
 
 # --- create isolated temp dir ---
 UUID=$(python3 -c "import uuid; print(uuid.uuid4().hex[:8])")
@@ -85,6 +95,16 @@ echo "  command:   $COMMAND"
 echo "  [1/3] setup..."
 (cd "$WORK_DIR" && bash "$INIT_SCRIPT") 2>&1 | sed 's/^/    /'
 step 1 "setup complete" "pass"
+
+# --- load env overrides written by setup.sh (.cass-test-env) ---
+ENV_FILE="$WORK_DIR/.cass-test-env"
+if [ -f "$ENV_FILE" ]; then
+  while IFS='=' read -r key val; do
+    [[ -z "$key" || "$key" == \#* ]] && continue
+    export "$key=$val"
+    echo "    env: $key set"
+  done < "$ENV_FILE"
+fi
 
 # --- run claude ---
 echo "  [2/3] executing command..."
@@ -109,31 +129,54 @@ import json, sys
 
 output_raw = open("$CLAUDE_OUTPUT_FILE").read().strip()
 
-# claude --output-format json may emit a single JSON object or NDJSON lines
-try:
-    data = json.loads(output_raw)
-    text_response = data.get("result", data.get("content", ""))
-    tool_calls = data.get("tool_uses", [])
-except json.JSONDecodeError:
-    # try NDJSON
-    lines = [l for l in output_raw.splitlines() if l.strip()]
-    parsed = []
-    text_parts = []
-    tool_calls = []
-    for line in lines:
-        try:
-            obj = json.loads(line)
-            parsed.append(obj)
-            if obj.get("type") == "assistant":
-                for block in obj.get("message", {}).get("content", []):
-                    if block.get("type") == "text":
-                        text_parts.append(block["text"])
-                    elif block.get("type") == "tool_use":
-                        tool_calls.append(block)
-        except Exception:
-            text_parts.append(line)
-    text_response = "\n".join(text_parts)
-    data = {"raw_lines": parsed}
+# Strip leading non-JSON lines (e.g. the ⚠ connector warning claude emits to stdout)
+lines = output_raw.splitlines()
+json_lines = []
+skipped = []
+for line in lines:
+    stripped = line.strip()
+    if stripped.startswith('{') or json_lines:
+        json_lines.append(line)
+    else:
+        skipped.append(line)
+
+json_raw = "\n".join(json_lines).strip()
+
+text_response = ""
+tool_calls = []
+data = {}
+
+if json_raw:
+    # Try single JSON object first (claude --output-format json default)
+    try:
+        data = json.loads(json_raw)
+        # "result" holds the final text in -p / print mode
+        text_response = data.get("result", data.get("content", ""))
+        tool_calls = data.get("tool_uses", [])
+    except json.JSONDecodeError:
+        # Fall back to NDJSON (streaming format)
+        parsed = []
+        text_parts = []
+        for line in json_lines:
+            if not line.strip():
+                continue
+            try:
+                obj = json.loads(line)
+                parsed.append(obj)
+                t = obj.get("type", "")
+                if t == "result":
+                    # -p mode final result object
+                    text_parts.append(obj.get("result", ""))
+                elif t == "assistant":
+                    for block in obj.get("message", {}).get("content", []):
+                        if block.get("type") == "text":
+                            text_parts.append(block["text"])
+                        elif block.get("type") == "tool_use":
+                            tool_calls.append(block)
+            except Exception:
+                pass
+        text_response = "\n".join(p for p in text_parts if p)
+        data = {"raw_lines": parsed}
 
 results = {
     "test": "$TEST_NAME",

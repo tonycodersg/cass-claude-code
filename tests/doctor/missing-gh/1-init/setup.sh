@@ -19,7 +19,9 @@ exit 127
 EOF
 chmod +x ./bin/gh
 
-export PATH="$(pwd)/bin:$PATH"
+# Write env overrides to .cass-test-env so the runner can export them
+# before spawning Claude (PATH export from this subshell doesn't carry over)
+echo "PATH=$(pwd)/bin:$PATH" > .cass-test-env
 
 # Create .cass files so only the gh check fails
 mkdir -p .cass
@@ -34,4 +36,3 @@ cat > .claude/settings.local.json <<'EOF'
 EOF
 
 echo "Setup complete. gh is stubbed to exit 127 (not found)."
-echo "Export PATH before running the test: export PATH=\"$(pwd)/bin:\$PATH\""
