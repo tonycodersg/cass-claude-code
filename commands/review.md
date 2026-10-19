@@ -67,7 +67,7 @@ Spawn the `pr-reviewer` agent with this context:
 
 ### Step 3b — Invoke security agent (if --security flag is set)
 
-If `--security` was passed, spawn the `security` agent in parallel with (or immediately after) the pr-reviewer:
+If `--security` was passed, spawn the `security` agent in parallel with the pr-reviewer:
 
 > "Run a security review on the current branch diff.
 > Head branch: [branch name]. Base branch: [target branch].

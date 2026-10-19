@@ -66,16 +66,18 @@ command -v semgrep 2>/dev/null && echo "available" || echo "not available"
 **If semgrep is available**, run it against the changed files only:
 
 ```bash
-# Get the list of changed files
-CHANGED=$(git diff --name-only $(git merge-base HEAD origin/staging 2>/dev/null || git merge-base HEAD origin/main 2>/dev/null || git merge-base HEAD origin/master 2>/dev/null)...HEAD)
-
-# Run semgrep with auto config on changed files
-echo "$CHANGED" | xargs semgrep --config=auto --json 2>/dev/null
+# Run semgrep with auto config on changed files only
+git diff --name-only \
+  "$(git merge-base HEAD origin/staging 2>/dev/null || git merge-base HEAD origin/main 2>/dev/null || git merge-base HEAD origin/master 2>/dev/null)...HEAD" \
+  | tr '\n' '\0' \
+  | xargs -0 semgrep --config=auto --json 2>/dev/null
 ```
 
 Parse the JSON output and extract findings: rule ID, file, line, severity, and message.
 
 **If semgrep is not available**, note it in the report and proceed with manual review only.
+
+If semgrep exits non-zero or its output is not valid JSON, treat it as unavailable — note the failure and fall back to manual review rather than aborting.
 
 **Step 4 — Manual OWASP Top 10 review**
 
