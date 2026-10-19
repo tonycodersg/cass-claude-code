@@ -1,6 +1,5 @@
 ---
 description: Generate a developer onboarding guide for this repo — spawns the onboarder agent to read project docs, structure, and recent activity, then writes .cass/ONBOARDING.md
-argument-hint: ""
 allowed-tools: [Agent, Bash, Read]
 model: haiku
 ---

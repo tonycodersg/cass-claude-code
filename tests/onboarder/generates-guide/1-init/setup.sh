@@ -74,6 +74,29 @@ EOF
 
 git add .
 git commit -m "initial: widget-api scaffold"
+
+# Add a couple more commits so the Active work section has real history to show
+mkdir -p src/routes
+cat > src/routes/widgets.ts <<'EOF'
+import { Router } from "express";
+export const widgetsRouter = Router();
+widgetsRouter.get("/", (_req, res) => res.json([]));
+EOF
+git add .
+git commit -m "feat: add widgets router with list endpoint"
+
+cat > src/routes/widgets.ts <<'EOF'
+import { Router } from "express";
+export const widgetsRouter = Router();
+widgetsRouter.get("/", (_req, res) => res.json([]));
+widgetsRouter.post("/", (req, res) => {
+  if (!req.body?.name) return res.status(400).json({ error: "name required" });
+  res.status(201).json({ id: "1", name: req.body.name });
+});
+EOF
+git add .
+git commit -m "fix: return 400 when widget name is missing"
+
 git log --oneline
 
-echo "Setup complete. Repo has README.md, CLAUDE.md, and package.json."
+echo "Setup complete. Repo has README.md, CLAUDE.md, package.json, and 3 commits."
