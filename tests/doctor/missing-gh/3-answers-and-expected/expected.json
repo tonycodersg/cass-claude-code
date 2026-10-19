@@ -1,0 +1,8 @@
+{
+  "files": [],
+  "output": {
+    "contains": ["✗", "cass v", "Run /cass:init to fix"],
+    "not_contains": []
+  },
+  "verifier_prompt": "Doctor should report at least one failure (gh not installed) with fix instructions and the run /cass:init line present"
+}

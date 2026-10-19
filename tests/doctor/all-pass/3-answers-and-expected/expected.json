@@ -1,0 +1,11 @@
+{
+  "files": [
+    { "path": ".cass/pr-template.md", "exists": true },
+    { "path": ".cass/commit-template.md", "exists": true }
+  ],
+  "output": {
+    "contains": ["✓", "cass v"],
+    "not_contains": ["✗", "Run /cass:init to fix"]
+  },
+  "verifier_prompt": "Doctor should report all checks passing with a version number shown and no failures or fix instructions"
+}
