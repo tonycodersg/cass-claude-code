@@ -1,0 +1,11 @@
+{
+  "files": [
+    { "path": ".cass", "exists": false },
+    { "path": "cass-.gitmessage", "exists": false }
+  ],
+  "output": {
+    "contains": ["ejected", "removed"],
+    "not_contains": ["error", "Error"]
+  },
+  "verifier_prompt": "The eject command should remove .cass/, delete cass-.gitmessage, unset git commit.template, clear the cass key from settings.local.json, and clean .gitignore. The output should confirm each item as removed or skipped, and show 'cass ejected' or equivalent success banner."
+}

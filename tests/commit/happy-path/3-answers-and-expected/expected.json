@@ -1,0 +1,7 @@
+{
+  "output": {
+    "contains": ["Committed", "Co-authored-by"],
+    "not_contains": ["Nothing to commit", "Cancel"]
+  },
+  "verifier_prompt": "The commit command should stage src/hello.js, generate a semantic commit message, and confirm a successful commit with a hash and Co-authored-by footer. The output should show a committed hash like '✓ Committed: abc1234 ...' and include the Co-authored-by line."
+}
