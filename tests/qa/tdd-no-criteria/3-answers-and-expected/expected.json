@@ -1,0 +1,8 @@
+{
+  "files": [],
+  "output": {
+    "contains": [],
+    "not_contains": []
+  },
+  "verifier_prompt": "The qa agent in --tdd mode must handle a plan with no explicit Success Criteria section by deriving testable units from the Goal and Approach sections instead. The plan describes clamp(value, min, max) with three observable behaviours in the Approach: (1) returns value when in range, (2) returns min when value < min, (3) returns max when value > max. The agent must write at least two test stubs covering distinct scenarios from these behaviours. Fail if: the agent produces zero test stubs, the agent errors or stops because no Success Criteria section was found, or the output does not include a QA Test Plan report."
+}

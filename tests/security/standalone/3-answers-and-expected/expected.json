@@ -1,0 +1,8 @@
+{
+  "files": [],
+  "output": {
+    "contains": [],
+    "not_contains": []
+  },
+  "verifier_prompt": "The /cass:security standalone command must invoke the security agent on the current branch diff without requiring --security to be passed to /cass:review. The security agent must identify the command injection vulnerabilities in src/runner.ts: both runReport and listReports pass user-controlled input directly into exec() shell strings — OWASP A03 Injection. Both must be flagged as P1. Fail if: the security agent is not invoked, either injection is not flagged, either is rated below P1, or the output does not include a Security Review report."
+}
