@@ -140,7 +140,44 @@ Triggered by `/cass:review`.
 - Reads the plan as source of truth
 - Diffs against base branch
 - Reports findings as P1 (must fix) / P2 (should fix) / P3 (consider) / Plan Compliance
+- `--auto-post` posts findings as a GitHub PR comment without asking — used in automated pipelines
 - Applies fixes only on explicit direction
+
+### qa — `sonnet`
+
+Triggered by `/cass:qa`.
+
+**Default mode** (post-implementation coverage fill)
+- Reads existing test files and source code
+- Identifies untested functions, branches, and error paths
+- Writes test assertions and runs the suite
+
+**`--tdd <plan-file>` mode** (pre-implementation stubs)
+- Reads plan file — extracts testable units from Success Criteria (falls back to Goal + Approach)
+- Writes failing test stubs; stubs fail because the module doesn't exist yet (correct TDD behaviour)
+- Posts a QA Test Plan report to the ticket via cass-bot
+
+**`--verify-pr <branch>` mode** (post-PR verification)
+- Checks out the PR branch, runs the full suite
+- Identifies coverage gaps introduced by the PR
+- Posts findings to both the PR and the original ticket
+
+### security — `sonnet`
+
+Triggered by `/cass:security` or `/cass:review --security`.
+
+- Runs `semgrep --config=auto` on the diff if semgrep is available
+- Falls back to manual OWASP Top 10 review if semgrep is not installed or JSON parse fails
+- Reports findings as P1 (critical) / P2 (medium) / P3 (low) matching pr-reviewer format
+
+### onboarder — `sonnet`
+
+Triggered by `/cass:onboard`.
+
+- Reads `CLAUDE.md`, `README.md`, package manifests, folder structure (`-maxdepth 2`), cass config
+- Reads `git log` and recent GitHub PRs/issues for activity context
+- Runs `git log --format="%ae"` to identify top contributors by area
+- Writes `.cass/ONBOARDING.md` with sections: What it does, How it works, Key directories, Running locally, Who to ask, Common workflows
 
 ### devops — `sonnet`
 
@@ -216,7 +253,7 @@ Health check. Verifies:
 5. Creates feature branch from `mainBranch`, worktrees under `worktreePath`
 6. Spawns SWE agents per workstream
 
-### `/cass:pr [base branch]`
+### `/cass:pr [base branch] [--no-qa]`
 
 Run inside a worktree. Auto-detects PR target:
 - Sub-task branch → parent feature branch
@@ -224,9 +261,29 @@ Run inside a worktree. Auto-detects PR target:
 
 PR body includes: What / Why / How / Risks / Test Coverage / Architecture Review / Implementation Steps / Checklist / Claude session ID.
 
-### `/cass:review [PR number or URL]`
+After the PR is created, automatically spawns in parallel:
+- `qa --verify-pr` — runs the suite and posts gaps to the PR and ticket
+- `pr-reviewer --auto-post` — posts review findings as a GitHub PR comment
+
+`--no-qa` skips the qa spawn (pr-reviewer still runs).
+
+### `/cass:review [PR number or URL] [--security]`
 
 Triggers `pr-reviewer` agent. Reports P1 / P2 / P3 / Plan Compliance. Never applies fixes without direction.
+
+`--security` also spawns the `security` agent in parallel — SAST + OWASP Top 10 on the same diff.
+
+### `/cass:qa [--tdd <plan-file>] [--verify-pr <branch>]`
+
+Routes to the qa agent in one of three modes (see agent description above).
+
+### `/cass:security [PR number or URL]`
+
+Triggers the `security` agent on the current branch diff or a specific PR. Reports P1/P2/P3 security findings. Standalone alternative to `/cass:review --security`.
+
+### `/cass:onboard`
+
+Triggers the `onboarder` agent. Generates `.cass/ONBOARDING.md` for the current repository.
 
 ### `/cass:clean-wt`
 
@@ -244,9 +301,11 @@ End-to-end test suite (plugin repo only). Discovers all test cases under `tests/
 /cass:test-suite tests/doctor # run only doctor tests
 ```
 
-### `/cass:plan-task`
+### `/cass:plan-task [--qa] <task>`
 
-Legacy single-command pipeline — planning + SA review + SWE implementation in one step. Still available as an alternative to the PO/Dev role split.
+Single-ticket planner — writes a structured plan file and creates a GitHub issue.
+
+`--qa` auto-spawns the qa agent in `--tdd` mode after the ticket is created (no confirmation prompt). Without the flag, the planner asks via `AskUserQuestion` whether to spawn qa.
 
 ---
 
@@ -346,17 +405,27 @@ echo "PATH=$(pwd)/bin:$PATH" > .cass-test-env
 | `review/bugs-flagged` | `/cass:review` | Unchecked `arr[0]` access — verifier asserts P1 raised |
 | `pr-reviewer/planted-bug` | (agent) | Async/await null deref planted in `src/auth.ts` — P1 caught |
 | `pr/happy-path` | `/cass:pr` | `gh` stubbed — PR body structure + URL in output |
+| `pr/qa-verification` | `/cass:pr` | After PR created, qa `--verify-pr` + pr-reviewer spawn in parallel |
 | `customize/happy-path` | `/cass:customize` | Clean repo — `.cass/` override scaffold created |
 | `clean-wt/remove-one` | `/cass:clean-wt` | Simulated worktree + settings — removal flow |
 | `plan/to-file` | `/cass:plan` | Auth requirement → Goal/Scope/Risks saved as MD in `docs/` |
 | `dev-feat/god-mode` | `/cass:dev-feat --god` | Trivial plan doc → zero-touch implementation flow |
+| `qa/writes-missing-test` | `/cass:qa` | Default mode — fills coverage gap on an untested `divide()` function |
+| `qa/tdd-from-plan` | `/cass:qa --tdd` | TDD mode — writes failing stubs from plan Success Criteria |
+| `qa/tdd-no-criteria` | `/cass:qa --tdd` | TDD mode — falls back to Goal + Approach when no Success Criteria section |
+| `qa/verify-pr` | `/cass:qa --verify-pr` | Post-PR mode — identifies coverage gap on `feat/add-divide` branch |
+| `security/injection-in-diff` | `/cass:review --security` | SQL injection via string concat — flagged as P1 (OWASP A03) |
+| `security/standalone` | `/cass:security` | Command injection in `exec()` calls — security agent invoked standalone |
+| `onboarder/generates-guide` | `/cass:onboard` | Reads project context, writes `.cass/ONBOARDING.md` |
+| `planner/qa-flag` | `/cass:plan-task --qa` | `--qa` force flag — qa agent auto-spawned after ticket without asking |
+| `planner/qa-offer` | `/cass:plan-task` | Interactive path — planner offers qa via `AskUserQuestion`, user says yes |
 
-> `plan` and `dev-feat` spawn internal sub-agents and take longer (~2–5 min each). `pr/happy-path` stubs `gh` so no real GitHub repo is required.
+> `plan`, `dev-feat`, `qa`, and `security` tests spawn internal sub-agents and take longer (~2–5 min each). Tests that need `gh` stub it locally so no real GitHub repo is required.
 
 ### Report format
 
 ```
-cass test suite  15 test(s) discovered
+cass test suite  25 test(s) discovered
 ═══════════════════════════════════════════════════
   ✓ good    clean-wt / remove-one
   ✓ good    commit / empty-staging
@@ -368,14 +437,24 @@ cass test suite  15 test(s) discovered
   ✓ good    eject / happy-path
   ✓ good    eject / hard-flag
   ✓ good    init / happy-path
+  ✓ good    onboarder / generates-guide
   ✓ good    plan / to-file
+  ✓ good    planner / qa-flag
+  ✓ good    planner / qa-offer
   ✓ good    pr-reviewer / planted-bug
   ✓ good    pr / happy-path
+  ✓ good    pr / qa-verification
+  ✓ good    qa / tdd-from-plan
+  ✓ good    qa / tdd-no-criteria
+  ✓ good    qa / verify-pr
+  ✓ good    qa / writes-missing-test
   ✓ good    review / bugs-flagged
   ✓ good    review / clean-diff
+  ✓ good    security / injection-in-diff
+  ✓ good    security / standalone
 ═══════════════════════════════════════════════════
 
-  15 passed  ·  0 comment  ·  0 failed
+  25 passed  ·  0 comment  ·  0 failed
 ```
 
 ---
