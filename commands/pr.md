@@ -1,6 +1,6 @@
 ---
-description: Create a PR from the current branch — runs in the worktree where the feature branch is checked out. Sub-task branches PR into the main feature branch; main feature branches PR into staging (default) with option to change target.
-argument-hint: "[optional: base branch override]"
+description: Create a PR from the current branch — runs in the worktree where the feature branch is checked out. Sub-task branches PR into the main feature branch; main feature branches PR into staging (default) with option to change target. After PR creation, auto-spawns the qa agent (--verify-pr) and pr-reviewer in parallel. Pass --no-qa to skip qa verification.
+argument-hint: "[optional: base branch override] [--no-qa]"
 allowed-tools: [Bash, Read, Write, AskUserQuestion, Agent, mcp__github__*]
 model: sonnet
 ---
@@ -16,6 +16,11 @@ model: sonnet
 - cass settings: !`cat .claude/settings.local.json 2>/dev/null || echo "NOT FOUND"`
 - Session ref: !`git rev-parse --short HEAD 2>/dev/null || echo "unknown"`
 - User override: $ARGUMENTS
+
+## Flags
+
+Parse from `$ARGUMENTS`:
+- `--no-qa` — skip the qa `--verify-pr` spawn after PR creation
 
 ## Your Role
 
@@ -175,9 +180,28 @@ If the script exits non-zero, log the error but do not fail the command.
 
 ---
 
-### Step 7 — Report
+### Step 7 — Spawn post-PR agents
 
-Output the PR URL and remind the user what comes next:
+After the PR is created and the PR number is known, spawn the following agents **in parallel** (unless `--no-qa` was passed for the qa agent):
+
+**qa agent (`--verify-pr`):**
+> "Run QA verification on PR #<N>.
+> Branch: <head-branch>. Base: <base-branch>.
+> Run the full test suite with coverage.
+> Check TDD stub resolution if a plan file is available at <plan-file-path or 'not available'>.
+> Post the result as a PR comment via bot-comment.sh.
+> Also post a follow-up comment to the originating ticket if a ref is found in the PR body or branch name."
+
+**pr-reviewer agent (`--auto-post`):**
+> "Review PR #<N>. Plan file: <plan-file-path or 'not available'>. Head: <head-branch>. Base: <base-branch>. Review for logic, performance, code quality, and plan compliance. Auto-post findings as a PR comment."
+
+Both agents post their comments independently. Do not wait for one before spawning the other.
+
+---
+
+### Step 8 — Report
+
+Output the PR URL and a brief status line for each spawned agent (qa verification running, pr-reviewer running). Then remind the user what comes next:
 
 **If this was a sub-task PR:**
 > "Sub-task PR created → `<main-feature-branch>`. Once all sub-task PRs are merged there, run `/cass:pr` from the `<main-feature-branch>` worktree to create the final PR to `staging`."
