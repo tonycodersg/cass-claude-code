@@ -79,6 +79,8 @@ If no tests exist yet, choose conventions matching the detected stack (jest for 
 **Step 3 — Identify testable units**
 
 For each success criterion and each function/module named in the Approach, derive:
+
+If no explicit `## Success Criteria` section is found, derive testable units from the Goal and Approach sections instead — look for verbs (returns, throws, creates, validates) that imply observable behaviour.
 - The happy-path scenario
 - Key error/null/edge paths implied by the contract
 
@@ -96,7 +98,7 @@ Testable units derived from plan:
 Write test stubs that:
 - Follow the project's test file location pattern and style
 - Have a descriptive `it()`/`def test_` name stating the scenario
-- Call the function under test but have no implementation to call yet — they will fail with "not found" or similar
+- Call the function under test with real assertions — stubs will fail because the module doesn't exist yet, which is correct TDD behaviour
 - Are minimal: one behaviour per stub
 
 Example stub (TypeScript):
