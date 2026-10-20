@@ -38,6 +38,7 @@ git commit -m "chore: initial commit"
 git checkout -b feat/user-auth
 
 # Add a change on the feature branch
+mkdir -p src
 cat > src/auth.ts <<'EOF'
 export function login(user: string) {
   return { token: "stub", user };

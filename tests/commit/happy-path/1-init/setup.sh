@@ -24,6 +24,7 @@ git add README.md
 git commit -m "chore: initial commit"
 
 # Add a new file with unstaged changes so the command has something to stage and commit
+mkdir -p src
 cat > src/hello.js <<'EOF'
 function hello(name) {
   return `Hello, ${name}!`;
