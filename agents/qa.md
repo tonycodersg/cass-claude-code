@@ -79,10 +79,10 @@ If no tests exist yet, choose conventions matching the detected stack (jest for 
 **Step 3 — Identify testable units**
 
 For each success criterion and each function/module named in the Approach, derive:
-
-If no explicit `## Success Criteria` section is found, derive testable units from the Goal and Approach sections instead — look for verbs (returns, throws, creates, validates) that imply observable behaviour.
 - The happy-path scenario
 - Key error/null/edge paths implied by the contract
+
+If no explicit `## Success Criteria` section is found, derive testable units from the Goal and Approach sections instead — look for verbs (returns, throws, creates, validates) that imply observable behaviour.
 
 Produce a test plan:
 
@@ -216,7 +216,7 @@ If a PR number is provided, get the head branch:
 gh pr view <PR number> --json headRefName,baseRefName,body,title
 ```
 
-If a branch name is provided directly, use it. Check it out if not already on it.
+If a branch name is provided directly, use it. Before checking it out, run `git status --short` — if there are uncommitted changes, warn the user and do not switch branches.
 
 **Step 2 — Discover test conventions**
 
