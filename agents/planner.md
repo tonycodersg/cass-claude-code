@@ -158,7 +158,7 @@ After tickets are created (or immediately after the plan is written if the user 
 
 **If `--qa` was passed:** skip this question and go directly to spawning the qa agent (see below).
 
-**Otherwise**, ask via AskUserQuestion:
+**Otherwise**, ask via AskUserQuestion (use the AskUserQuestion tool with two options):
 
 > "Would you like the qa agent to review this plan for testability and write test case stubs before implementation starts?
 > 1. Yes — spawn qa agent now to analyse the plan and write TDD test stubs
@@ -168,7 +168,7 @@ If the user selects yes (or `--qa` is set):
 
 Spawn the `qa` agent with:
 - `--tdd <plan-file-path>`
-- `--ticket <ticket-ref>` if a ticket was created (pass the first created ticket ref)
+- `--ticket <ticket-ref>` if tickets were created — use the parent ticket if subtasks were created under one, otherwise the first ticket created
 
 The qa agent will analyse the plan, write failing test stubs per success criterion, and post a comment to the ticket. Report back what was found.
 
