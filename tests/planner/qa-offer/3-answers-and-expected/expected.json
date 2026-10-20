@@ -1,0 +1,8 @@
+{
+  "files": [],
+  "output": {
+    "contains": [],
+    "not_contains": []
+  },
+  "verifier_prompt": "The planner agent must: (1) write a plan file describing the multiply function with at least one success criterion, (2) ask the user via AskUserQuestion whether to spawn the qa agent (Step 5d), (3) when the user answers yes, spawn the qa agent in --tdd mode and write test stubs. Fail if: no plan file is created, the planner does not ask the user about qa (the offer must be presented — this is the interactive path, not --qa forced), or the qa agent is not spawned after the user selects yes."
+}
