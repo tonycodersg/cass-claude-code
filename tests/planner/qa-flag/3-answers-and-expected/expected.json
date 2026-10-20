@@ -1,0 +1,8 @@
+{
+  "files": [],
+  "output": {
+    "contains": [],
+    "not_contains": []
+  },
+  "verifier_prompt": "The planner agent must: (1) write a plan file (in .claude/plans/ or similar) describing the divide function with success criteria, (2) spawn the qa agent in --tdd mode WITHOUT asking the user (because --qa was passed), (3) the qa agent must write at least one failing test stub. Fail if: no plan file is created, the qa agent is not invoked, the agent asks the user whether to spawn qa (it should be automatic with --qa), or no test stubs are written."
+}
