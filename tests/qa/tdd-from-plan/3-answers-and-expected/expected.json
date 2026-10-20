@@ -1,0 +1,8 @@
+{
+  "files": [],
+  "output": {
+    "contains": [],
+    "not_contains": []
+  },
+  "verifier_prompt": "The qa agent in --tdd mode must write failing test stubs derived from the plan's three success criteria: (1) divide(6,2) returns 3, (2) divide(6,0) throws 'Division by zero', (3) divide(-6,2) returns -3. The stubs must be written to a test file (e.g. src/math.test.ts). The agent must also output a QA Test Plan report listing the stubs written and flagging src/math.ts as an impact area. Fail if: fewer than two stubs are written, the zero-division error path is not included, or no test plan report is output."
+}

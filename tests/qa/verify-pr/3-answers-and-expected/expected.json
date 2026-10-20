@@ -1,0 +1,8 @@
+{
+  "files": [],
+  "output": {
+    "contains": [],
+    "not_contains": []
+  },
+  "verifier_prompt": "The qa agent in --verify-pr mode must: (1) run the test suite and report that tests pass, (2) report a coverage percentage, (3) identify the zero-division error path in divide() as a remaining gap not covered by tests. The output must follow the QA Verification comment format with Suite result, Coverage, and Remaining gaps sections. Fail if: the suite result is not reported, no coverage percentage is mentioned, or the zero-division untested path is not identified as a gap."
+}
