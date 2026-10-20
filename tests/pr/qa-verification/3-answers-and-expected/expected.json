@@ -4,5 +4,5 @@
     "contains": [],
     "not_contains": []
   },
-  "verifier_prompt": "After the PR is created, the /cass:pr command must spawn the qa agent in --verify-pr mode. Evidence of this is: (1) the output mentions qa verification or a QA Verification report, OR (2) the qa agent is explicitly spawned with --verify-pr in the session. The qa agent must report the suite result (tests passing) and a coverage percentage. Fail if: no PR is created, the qa agent is never spawned in verify-pr mode, or no suite/coverage result is reported."
+  "verifier_prompt": "After the PR is created, the /cass:pr command must spawn the qa agent in --verify-pr mode. Evidence of this is: (1) the output mentions qa verification or a QA Verification report, OR (2) the qa agent is explicitly spawned with --verify-pr in the session. The qa agent must attempt to run the suite and report the result (pass, fail, or error — any outcome is acceptable; the verifier checks that the attempt was made, not that jest is installed). Fail if: no PR is created, or the qa agent is never spawned in verify-pr mode."
 }

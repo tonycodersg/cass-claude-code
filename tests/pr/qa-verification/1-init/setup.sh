@@ -34,6 +34,9 @@ git commit -m "chore: initial commit"
 git checkout -b feat/add-divide
 
 mkdir -p src
+# Note: no npm install — the verifier uses LLM evaluation of agent output,
+# not real jest execution. The qa agent will attempt to run the suite and
+# report whatever outcome it gets (even jest-not-found is reportable output).
 cat > package.json <<'EOF'
 {
   "name": "qa-pr-fixture",

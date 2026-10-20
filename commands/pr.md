@@ -22,6 +22,8 @@ model: sonnet
 Parse from `$ARGUMENTS`:
 - `--no-qa` — skip the qa `--verify-pr` spawn after PR creation
 
+Strip `--no-qa` from `$ARGUMENTS` before using the remaining value as a base branch override in Step 2.
+
 ## Your Role
 
 Create a pull request from the feature branch in the current worktree. This command is designed to run inside a worktree folder — the branch is already checked out here by `/cass:dev-feat`.
@@ -193,7 +195,7 @@ After the PR is created and the PR number is known, spawn the following agents *
 > Also post a follow-up comment to the originating ticket if a ref is found in the PR body or branch name."
 
 **pr-reviewer agent (`--auto-post`):**
-> "Review PR #<N>. Plan file: <plan-file-path or 'not available'>. Head: <head-branch>. Base: <base-branch>. Review for logic, performance, code quality, and plan compliance. Auto-post findings as a PR comment."
+> "--auto-post Review PR #<N>. Plan file: <plan-file-path or 'not available'>. Head: <head-branch>. Base: <base-branch>. Review for logic, performance, code quality, and plan compliance."
 
 Both agents post their comments independently. Do not wait for one before spawning the other.
 
