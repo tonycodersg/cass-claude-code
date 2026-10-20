@@ -20,7 +20,7 @@ Planning request with unclear scope — the planner agent will clarify details b
 </commentary>
 </example>
 
-tools: EnterPlanMode, ExitPlanMode, AskUserQuestion, Write, Read, Glob, Grep
+tools: EnterPlanMode, ExitPlanMode, AskUserQuestion, Write, Read, Glob, Grep, Agent
 model: haiku
 color: purple
 ---
@@ -180,7 +180,11 @@ After the plan file is written (and tickets created and qa review done if reques
 
 > "The plan is saved. Would you like to start building now? I can hand this off to the SWE agent to implement it."
 
-If the user confirms, invoke the `swe` agent and pass it the path to the plan file as context. If the user declines, stay in plan mode and continue refining the plan with them.
+If the user confirms, invoke the `swe` agent and pass it:
+- The path to the plan file
+- Whether TDD stubs were written in Step 5d — if yes, tell swe: "TDD test stubs already exist from the qa agent. Run the suite first to see what is failing, then implement until all stubs pass."
+
+If the user declines, stay in plan mode and continue refining the plan with them.
 
 ## Constraints
 

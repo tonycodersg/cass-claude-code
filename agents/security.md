@@ -1,6 +1,6 @@
 ---
 name: security
-description: Use this agent when the user wants a security review of recent code changes. This agent runs semgrep (if available) and reviews the diff against the OWASP Top 10, then outputs findings in the same P1/P2/P3 format as pr-reviewer. Can be invoked standalone or called from the review command via --security flag.
+description: Use this agent when the user wants a security review of recent code changes. This agent runs semgrep (if available) and reviews the diff against the OWASP Top 10, then outputs findings in the same P1/P2/P3 format as pr-reviewer. Invoked via /cass:security or from /cass:review --security.
 
 <example>
 Context: The user wants a security check before merging a feature branch.
