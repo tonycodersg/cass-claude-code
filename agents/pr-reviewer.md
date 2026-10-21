@@ -62,7 +62,7 @@ This is your source of truth for what the implementation was supposed to do.
 Get the full diff of all changes on the current branch relative to its base:
 
 ```bash
-git diff $(git merge-base HEAD origin/staging 2>/dev/null || git merge-base HEAD origin/main 2>/dev/null || git merge-base HEAD origin/master 2>/dev/null)...HEAD
+bash "${CLAUDE_PLUGIN_ROOT}/tools/base-diff.sh"
 ```
 
 Also read any new or modified files in full where the diff alone is insufficient to judge correctness.

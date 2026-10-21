@@ -1,0 +1,8 @@
+{
+  "files": [],
+  "output": {
+    "contains": [],
+    "not_contains": []
+  },
+  "verifier_prompt": "The review runs on a feature branch that added src/b.ts and src/c.ts on top of a base commit that already had src/a.ts. The base-diff.sh script (used by the pr-reviewer agent) must scope the diff to the feature branch only. Fail if: the review mentions src/a.ts as a changed file, or the review reports zero changed files, or the review does not mention src/b.ts or src/c.ts. Pass if: the review covers only the feature branch changes (b.ts and c.ts) and correctly ignores the base commit file (a.ts)."
+}
