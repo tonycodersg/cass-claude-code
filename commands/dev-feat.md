@@ -8,7 +8,6 @@ model: sonnet
 ## Context
 
 - Working directory: !`pwd`
-- Today's date: !`date +%Y-%m-%d`
 - Repo name: !`basename $(git rev-parse --show-toplevel 2>/dev/null) 2>/dev/null || basename $(pwd)`
 - Repo root: !`git rev-parse --show-toplevel 2>/dev/null || pwd`
 - User input: $ARGUMENTS
