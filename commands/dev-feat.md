@@ -139,7 +139,7 @@ After SA approves: proceed to Step 4b.
 
 Post the SA-approved plan as a comment on the original ticket before implementation begins.
 
-**GitHub issue:**
+**GitHub issue** — use the `bot-comment` skill:
 ```bash
 bash "${CLAUDE_PLUGIN_ROOT}/hooks/scripts/bot-comment.sh" issue <issue-number> "<comment>"
 ```
@@ -318,7 +318,7 @@ Run /cass:clean-wt once PRs are merged.
 
 Skip this step in standard mode or if the requirement came from an MD file / inline description.
 
-**GitHub issue** — use `bot-comment.sh` (cass-bot identity if configured, personal token fallback):
+**GitHub issue** — use the `bot-comment` skill:
 ```bash
 bash "${CLAUDE_PLUGIN_ROOT}/hooks/scripts/bot-comment.sh" issue <issue-number> "<comment>"
 ```

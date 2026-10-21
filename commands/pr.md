@@ -191,7 +191,7 @@ After the PR is created and the PR number is known, spawn the following agents *
 > Branch: <head-branch>. Base: <base-branch>.
 > Run the full test suite with coverage.
 > Check TDD stub resolution if a plan file is available at <plan-file-path or 'not available'>.
-> Post the result as a PR comment via bot-comment.sh.
+> Post the result as a PR comment via the bot-comment skill.
 > Also post a follow-up comment to the originating ticket if a ref is found in the PR body or branch name."
 
 **pr-reviewer agent (`--auto-post`):**
