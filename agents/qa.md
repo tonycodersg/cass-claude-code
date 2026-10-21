@@ -137,13 +137,11 @@ These N stubs must all pass before the PR is merged.
 
 **Step 6 — Post to ticket (if --ticket is set)**
 
-If a ticket reference was provided, post the test plan report as a ticket comment using bot-comment.sh:
+If a ticket reference was provided, post the test plan report as a ticket comment using the `bot-comment` skill:
 
 ```bash
 bash "${CLAUDE_PLUGIN_ROOT}/hooks/scripts/bot-comment.sh" ticket "<ticket-ref>" "<report markdown>"
 ```
-
-If bot-comment.sh is not available or the ticket ref is not a recognised format, output the comment text so the user can post it manually.
 
 ---
 
@@ -286,7 +284,7 @@ Suite: N tests pass ✓ · Coverage: X% → Y%
 [Full report on PR #<N>](<PR URL>)
 ```
 
-If bot-comment.sh is not available, output both comment texts so the user can post manually.
+See the `bot-comment` skill for identity and fallback behaviour.
 
 ---
 

@@ -175,7 +175,7 @@ If no PR number was provided, detect it:
 gh pr view --json number --jq '.number'
 ```
 
-Post using `bot-comment.sh` (uses cass-bot identity if configured, falls back to personal token):
+Post using the `bot-comment` skill:
 ```bash
 bash "${CLAUDE_PLUGIN_ROOT}/hooks/scripts/bot-comment.sh" pr <PR number> "<review markdown>"
 ```
