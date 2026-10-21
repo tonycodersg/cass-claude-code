@@ -296,4 +296,4 @@ See the `bot-comment` skill for identity and fallback behaviour.
 - If a gap requires a live external dependency, note it in Remaining Gaps rather than writing a brittle test
 - Report honestly — do not claim full coverage when gaps remain
 - If the suite was already passing with full coverage in default mode, say so and stop
-- If bot-comment.sh is unavailable, output the comment text rather than failing silently
+- If bot-comment.sh is unavailable, follow the `bot-comment` skill fallback guidance
