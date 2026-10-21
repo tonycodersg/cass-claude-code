@@ -2,7 +2,7 @@
 description: Run a security review on the current branch — spawns the security agent to run semgrep (if available) and review the diff against the OWASP Top 10, then reports findings in P1/P2/P3 format
 argument-hint: "[PR number or URL — omit to review current branch diff]"
 allowed-tools: [Agent, Bash, AskUserQuestion, Read]
-model: sonnet
+model: haiku
 ---
 
 ## Context
