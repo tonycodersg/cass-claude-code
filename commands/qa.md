@@ -2,7 +2,7 @@
 description: QA the current branch — spawns the qa agent to discover the test runner, run the suite, identify untested paths, write missing tests, and report coverage. Pass --tdd <plan-file> to write failing test stubs from a plan before implementation. Pass --verify-pr <PR number or branch> to run suite verification and post results as a PR comment after a PR is created.
 argument-hint: "[--tdd <plan-file>] [--verify-pr <PR number or branch>] [--ticket <ref>] [plan-file]"
 allowed-tools: [Agent, Bash, AskUserQuestion, Read, Glob, Grep]
-model: sonnet
+model: haiku
 ---
 
 ## Context
