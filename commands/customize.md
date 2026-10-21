@@ -9,7 +9,6 @@ model: haiku
 
 - Working directory: !`pwd`
 - Repo name: !`basename $(git rev-parse --show-toplevel 2>/dev/null) 2>/dev/null || basename $(pwd)`
-- Plugin root: !`echo "${CLAUDE_PLUGIN_ROOT}"`
 - .cass exists: !`[ -d .cass ] && echo "yes" || echo "no"`
 - .claude/commands exists: !`[ -d .claude/commands ] && echo "yes" || echo "no"`
 - .cass/agents exists: !`[ -d .cass/agents ] && echo "yes" || echo "no"`

@@ -7,7 +7,6 @@ model: haiku
 ## Context
 
 - Working directory: !`pwd`
-- Current branch: !`git branch --show-current 2>/dev/null`
 
 ## Your Role
 
