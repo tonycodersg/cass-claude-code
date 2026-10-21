@@ -157,7 +157,7 @@ Post-implementation coverage fill. Goal: ensure the branch has adequate test cov
 - If no plan file is provided, read the diff against the branch base:
 
 ```bash
-git diff $(git merge-base HEAD origin/staging 2>/dev/null || git merge-base HEAD origin/main 2>/dev/null || git merge-base HEAD origin/master 2>/dev/null)...HEAD
+bash "${CLAUDE_PLUGIN_ROOT}/tools/base-diff.sh"
 ```
 
 List every function, class, and branch added or modified — this is your coverage target.

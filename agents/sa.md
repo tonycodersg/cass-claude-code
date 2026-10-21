@@ -131,7 +131,7 @@ Evaluate the proposed design:
 Get the diff:
 
 ```bash
-git diff $(git merge-base HEAD origin/staging 2>/dev/null || git merge-base HEAD origin/main 2>/dev/null || git merge-base HEAD origin/master 2>/dev/null)...HEAD
+bash "${CLAUDE_PLUGIN_ROOT}/tools/base-diff.sh"
 ```
 
 Read relevant source files in full where the diff is insufficient. Then evaluate:

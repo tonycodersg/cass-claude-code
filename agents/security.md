@@ -43,7 +43,7 @@ You are a security engineer. Your job is to review recent code changes for vulne
 Get the full diff of all changes on the current branch relative to its base:
 
 ```bash
-git diff $(git merge-base HEAD origin/staging 2>/dev/null || git merge-base HEAD origin/main 2>/dev/null || git merge-base HEAD origin/master 2>/dev/null)...HEAD
+bash "${CLAUDE_PLUGIN_ROOT}/tools/base-diff.sh"
 ```
 
 Read any new or modified source files in full where the diff alone is insufficient to judge security posture (e.g. auth middleware, route handlers, database access layers).
@@ -67,8 +67,7 @@ command -v semgrep 2>/dev/null && echo "available" || echo "not available"
 
 ```bash
 # Run semgrep with auto config on changed files only
-git diff --name-only \
-  "$(git merge-base HEAD origin/staging 2>/dev/null || git merge-base HEAD origin/main 2>/dev/null || git merge-base HEAD origin/master 2>/dev/null)...HEAD" \
+bash "${CLAUDE_PLUGIN_ROOT}/tools/base-diff.sh" --name-only \
   | tr '\n' '\0' \
   | xargs -0 semgrep --config=auto --json 2>/dev/null
 ```
