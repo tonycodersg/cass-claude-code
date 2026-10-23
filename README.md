@@ -234,6 +234,7 @@ Commit `.cass/` to version-control so your whole team gets the same overrides.
 | [GitHub CLI (`gh`)](https://cli.github.com) | Yes | PRs, issues, branch management |
 | [uv / uvx](https://astral.sh/uv) | Yes | Launches Serena MCP for code intelligence |
 | Atlassian MCP | Optional | Read and create Jira tickets from `/cass:plan` |
+| [Node.js / npx](https://nodejs.org) | Optional | Launches Playwright MCP for browser automation |
 
 See [docs/TECHNICAL.md](docs/TECHNICAL.md) for full setup instructions.
 
