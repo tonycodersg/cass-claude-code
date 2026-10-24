@@ -5,6 +5,7 @@
     "description": "Cass — a Claude Code plugin that brings a structured plan → architect → build → review pipeline with SA, SWE, planner, devops, and pr-reviewer agents.",
     "homepage": "https://github.com/tonycodersg/cass-claude-code",
     "license": "MIT",
+    "displayName": "cass",
     "name": "cass",
     "privacyPolicyUrl": "https://github.com/tonycodersg/cass-claude-code/blob/master/PRIVACY.md",
     "repository": "https://github.com/tonycodersg/cass-claude-code",
