@@ -1,7 +1,7 @@
 ---
 description: Plan a feature or task — enters plan mode, clarifies requirements, writes a detailed plan file, then hands off to the SWE agent (Sonnet) for implementation. Pass --qa to automatically spawn the qa agent in TDD mode after the plan is written.
 argument-hint: "[feature description or Jira ticket] [--qa]"
-allowed-tools: [EnterPlanMode, ExitPlanMode, AskUserQuestion, Write, Read, Glob, Grep, Bash, Agent, mcp__atlassian__*, mcp__github__*]
+allowed-tools: [EnterPlanMode, ExitPlanMode, AskUserQuestion, Write(./docs/**), Write(./.claude/plans/**), Read, Glob, Grep, Bash, Agent, mcp__plugin_cass_atlassian__*, mcp__github__*]
 model: haiku
 ---
 

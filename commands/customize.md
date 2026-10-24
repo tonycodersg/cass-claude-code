@@ -1,7 +1,7 @@
 ---
 description: Scaffold a .cass/ customization package in the current repo — creates the override folder structure so teams can customize commands, agents, hooks, and templates without touching the global plugin.
 argument-hint: "[optional: space-separated list of things to scaffold e.g. commands hooks agents]"
-allowed-tools: [Bash, Read, Write, AskUserQuestion]
+allowed-tools: [Bash, Read, Write(./.cass/**), AskUserQuestion]
 model: haiku
 ---
 

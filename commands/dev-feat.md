@@ -1,7 +1,7 @@
 ---
 description: SWE/SA workflow — read a requirement MD or ticket, write an implementation plan with test coverage, identify parallel workstreams, set up worktrees, and spawn SWE agents to implement
 argument-hint: "[path to requirement MD or ticket ref e.g. PROJ-123]"
-allowed-tools: [EnterPlanMode, ExitPlanMode, AskUserQuestion, Write, Read, Glob, Grep, Bash, Agent, mcp__atlassian__*, mcp__github__*]
+allowed-tools: [EnterPlanMode, ExitPlanMode, AskUserQuestion, Write(./.claude/**), Write(./docs/**), Read, Glob, Grep, Bash, Agent, mcp__plugin_cass_atlassian__*, mcp__github__*]
 model: sonnet
 ---
 

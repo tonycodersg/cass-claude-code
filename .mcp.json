@@ -9,7 +9,7 @@
     "command": "uvx",
     "args": [
       "--from",
-      "git+https://github.com/oraios/serena",
+      "git+https://github.com/oraios/serena@v1.7.0",
       "serena",
       "start-mcp-server",
       "--context",
@@ -25,7 +25,7 @@
     "command": "npx",
     "args": [
       "-y",
-      "@playwright/mcp@latest"
+      "@playwright/mcp@0.0.62"
     ],
     "description": "Launches the Playwright MCP server so agents can drive a real browser — navigate pages, click, fill forms, take screenshots, and read console output for UI verification."
   }

@@ -1,7 +1,7 @@
 ---
 description: Create a PR from the current branch — runs in the worktree where the feature branch is checked out. Sub-task branches PR into the main feature branch; main feature branches PR into staging (default) with option to change target. After PR creation, auto-spawns the qa agent (--verify-pr) and pr-reviewer in parallel. Pass --no-qa to skip qa verification.
 argument-hint: "[optional: base branch override] [--no-qa]"
-allowed-tools: [Bash, Read, Write, AskUserQuestion, Agent, mcp__github__*]
+allowed-tools: [Bash, Read, Write(./.github/**), AskUserQuestion, Agent, mcp__github__*]
 model: sonnet
 ---
 
