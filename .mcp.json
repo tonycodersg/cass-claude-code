@@ -19,5 +19,14 @@
       "False"
     ],
     "description": "Launches Serena via uvx for symbol-aware code navigation — find definitions, references, and call graphs without scanning every file. The claude-code context disables tools already covered by Claude Code built-ins."
+  },
+  "playwright": {
+    "type": "stdio",
+    "command": "npx",
+    "args": [
+      "-y",
+      "@playwright/mcp@latest"
+    ],
+    "description": "Launches the Playwright MCP server so agents can drive a real browser — navigate pages, click, fill forms, take screenshots, and read console output for UI verification."
   }
 }
