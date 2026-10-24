@@ -9,19 +9,16 @@
     "privacyPolicyUrl": "https://github.com/tonycodersg/cass-claude-code/blob/master/PRIVACY.md",
     "repository": "https://github.com/tonycodersg/cass-claude-code",
     "userConfig": {
-        "cassBot": {
-            "description": "GitHub App credentials for cass-bot (optional — enables automated PR comments and ticket updates)",
-            "properties": {
-                "appId": {
-                    "description": "GitHub App ID (found in your App's General settings page)",
-                    "type": "string"
-                },
-                "privateKeyPath": {
-                    "description": "Absolute path to the GitHub App private key (.pem file)",
-                    "type": "string",
-                    "sensitive": true
-                }
-            }
+        "cassBotAppId": {
+            "title": "cass-bot App ID",
+            "description": "GitHub App ID for cass-bot (optional — enables automated PR comments and ticket updates)",
+            "type": "string"
+        },
+        "cassBotPrivateKeyPath": {
+            "title": "cass-bot Private Key Path",
+            "description": "Absolute path to the GitHub App private key (.pem file)",
+            "type": "file",
+            "sensitive": true
         }
     },
     "version": "1.2.0"
