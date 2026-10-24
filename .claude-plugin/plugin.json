@@ -8,7 +8,7 @@
     "name": "cass",
     "privacyPolicyUrl": "https://github.com/tonycodersg/cass-claude-code/blob/master/PRIVACY.md",
     "repository": "https://github.com/tonycodersg/cass-claude-code",
-    "user_config": {
+    "userConfig": {
         "cassBot": {
             "description": "GitHub App credentials for cass-bot (optional — enables automated PR comments and ticket updates)",
             "properties": {

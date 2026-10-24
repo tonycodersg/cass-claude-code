@@ -24,7 +24,6 @@
     "type": "stdio",
     "command": "npx",
     "args": [
-      "-y",
       "@playwright/mcp@0.0.62"
     ],
     "description": "Launches the Playwright MCP server so agents can drive a real browser — navigate pages, click, fill forms, take screenshots, and read console output for UI verification."
