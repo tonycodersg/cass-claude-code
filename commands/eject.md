@@ -1,7 +1,7 @@
 ---
 description: Remove all cass config and files from the current repo — undoes /cass:init. Removes .cass/, clears cass.projects from settings, unsets git commit template, and cleans .gitignore entries.
 argument-hint: "[--hard to also remove .claude/commands/ overrides]"
-allowed-tools: [Bash, Read, Write, AskUserQuestion]
+allowed-tools: [Bash, Read, Write(./.cass/**), Write(./.claude/**), AskUserQuestion]
 ---
 
 ## Context

@@ -1,7 +1,7 @@
 ---
 description: Initialise a project with cass — wizard-style setup that asks all questions upfront, confirms with the user, then executes silently. Creates .cass/ templates, saves project config, wires git, optionally sets up cass-bot and Playwright CI. Safe to re-run.
 argument-hint: "[project name]"
-allowed-tools: [Bash, Read, Write, AskUserQuestion]
+allowed-tools: [Bash, Read, Write(./.cass/**), Write(./.claude/**), Write(./.github/**), Write(./.gitignore), AskUserQuestion]
 ---
 
 ## Context

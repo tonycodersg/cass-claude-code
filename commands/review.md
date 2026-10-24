@@ -1,7 +1,7 @@
 ---
 description: Review a PR or the current branch — spawns the pr-reviewer agent to check logic, performance, code quality, and plan compliance. Pass --security to also run the security agent for an OWASP/SAST scan.
 argument-hint: "[PR number or URL — omit to review current branch] [--security]"
-allowed-tools: [Agent, Bash, AskUserQuestion, Read, Edit, Write, Glob, Grep]
+allowed-tools: [Agent, Bash, AskUserQuestion, Read, Edit, Write(./**), Glob, Grep]
 model: sonnet
 ---
 

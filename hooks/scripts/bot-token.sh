@@ -30,7 +30,7 @@ if [ -z "$APP_ID" ] || [ -z "$KEY_PATH" ] || [ ! -f "$KEY_PATH" ]; then
 fi
 
 # Generate JWT using PyJWT via uvx
-JWT=$(uvx --quiet --with PyJWT --with cryptography python3 - "$APP_ID" "$KEY_PATH" <<'PYEOF'
+JWT=$(uvx --quiet --with "PyJWT==2.13.0" --with "cryptography==46.0.6" python3 - "$APP_ID" "$KEY_PATH" <<'PYEOF'
 import jwt, time, sys
 app_id = sys.argv[1]
 key_path = sys.argv[2]
