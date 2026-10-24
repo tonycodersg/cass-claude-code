@@ -9,7 +9,7 @@
 > Hooks run automatically to guard against destructive commands and keep Claude context-aware.
 > Each repo gets its own `.cass/` customization layer — override commands, agents, hooks, and templates, committed alongside your code.
 
-**Latest stable: [v1.0.0](https://github.com/tonycodersg/cass-claude-code/releases/tag/v1.0.0)**
+**Latest stable: [v1.1.0](https://github.com/tonycodersg/cass-claude-code/releases/tag/v1.1.0)**
 
 ---
 
@@ -32,8 +32,8 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 Reliable, always up-to-date with `git pull`:
 
 ```bash
-# Latest stable (v1.0.0)
-git clone --branch v1.0.0 https://tonycodersg@github.com/tonycodersg/cass-claude-code ~/.claude/plugins/cass
+# Latest stable (v1.1.0)
+git clone --branch v1.1.0 https://tonycodersg@github.com/tonycodersg/cass-claude-code ~/.claude/plugins/cass
 
 # Or track latest
 git clone https://tonycodersg@github.com/tonycodersg/cass-claude-code ~/.claude/plugins/cass
@@ -153,10 +153,14 @@ Prompt       injects repo / branch / worktree context into every message
 | `/cass:customize` | Setup | Scaffold `.cass/` override package — commands, agents, hooks, post-PR callback |
 | `/cass:eject` | Setup | Remove all cass config from this repo — undoes `/cass:init`. `--hard` also removes `.claude/commands/` |
 | `/cass:plan [text or doc]` | PO | Requirement → risk-assessed plan → Jira / GitHub issue / MD file |
+| `/cass:plan-task [--qa] <task>` | PO | Single-ticket planner — writes plan file + GitHub issue; `--qa` auto-spawns qa agent in TDD mode after ticket creation |
 | `/cass:dev-feat [plan/ticket]` | Dev | Plan → feature branch + worktree → parallel SWE agents. Three autonomous modes: `--god` (SWE writes plan + implements), `--architect` (SA reviews plan first), `--full` (SA review + fix-review loop until clean, max 3 cycles). All modes post results to original ticket. |
+| `/cass:qa [--tdd plan] [--verify-pr branch]` | Dev | QA agent — default: fill missing coverage; `--tdd`: write failing stubs from plan before implementation; `--verify-pr`: run suite + post gaps to PR and ticket |
 | `/cass:commit` | Dev | Stage changes, generate semantic message, commit with co-author |
-| `/cass:pr` | Dev | Create PR from current worktree — fires post-PR callback hook if configured |
-| `/cass:review [PR or branch]` | Dev | Code review via pr-reviewer agent — P1 / P2 / P3 findings, lists all PR comment threads with resolved/unresolved status, walks through unresolved one by one |
+| `/cass:pr [--no-qa]` | Dev | Create PR — auto-spawns qa `--verify-pr` + pr-reviewer in parallel; `--no-qa` skips qa spawn |
+| `/cass:review [PR or branch] [--security]` | Dev | Code review via pr-reviewer agent — P1 / P2 / P3 findings, lists all PR comment threads with resolved/unresolved status; `--security` also spawns security agent in parallel |
+| `/cass:security [PR number]` | Dev | Security review — semgrep SAST + OWASP Top 10 on current branch diff or a specific PR |
+| `/cass:onboard` | Dev | Generate `.cass/ONBOARDING.md` — reads project docs, structure, and recent activity |
 | `/cass:clean-wt` | Dev | List worktrees by project, pick to remove |
 | `/cass:test-suite` | Dev | End-to-end test suite — discovers all test cases under `tests/`, runs runner + LLM verifier per case in parallel, prints a `✓ good / ⚠ comment / ✗ fail` report. Plugin repo only. |
 
@@ -218,10 +222,13 @@ Commit `.cass/` to version-control so your whole team gets the same overrides.
 
 | Agent | Model | Role |
 |---|---|---|
-| `planner` | haiku | Clarifies requirements, writes structured plan files |
+| `planner` | haiku | Clarifies requirements, writes structured plan files; offers TDD qa review after ticket creation |
 | `sa` | sonnet | Architecture review — SOLID, CAP, clean code — pre or post implementation |
 | `swe` | sonnet | Implements from plan, commits, creates PR |
-| `pr-reviewer` | sonnet | Reviews diffs for logic, performance, and plan compliance |
+| `pr-reviewer` | sonnet | Reviews diffs for logic, performance, and plan compliance; `--auto-post` for machine-to-machine use |
+| `qa` | sonnet | Three modes: fill missing coverage (default), write TDD stubs from plan (`--tdd`), verify PR and post gaps (`--verify-pr`) |
+| `security` | sonnet | SAST via semgrep + OWASP Top 10 manual review; P1/P2/P3 findings |
+| `onboarder` | sonnet | Reads project docs, structure, and recent git activity; writes `.cass/ONBOARDING.md` |
 | `devops` | sonnet | Dockerfiles, CI/CD pipelines, VPS deployment scripts |
 
 ---
@@ -312,7 +319,7 @@ bash tools/run-test.sh tests/commit/happy-path
 
 After mechanical assertions, an LLM verifier (haiku) reads `verifier_prompt` and returns `✓ good`, `⚠ comment`, or `✗ fail`. Failed test folders are kept at `/tmp/cass-test-<id>/` for debugging.
 
-**Current test cases (15):**
+**Current test cases (25):**
 
 | Test | Command | What it covers |
 |---|---|---|
@@ -327,10 +334,20 @@ After mechanical assertions, an LLM verifier (haiku) reads `verifier_prompt` and
 | `review/bugs-flagged` | `/cass:review` | Unchecked `arr[0]` — verifier asserts P1 raised |
 | `pr-reviewer/planted-bug` | (agent) | Async/await null deref — P1 caught by pr-reviewer agent |
 | `pr/happy-path` | `/cass:pr` | `gh` stubbed — PR body structure + URL output |
+| `pr/qa-verification` | `/cass:pr` | After PR created, qa `--verify-pr` + pr-reviewer spawn in parallel |
 | `customize/happy-path` | `/cass:customize` | `.cass/` override scaffold created |
 | `clean-wt/remove-one` | `/cass:clean-wt` | Simulated worktree + settings — removal flow |
 | `plan/to-file` | `/cass:plan` | Auth requirement → Goal/Scope/Risks saved as MD |
 | `dev-feat/god-mode` | `/cass:dev-feat --god` | Trivial plan → zero-touch flow starts without prompting |
+| `qa/writes-missing-test` | `/cass:qa` | Default mode — fills coverage gap on an untested function |
+| `qa/tdd-from-plan` | `/cass:qa --tdd` | TDD mode — writes failing stubs from plan Success Criteria |
+| `qa/tdd-no-criteria` | `/cass:qa --tdd` | TDD mode — falls back to Goal + Approach when no Success Criteria section |
+| `qa/verify-pr` | `/cass:qa --verify-pr` | Post-PR mode — identifies coverage gap on feature branch |
+| `security/injection-in-diff` | `/cass:review --security` | SQL injection via string concat — flagged as P1 |
+| `security/standalone` | `/cass:security` | Command injection in exec() calls — security agent invoked standalone |
+| `onboarder/generates-guide` | `/cass:onboard` | Reads project context, writes `.cass/ONBOARDING.md` |
+| `planner/qa-flag` | `/cass:plan-task --qa` | `--qa` force flag — qa agent spawned after ticket without asking |
+| `planner/qa-offer` | `/cass:plan-task` | Interactive path — planner offers qa via `AskUserQuestion`, user says yes |
 
 ---
 

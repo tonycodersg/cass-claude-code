@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-10-20
+
+### Added
+
+- `agents/qa`: three-mode QA agent:
+  - Default: post-implementation coverage fill — reads existing tests, identifies untested paths, writes assertions
+  - `--tdd`: pre-implementation TDD stubs from a plan file — derives testable units from Success Criteria (falls back to Goal + Approach); writes failing stubs; posts QA Test Plan to ticket via cass-bot
+  - `--verify-pr`: post-PR verification — runs full test suite, identifies gaps introduced by the PR, posts report to both PR and ticket
+- `commands/qa`: `/cass:qa [--tdd <plan>] [--verify-pr <branch>]` — routes to the three qa agent modes
+- `agents/security`: SAST + OWASP Top 10 security review — runs semgrep if available, falls back to manual review; reports P1/P2/P3 findings
+- `commands/security`: `/cass:security [PR number]` — standalone security review of current branch or a PR
+- `agents/onboarder`: one-shot onboarding guide generator — reads CLAUDE.md, README, package manifests, folder structure, recent git activity; writes `.cass/ONBOARDING.md`
+- `commands/onboard`: `/cass:onboard` — generates the onboarding guide via the onboarder agent
+- `commands/plan-task`: `/cass:plan-task [--qa] <task>` — single-ticket planner with `--qa` flag to auto-spawn the qa agent in TDD mode after ticket creation
+- `commands/pr`: `--no-qa` flag; after PR creation auto-spawns qa agent (`--verify-pr`) and pr-reviewer in parallel
+- `commands/review`: `--security` flag spawns the security agent alongside pr-reviewer
+
+### Changed
+
+- `agents/planner`: added `--qa` flag — forces TDD qa spawn after ticket creation without asking; interactive offer (Step 5d) via `AskUserQuestion` when flag is omitted; swe handoff now includes TDD stub context
+- `agents/pr-reviewer`: `--auto-post` flag posts review as GitHub PR comment without asking
+
+### Tests
+
+- 10 new e2e test cases (total: 25)
+  - `qa/writes-missing-test`, `qa/tdd-from-plan`, `qa/tdd-no-criteria`, `qa/verify-pr`
+  - `security/injection-in-diff`, `security/standalone`
+  - `onboarder/generates-guide`
+  - `planner/qa-flag`, `planner/qa-offer`
+  - `pr/qa-verification`
+
 ## [0.9.1] - 2026-10-16
 
 ### Added
