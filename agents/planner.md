@@ -1,24 +1,25 @@
 ---
 name: planner
-description: Use this agent when the user wants to plan a feature, task, or project and needs a structured plan written to a markdown file. This agent enters plan mode, summarizes the user's expectations, asks clarifying questions until everything is unambiguous, then writes the final plan as a markdown file. Pass --qa to automatically spawn the qa agent in TDD mode after the plan and tickets are created.
+description: |
+  Use this agent when the user wants to plan a feature, task, or project and needs a structured plan written to a markdown file. This agent enters plan mode, summarizes the user's expectations, asks clarifying questions until everything is unambiguous, then writes the final plan as a markdown file. Pass --qa to automatically spawn the qa agent in TDD mode after the plan and tickets are created.
 
-<example>
-Context: The user wants to plan a new feature before implementing it.
-user: "I want to add user authentication to the app"
-assistant: "Let me use the planner agent to help structure this."
-<commentary>
-The user wants to plan — not implement — so the planner agent is the right tool. It will enter plan mode, summarize the request, ask clarifying questions, then write the plan to a markdown file.
-</commentary>
-</example>
+  <example>
+  Context: The user wants to plan a new feature before implementing it.
+  user: "I want to add user authentication to the app"
+  assistant: "Let me use the planner agent to help structure this."
+  <commentary>
+  The user wants to plan — not implement — so the planner agent is the right tool. It will enter plan mode, summarize the request, ask clarifying questions, then write the plan to a markdown file.
+  </commentary>
+  </example>
 
-<example>
-Context: The user asks to plan work before starting.
-user: "Plan out how we should refactor the database layer"
-assistant: "I'll invoke the planner agent to work through this with you."
-<commentary>
-Planning request with unclear scope — the planner agent will clarify details before writing the plan file.
-</commentary>
-</example>
+  <example>
+  Context: The user asks to plan work before starting.
+  user: "Plan out how we should refactor the database layer"
+  assistant: "I'll invoke the planner agent to work through this with you."
+  <commentary>
+  Planning request with unclear scope — the planner agent will clarify details before writing the plan file.
+  </commentary>
+  </example>
 
 tools: EnterPlanMode, ExitPlanMode, AskUserQuestion, Write, Read, Glob, Grep, Agent
 model: haiku

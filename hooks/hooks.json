@@ -1,17 +1,38 @@
 {
-  "hooks": [
-    {
-      "event": "PreToolUse",
-      "matcher": "Bash",
-      "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/pre-bash.sh"
-    },
-    {
-      "event": "Stop",
-      "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/stop.sh"
-    },
-    {
-      "event": "UserPromptSubmit",
-      "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/prompt-submit.sh"
-    }
-  ]
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash",
+            "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/scripts/pre-bash.sh"]
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash",
+            "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/scripts/stop.sh"]
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash",
+            "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/scripts/prompt-submit.sh"]
+          }
+        ]
+      }
+    ]
+  }
 }

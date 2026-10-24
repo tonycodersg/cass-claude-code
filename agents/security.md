@@ -1,33 +1,34 @@
 ---
 name: security
-description: Use this agent when the user wants a security review of recent code changes. This agent runs semgrep (if available) and reviews the diff against the OWASP Top 10, then outputs findings in the same P1/P2/P3 format as pr-reviewer. Invoked via /cass:security or from /cass:review --security.
+description: |
+  Use this agent when the user wants a security review of recent code changes. This agent runs semgrep (if available) and reviews the diff against the OWASP Top 10, then outputs findings in the same P1/P2/P3 format as pr-reviewer. Invoked via /cass:security or from /cass:review --security.
 
-<example>
-Context: The user wants a security check before merging a feature branch.
-user: "Run a security check on these changes"
-assistant: "I'll invoke the security agent to scan the diff for vulnerabilities."
-<commentary>
-Pre-merge security scan — security agent reads the diff, runs semgrep if available, reviews against OWASP Top 10, and reports findings by priority.
-</commentary>
-</example>
+  <example>
+  Context: The user wants a security check before merging a feature branch.
+  user: "Run a security check on these changes"
+  assistant: "I'll invoke the security agent to scan the diff for vulnerabilities."
+  <commentary>
+  Pre-merge security scan — security agent reads the diff, runs semgrep if available, reviews against OWASP Top 10, and reports findings by priority.
+  </commentary>
+  </example>
 
-<example>
-Context: The user wants to confirm there are no security issues before raising a PR.
-user: "Any security issues before I merge?"
-assistant: "I'll use the security agent to review the diff for vulnerabilities."
-<commentary>
-Security check request — agent runs SAST tooling and manual OWASP review, outputs findings in P1/P2/P3 format.
-</commentary>
-</example>
+  <example>
+  Context: The user wants to confirm there are no security issues before raising a PR.
+  user: "Any security issues before I merge?"
+  assistant: "I'll use the security agent to review the diff for vulnerabilities."
+  <commentary>
+  Security check request — agent runs SAST tooling and manual OWASP review, outputs findings in P1/P2/P3 format.
+  </commentary>
+  </example>
 
-<example>
-Context: The review command is invoked with --security flag.
-user: (spawned by /cass:review --security)
-assistant: (reviews diff for security issues, outputs findings in the same format as pr-reviewer)
-<commentary>
-Security agent invoked as part of the review pipeline — runs autonomously and outputs a structured findings report.
-</commentary>
-</example>
+  <example>
+  Context: The review command is invoked with --security flag.
+  user: (spawned by /cass:review --security)
+  assistant: (reviews diff for security issues, outputs findings in the same format as pr-reviewer)
+  <commentary>
+  Security agent invoked as part of the review pipeline — runs autonomously and outputs a structured findings report.
+  </commentary>
+  </example>
 
 tools: Read, Glob, Grep, Bash, AskUserQuestion
 model: sonnet

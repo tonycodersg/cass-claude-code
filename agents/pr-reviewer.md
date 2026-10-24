@@ -1,33 +1,34 @@
 ---
 name: pr-reviewer
-description: Use this agent when the user wants to review changes produced by the swe agent, or any code changes on the current branch. This agent reads the plan file and the git diff, identifies issues grouped by priority, then lets the user decide what to fix. Pass --auto-post to automatically post the review as a GitHub PR comment without asking. Pass --pr <number|URL> to target a specific PR.
+description: |
+  Use this agent when the user wants to review changes produced by the swe agent, or any code changes on the current branch. This agent reads the plan file and the git diff, identifies issues grouped by priority, then lets the user decide what to fix. Pass --auto-post to automatically post the review as a GitHub PR comment without asking. Pass --pr <number|URL> to target a specific PR.
 
-<example>
-Context: The swe agent has finished implementing and the user wants a review before merging.
-user: "Review the changes before I approve the PR"
-assistant: "I'll invoke the pr-reviewer agent to review the implementation."
-<commentary>
-Implementation is done — pr-reviewer reads the plan and the diff, then surfaces issues by priority.
-</commentary>
-</example>
+  <example>
+  Context: The swe agent has finished implementing and the user wants a review before merging.
+  user: "Review the changes before I approve the PR"
+  assistant: "I'll invoke the pr-reviewer agent to review the implementation."
+  <commentary>
+  Implementation is done — pr-reviewer reads the plan and the diff, then surfaces issues by priority.
+  </commentary>
+  </example>
 
-<example>
-Context: The user asks for a code review after implementation.
-user: "Can you review what was built against the plan?"
-assistant: "I'll use the pr-reviewer agent to check the changes."
-<commentary>
-Review request after implementation — pr-reviewer agent is the right tool.
-</commentary>
-</example>
+  <example>
+  Context: The user asks for a code review after implementation.
+  user: "Can you review what was built against the plan?"
+  assistant: "I'll use the pr-reviewer agent to check the changes."
+  <commentary>
+  Review request after implementation — pr-reviewer agent is the right tool.
+  </commentary>
+  </example>
 
-<example>
-Context: God mode — dev-feat spawns pr-reviewer automatically after PR is created.
-user: (spawned by dev-feat with --auto-post --pr 42)
-assistant: (reviews, applies P1 fixes, posts review comment to PR #42 without asking)
-<commentary>
-Auto-post flag set — skip the posting question and post directly.
-</commentary>
-</example>
+  <example>
+  Context: God mode — dev-feat spawns pr-reviewer automatically after PR is created.
+  user: (spawned by dev-feat with --auto-post --pr 42)
+  assistant: (reviews, applies P1 fixes, posts review comment to PR #42 without asking)
+  <commentary>
+  Auto-post flag set — skip the posting question and post directly.
+  </commentary>
+  </example>
 
 tools: Read, Glob, Grep, Bash, AskUserQuestion, Edit
 model: sonnet
