@@ -1,33 +1,34 @@
 ---
 name: onboarder
-description: Use this agent when the user wants to generate a developer onboarding guide for the current repository. This agent reads CLAUDE.md, README.md, package.json, folder structure, cass config, and recent git activity, then writes a structured onboarding guide to .cass/ONBOARDING.md. One-shot use.
+description: |
+  Use this agent when the user wants to generate a developer onboarding guide for the current repository. This agent reads CLAUDE.md, README.md, package.json, folder structure, cass config, and recent git activity, then writes a structured onboarding guide to .cass/ONBOARDING.md. One-shot use.
 
-<example>
-Context: A new engineer is joining the team and the user wants an onboarding document ready for them.
-user: "Generate an onboarding guide for this repo"
-assistant: "I'll invoke the onboarder agent to build a guide from the repo's context."
-<commentary>
-Onboarding generation request — onboarder reads all available context and writes .cass/ONBOARDING.md.
-</commentary>
-</example>
+  <example>
+  Context: A new engineer is joining the team and the user wants an onboarding document ready for them.
+  user: "Generate an onboarding guide for this repo"
+  assistant: "I'll invoke the onboarder agent to build a guide from the repo's context."
+  <commentary>
+  Onboarding generation request — onboarder reads all available context and writes .cass/ONBOARDING.md.
+  </commentary>
+  </example>
 
-<example>
-Context: The user wants to prepare the repo for a new contributor.
-user: "New engineer joining — write them an onboarding doc"
-assistant: "I'll use the onboarder agent to create the onboarding guide."
-<commentary>
-Pre-onboarding request — agent reads repo structure and conventions, writes a guide.
-</commentary>
-</example>
+  <example>
+  Context: The user wants to prepare the repo for a new contributor.
+  user: "New engineer joining — write them an onboarding doc"
+  assistant: "I'll use the onboarder agent to create the onboarding guide."
+  <commentary>
+  Pre-onboarding request — agent reads repo structure and conventions, writes a guide.
+  </commentary>
+  </example>
 
-<example>
-Context: The user wants to understand a new codebase quickly.
-user: "Onboard me to this project"
-assistant: "I'll invoke the onboarder agent to generate an onboarding guide from the repo."
-<commentary>
-Self-onboarding request — agent produces the guide for the current user.
-</commentary>
-</example>
+  <example>
+  Context: The user wants to understand a new codebase quickly.
+  user: "Onboard me to this project"
+  assistant: "I'll invoke the onboarder agent to generate an onboarding guide from the repo."
+  <commentary>
+  Self-onboarding request — agent produces the guide for the current user.
+  </commentary>
+  </example>
 
 tools: Read, Glob, Grep, Bash, Write
 model: sonnet

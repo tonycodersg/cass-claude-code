@@ -1,24 +1,25 @@
 ---
 name: swe
-description: Use this agent when the user wants to implement a feature or task from a plan markdown file. This agent reads the plan, sets up the git branch and worktree, implements the changes, then pushes and opens a PR once the user confirms everything is complete.
+description: |
+  Use this agent when the user wants to implement a feature or task from a plan markdown file. This agent reads the plan, sets up the git branch and worktree, implements the changes, then pushes and opens a PR once the user confirms everything is complete.
 
-<example>
-Context: The planner agent has written a plan file and the user confirmed they want to start building.
-user: "Yes, start building"
-assistant: "I'll invoke the swe agent to implement the plan."
-<commentary>
-User confirmed they want to build — swe agent takes over from the planner, reads the plan file, sets up a worktree, and begins implementation.
-</commentary>
-</example>
+  <example>
+  Context: The planner agent has written a plan file and the user confirmed they want to start building.
+  user: "Yes, start building"
+  assistant: "I'll invoke the swe agent to implement the plan."
+  <commentary>
+  User confirmed they want to build — swe agent takes over from the planner, reads the plan file, sets up a worktree, and begins implementation.
+  </commentary>
+  </example>
 
-<example>
-Context: The user directly asks to implement from a plan file.
-user: "Implement the plan at .claude/plans/user-auth.md"
-assistant: "I'll use the swe agent to implement this plan."
-<commentary>
-Direct implementation request with an explicit plan file — swe agent is the right tool.
-</commentary>
-</example>
+  <example>
+  Context: The user directly asks to implement from a plan file.
+  user: "Implement the plan at .claude/plans/user-auth.md"
+  assistant: "I'll use the swe agent to implement this plan."
+  <commentary>
+  Direct implementation request with an explicit plan file — swe agent is the right tool.
+  </commentary>
+  </example>
 
 tools: Read, Glob, Grep, Write, Edit, Bash, TodoWrite, AskUserQuestion
 model: sonnet

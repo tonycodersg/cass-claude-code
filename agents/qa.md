@@ -1,42 +1,43 @@
 ---
 name: qa
-description: Use this agent when the user wants to write tests, check test coverage, audit untested paths, write TDD test stubs from a plan before implementation, or verify a PR's test coverage after merging. Supports three modes: default (post-implementation coverage fill), --tdd (pre-implementation test stubs from a plan file), and --verify-pr (post-PR suite run + coverage comment).
+description: |
+  Use this agent when the user wants to write tests, check test coverage, audit untested paths, write TDD test stubs from a plan before implementation, or verify a PR's test coverage after merging. Supports three modes: default (post-implementation coverage fill), --tdd (pre-implementation test stubs from a plan file), and --verify-pr (post-PR suite run + coverage comment).
 
-<example>
-Context: The swe agent has finished implementing and the user wants tests written before the PR is raised.
-user: "Write tests for what swe just built"
-assistant: "I'll invoke the qa agent to audit coverage and write the missing tests."
-<commentary>
-Post-implementation test authoring — qa reads the plan and diff, discovers untested paths, writes tests that follow project conventions, then re-runs the suite to confirm.
-</commentary>
-</example>
+  <example>
+  Context: The swe agent has finished implementing and the user wants tests written before the PR is raised.
+  user: "Write tests for what swe just built"
+  assistant: "I'll invoke the qa agent to audit coverage and write the missing tests."
+  <commentary>
+  Post-implementation test authoring — qa reads the plan and diff, discovers untested paths, writes tests that follow project conventions, then re-runs the suite to confirm.
+  </commentary>
+  </example>
 
-<example>
-Context: The user wants to check test coverage on the current branch before merging.
-user: "Check test coverage on this branch"
-assistant: "I'll use the qa agent to run the suite and report on coverage."
-<commentary>
-Coverage audit request — qa agent runs the suite, reads output, and reports what is and isn't covered.
-</commentary>
-</example>
+  <example>
+  Context: The user wants to check test coverage on the current branch before merging.
+  user: "Check test coverage on this branch"
+  assistant: "I'll use the qa agent to run the suite and report on coverage."
+  <commentary>
+  Coverage audit request — qa agent runs the suite, reads output, and reports what is and isn't covered.
+  </commentary>
+  </example>
 
-<example>
-Context: The planner agent has just created a ticket and the user wants TDD stubs written from the plan before implementation starts.
-user: (spawned by planner with --tdd .claude/plans/user-auth.md --ticket PROJ-123)
-assistant: (reads plan, writes failing test stubs per success criterion, posts test plan comment to ticket)
-<commentary>
-TDD mode — qa reads the plan before any code exists, writes failing stubs, posts a comment to the ticket so the swe agent has a test contract to implement against.
-</commentary>
-</example>
+  <example>
+  Context: The planner agent has just created a ticket and the user wants TDD stubs written from the plan before implementation starts.
+  user: (spawned by planner with --tdd .claude/plans/user-auth.md --ticket PROJ-123)
+  assistant: (reads plan, writes failing test stubs per success criterion, posts test plan comment to ticket)
+  <commentary>
+  TDD mode — qa reads the plan before any code exists, writes failing stubs, posts a comment to the ticket so the swe agent has a test contract to implement against.
+  </commentary>
+  </example>
 
-<example>
-Context: A PR was just created and the pr command auto-spawns qa to verify coverage.
-user: (spawned by /cass:pr with --verify-pr 42)
-assistant: (runs suite, checks coverage, posts verification comment to PR and originating ticket)
-<commentary>
-Verify-PR mode — qa runs after PR creation, posts coverage result as a comment so reviewers can see test health without running the suite locally.
-</commentary>
-</example>
+  <example>
+  Context: A PR was just created and the pr command auto-spawns qa to verify coverage.
+  user: (spawned by /cass:pr with --verify-pr 42)
+  assistant: (runs suite, checks coverage, posts verification comment to PR and originating ticket)
+  <commentary>
+  Verify-PR mode — qa runs after PR creation, posts coverage result as a comment so reviewers can see test health without running the suite locally.
+  </commentary>
+  </example>
 
 tools: Read, Glob, Grep, Write, Edit, Bash, AskUserQuestion
 model: sonnet

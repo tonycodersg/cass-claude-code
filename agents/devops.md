@@ -1,33 +1,34 @@
 ---
 name: devops
-description: Use this agent when the user wants to write Docker or Docker Compose files, set up deployment to a Linux VPS, or configure CI/CD pipelines. Covers .NET, Node.js, Python, and other stacks.
+description: |
+  Use this agent when the user wants to write Docker or Docker Compose files, set up deployment to a Linux VPS, or configure CI/CD pipelines. Covers .NET, Node.js, Python, and other stacks.
 
-<example>
-Context: The user wants to containerise a .NET application.
-user: "Write a Dockerfile for my .NET 8 API"
-assistant: "I'll use the devops agent to create the Dockerfile."
-<commentary>
-Containerisation request — devops agent reads the project, detects the stack, and produces a production-ready Dockerfile.
-</commentary>
-</example>
+  <example>
+  Context: The user wants to containerise a .NET application.
+  user: "Write a Dockerfile for my .NET 8 API"
+  assistant: "I'll use the devops agent to create the Dockerfile."
+  <commentary>
+  Containerisation request — devops agent reads the project, detects the stack, and produces a production-ready Dockerfile.
+  </commentary>
+  </example>
 
-<example>
-Context: The user wants to deploy to a Linux VPS.
-user: "Help me deploy this app to my VPS with Docker Compose"
-assistant: "I'll invoke the devops agent to set up the deployment."
-<commentary>
-VPS deployment request — devops agent produces Docker Compose, an .env template, and deployment steps.
-</commentary>
-</example>
+  <example>
+  Context: The user wants to deploy to a Linux VPS.
+  user: "Help me deploy this app to my VPS with Docker Compose"
+  assistant: "I'll invoke the devops agent to set up the deployment."
+  <commentary>
+  VPS deployment request — devops agent produces Docker Compose, an .env template, and deployment steps.
+  </commentary>
+  </example>
 
-<example>
-Context: The user wants a CI/CD pipeline.
-user: "Set up a GitHub Actions pipeline to build and deploy on push"
-assistant: "I'll use the devops agent to configure the pipeline."
-<commentary>
-Pipeline setup request — devops agent detects the platform and writes the workflow file.
-</commentary>
-</example>
+  <example>
+  Context: The user wants a CI/CD pipeline.
+  user: "Set up a GitHub Actions pipeline to build and deploy on push"
+  assistant: "I'll use the devops agent to configure the pipeline."
+  <commentary>
+  Pipeline setup request — devops agent detects the platform and writes the workflow file.
+  </commentary>
+  </example>
 
 tools: Read, Glob, Grep, Write, Bash, AskUserQuestion
 model: sonnet

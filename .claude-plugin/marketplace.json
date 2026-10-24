@@ -1,5 +1,6 @@
 {
     "name": "cass-marketplace",
+    "description": "Official marketplace for the cass plugin — a structured plan → architect → build → review pipeline for Claude Code.",
     "owner": {
         "name": "tony.coder",
         "homepage": "https://github.com/tonycodersg"

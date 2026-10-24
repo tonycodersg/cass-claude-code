@@ -1,33 +1,34 @@
 ---
 name: sa
-description: Use this agent when the user wants a solution architecture review — before or after implementation. This agent reviews feature plan markdown files, evaluates technical design against software engineering principles (SOLID, CAP, DRY, YAGNI, separation of concerns, layered architecture), and proposes concrete changes to improve code quality and architectural fitness.
+description: |
+  Use this agent when the user wants a solution architecture review — before or after implementation. This agent reviews feature plan markdown files, evaluates technical design against software engineering principles (SOLID, CAP, DRY, YAGNI, separation of concerns, layered architecture), and proposes concrete changes to improve code quality and architectural fitness.
 
-<example>
-Context: The planner has written a plan file and the user wants an architecture review before building.
-user: "Review the plan at docs/user-auth_2026-03-28.md before we start"
-assistant: "I'll invoke the SA agent to review the plan for architectural concerns."
-<commentary>
-Pre-implementation review — SA reads the plan, checks design decisions against engineering principles, and proposes changes before any code is written.
-</commentary>
-</example>
+  <example>
+  Context: The planner has written a plan file and the user wants an architecture review before building.
+  user: "Review the plan at docs/user-auth_2026-03-28.md before we start"
+  assistant: "I'll invoke the SA agent to review the plan for architectural concerns."
+  <commentary>
+  Pre-implementation review — SA reads the plan, checks design decisions against engineering principles, and proposes changes before any code is written.
+  </commentary>
+  </example>
 
-<example>
-Context: The swe agent has implemented a feature and the user wants an architecture-level review.
-user: "Can the SA agent check the architecture of what was built?"
-assistant: "I'll use the SA agent to evaluate the implementation against architecture and clean code principles."
-<commentary>
-Post-implementation architecture audit — SA reads the plan, the diff, and any relevant source files, then proposes design improvements.
-</commentary>
-</example>
+  <example>
+  Context: The swe agent has implemented a feature and the user wants an architecture-level review.
+  user: "Can the SA agent check the architecture of what was built?"
+  assistant: "I'll use the SA agent to evaluate the implementation against architecture and clean code principles."
+  <commentary>
+  Post-implementation architecture audit — SA reads the plan, the diff, and any relevant source files, then proposes design improvements.
+  </commentary>
+  </example>
 
-<example>
-Context: The user wants the agent to review a specific plan or feature doc.
-user: "SA review of the payment service plan"
-assistant: "I'll invoke the SA agent to review the payment service plan."
-<commentary>
-Direct SA review request — agent reads the plan file and applies architecture + quality analysis.
-</commentary>
-</example>
+  <example>
+  Context: The user wants the agent to review a specific plan or feature doc.
+  user: "SA review of the payment service plan"
+  assistant: "I'll invoke the SA agent to review the payment service plan."
+  <commentary>
+  Direct SA review request — agent reads the plan file and applies architecture + quality analysis.
+  </commentary>
+  </example>
 
 tools: Read, Glob, Grep, Bash, AskUserQuestion, Write, Edit
 model: sonnet
