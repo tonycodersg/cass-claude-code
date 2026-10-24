@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-10-24
+
+### Added
+
+- `skills/cass-overview`: new auto-invoked skill — loaded when the user asks what cass can do, which agent to invoke, or how the pipeline fits together; ships a commands + agents reference table to plugin users
+- `.mcp.json`: Playwright MCP server (`@playwright/mcp`) — browser automation available in all cass sessions; requires Node.js/npx
+
+### Fixed
+
+- `agents/*` (8 agents): YAML frontmatter parse error — `<example>` blocks now correctly embedded inside `description: |` block scalar instead of floating after a plain scalar
+- `hooks/hooks.json`: migrated to object-keyed format with nested `hooks` entries and exec-form commands (`bash` + `args[]`) to resolve validator errors and `CLAUDE_PLUGIN_ROOT` quoting warnings
+- `.claude-plugin/marketplace.json`: added top-level `description` field required by `claude plugin validate`
+
 ## [1.1.0] - 2026-10-20
 
 ### Added
@@ -293,7 +306,9 @@ staging/master
 - `.claude-plugin/plugin.json` manifest
 - Example command and skill stubs
 
-[Unreleased]: https://github.com/tonycodersg/cass-claude-code/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/tonycodersg/cass-claude-code/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/tonycodersg/cass-claude-code/compare/v1.1.0...v1.2.0
+[1.1.0]: https://github.com/tonycodersg/cass-claude-code/compare/v0.9.1...v1.1.0
 [0.6.0]: https://github.com/tonycodersg/cass-claude-code/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/tonycodersg/cass-claude-code/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/tonycodersg/cass-claude-code/compare/v0.3.0...v0.4.0

@@ -65,7 +65,26 @@ uvx --from git+https://github.com/oraios/serena serena start-mcp-server \
 
 Press `Ctrl+C` to stop — Claude Code launches it automatically via `.mcp.json` each session.
 
-### 4. Atlassian MCP (optional — Jira integration)
+### 4. Node.js / npx (optional — Playwright MCP)
+
+Required for the Playwright MCP server bundled in `.mcp.json`.
+
+```bash
+# macOS
+brew install node
+
+# Or download from nodejs.org (LTS recommended)
+```
+
+Verify:
+```bash
+node --version
+npx --version
+```
+
+Claude Code launches the Playwright MCP server automatically via `.mcp.json` — no manual start needed.
+
+### 5. Atlassian MCP (optional — Jira integration)
 
 Required for `/cass:plan` to read and create Jira tickets.
 
