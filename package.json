@@ -1,0 +1,9 @@
+{
+  "name": "cass-mcp",
+  "version": "1.0.0",
+  "description": "MCP server dependencies for the cass Claude Code plugin",
+  "private": true,
+  "dependencies": {
+    "@playwright/mcp": "0.0.62"
+  }
+}

@@ -1,0 +1,8 @@
+[project]
+name = "cass-mcp"
+version = "1.0.0"
+description = "MCP server dependencies for the cass Claude Code plugin"
+requires-python = ">=3.11,<3.15"
+dependencies = [
+    "serena-agent @ git+https://github.com/oraios/serena@v1.7.0",
+]
