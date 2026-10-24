@@ -16,7 +16,7 @@ model: sonnet
 ## Flags
 
 Parse from `$ARGUMENTS`:
-- `--god` — fully autonomous, zero human touch. SWE writes plan itself (no approval prompt), implements, creates PR, pr-reviewer reviews + fixes P1s + posts GitHub comment, then comments on the original ticket with PR link + status.
+- `--god` — fully autonomous, zero human touch. SWE writes plan itself (no approval prompt), implements, creates PR, pr-reviewer reviews + fixes P1s + posts GitHub comment, **auto-merges PR when review is clean (squash + delete branch)**, then comments on the original ticket with PR link + status.
 - `--architect` — same as `--god` but SA agent reviews the plan before implementation begins (coming soon).
 - `--full` — same as `--architect` but adds a fix-review loop until clean (coming soon).
 
@@ -314,6 +314,18 @@ All PRs are ready for human approval. Review the GitHub comments for findings.
 Run /cass:clean-wt once PRs are merged.
 ```
 
+### Step 8b — Auto-merge (`--god` mode only)
+
+After pr-reviewer completes with no outstanding P1s, merge each PR:
+
+```bash
+gh pr merge <PR number> --squash --delete-branch 2>&1
+```
+
+If merge is blocked (branch protection, required checks pending): leave the PR open, note it in the Step 9 ticket comment as "⚠ merge blocked — manual action required", and continue to Step 9.
+
+After all successful merges run `/cass:clean-wt`.
+
 ### Step 9 — Comment on original ticket (autonomous modes only)
 
 Skip this step in standard mode or if the requirement came from an MD file / inline description.
@@ -351,4 +363,4 @@ Comment body:
 - Always save worktree preference to `.claude/settings.local.json`
 - Sub-branch PRs always target the main feature branch, not staging/master
 - The main feature branch PR targets staging/master
-- Never auto-merge — PRs always wait for human approval
+- **`--god` mode only:** auto-merge with `--squash --delete-branch` after review is clean — all other modes leave PRs open for human approval
