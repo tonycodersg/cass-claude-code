@@ -6,10 +6,12 @@
   },
   "serena": {
     "type": "stdio",
-    "command": "uvx",
+    "command": "uv",
     "args": [
-      "--from",
-      "git+https://github.com/oraios/serena@v1.7.0",
+      "run",
+      "--frozen",
+      "--project",
+      "${CLAUDE_PLUGIN_ROOT}",
       "serena",
       "start-mcp-server",
       "--context",
@@ -18,7 +20,7 @@
       "--open-web-dashboard",
       "False"
     ],
-    "description": "Launches Serena via uvx for symbol-aware code navigation — find definitions, references, and call graphs without scanning every file. The claude-code context disables tools already covered by Claude Code built-ins."
+    "description": "Launches Serena via uv run --frozen (using the committed uv.lock) for symbol-aware code navigation — find definitions, references, and call graphs without scanning every file. The claude-code context disables tools already covered by Claude Code built-ins."
   },
   "playwright": {
     "type": "stdio",

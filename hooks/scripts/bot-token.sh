@@ -29,17 +29,9 @@ if [ -z "$APP_ID" ] || [ -z "$KEY_PATH" ] || [ ! -f "$KEY_PATH" ]; then
   exit 1
 fi
 
-# Generate JWT using PyJWT via uvx
-JWT=$(uvx --quiet --with "PyJWT==2.13.0" --with "cryptography==50.0.0" python3 - "$APP_ID" "$KEY_PATH" <<'PYEOF'
-import jwt, time, sys
-app_id = sys.argv[1]
-key_path = sys.argv[2]
-private_key = open(key_path).read()
-now = int(time.time())
-payload = {"iat": now - 60, "exp": now + 600, "iss": app_id}
-print(jwt.encode(payload, private_key, algorithm="RS256"))
-PYEOF
-)
+# Generate JWT — delegate to sub-script to keep shell substitutions out of
+# the uvx command line (required for plugin package-pin validation).
+JWT=$(CASS_APP_ID="$APP_ID" CASS_KEY_PATH="$KEY_PATH" bash "${CLAUDE_PLUGIN_ROOT}/hooks/scripts/generate-jwt.sh")
 
 if [ -z "$JWT" ]; then
   exit 1
